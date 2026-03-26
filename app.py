@@ -5,7 +5,6 @@ import time
 import re
 import requests
 from flask import Flask, request, jsonify
-import anthropic
 
 app = Flask(__name__)
 
@@ -13,21 +12,12 @@ SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN")
 SLACK_SIGNING_SECRET = os.environ.get("SLACK_SIGNING_SECRET")
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 
-anthropic_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+# Lazy-initialized globals
+_anthropic_client = None
+_bot_user_id = None
 
 # Track processed event IDs to avoid duplicates
 processed_events = set()
-
-# Fetch bot's own user ID at startup so we can filter our own messages
-def get_bot_user_id():
-    resp = requests.post(
-        "https://slack.com/api/auth.test",
-        headers={"Authorization": f"Bearer {SLACK_BOT_TOKEN}"},
-    )
-    data = resp.json()
-    return data.get("user_id")
-
-BOT_USER_ID = get_bot_user_id()
 
 SYSTEM_PROMPT = """You are a helpful AI assistant for the Stageculture team. \
 You help with writing, research, analysis, brainstorming, strategy, \
@@ -35,6 +25,32 @@ summarizing, drafting communications, answering questions, and general \
 productivity tasks. Be concise, professional, and direct. \
 Format your responses clearly using plain text suitable for Slack. \
 Do not use markdown headers — use short paragraphs or bullet points instead."""
+
+
+def get_anthropic_client():
+    """Lazy-initialize the Anthropic client on first use."""
+    global _anthropic_client
+    if _anthropic_client is None:
+        import anthropic
+        _anthropic_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    return _anthropic_client
+
+
+def get_bot_user_id():
+    """Fetch the bot's own user ID (cached after first call)."""
+    global _bot_user_id
+    if _bot_user_id is None:
+        try:
+            resp = requests.post(
+                "https://slack.com/api/auth.test",
+                headers={"Authorization": f"Bearer {SLACK_BOT_TOKEN}"},
+                timeout=5,
+            )
+            data = resp.json()
+            _bot_user_id = data.get("user_id", "")
+        except Exception:
+            _bot_user_id = ""
+    return _bot_user_id
 
 
 def verify_slack_signature(req):
@@ -73,7 +89,8 @@ def post_message(channel, text, thread_ts=None):
 
 def ask_claude(user_message):
     """Send a message to Claude and return the response."""
-    message = anthropic_client.messages.create(
+    client = get_anthropic_client()
+    message = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=1024,
         system=SYSTEM_PROMPT,
@@ -86,7 +103,7 @@ def ask_claude(user_message):
 def slack_events():
     data = request.json
 
-    # Handle Slack URL verification challenge
+    # Handle Slack URL verification challenge (no auth needed)
     if data.get("type") == "url_verification":
         return jsonify({"challenge": data["challenge"]})
 
@@ -115,7 +132,7 @@ def slack_events():
                    "message_changed", "file_share"):
         return jsonify({"ok": True})
     # Filter our own user ID as a fallback
-    if user_id and user_id == BOT_USER_ID:
+    if user_id and user_id == get_bot_user_id():
         return jsonify({"ok": True})
 
     user_text = event.get("text", "").strip()
