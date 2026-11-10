@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Hundred — a collection of hand-built web pieces</title>
+<meta name="description" content="One hundred standalone HTML pieces. No two alike: generative art, playable toys, period styles, living scenes.">
+<style>
+  :root{
+    --paper:#f3efe6; --ink:#15130f; --mute:#6d675b; --rule:#15130f22; --accent:#e4431b;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){--paper:#12110e;--ink:#f1ecdf;--mute:#9a9384;--rule:#f1ecdf24;--accent:#ff6a3d}
+  }
+  :root[data-theme="dark"]{--paper:#12110e;--ink:#f1ecdf;--mute:#9a9384;--rule:#f1ecdf24;--accent:#ff6a3d}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:1320px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
+
+  header{padding:clamp(28px,6vw,72px) 0 clamp(20px,3vw,36px);border-bottom:1px solid var(--ink)}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(64px,17vw,260px);line-height:.82;letter-spacing:-.045em;margin:.18em 0 .12em;text-wrap:balance}
+  h1 em{font-style:italic;color:var(--accent)}
+  .lede{display:grid;grid-template-columns:1fr;gap:16px;align-items:end}
+  .lede p{font-family:var(--serif);font-size:clamp(18px,2.1vw,26px);line-height:1.35;max-width:34ch;margin:0}
+  @media (min-width:820px){.lede{grid-template-columns:1.2fr 1fr}}
+
+  .bar{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1px solid var(--rule);padding:12px 0}
+  .bar .wrap{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+  .chip{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:9px 12px;border:1px solid var(--ink);background:none;color:var(--ink);border-radius:999px;cursor:pointer}
+  .chip[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+  .chip:focus-visible,input:focus-visible,.tile:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  input[type=search]{font:14px var(--sans);padding:9px 14px;border:1px solid var(--ink);border-radius:999px;background:transparent;color:var(--ink);min-width:0;width:min(100%,220px)}
+  input::placeholder{color:var(--mute)}
+  .count{font:12px var(--mono);color:var(--mute);white-space:nowrap}
+
+  main{padding:clamp(20px,3vw,40px) 0 80px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,210px),1fr));gap:clamp(10px,1.4vw,18px)}
+  .tile{position:relative;display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:4/5;padding:14px;text-decoration:none;color:var(--fg);background:var(--bg);overflow:hidden;border-radius:4px;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+  .tile::before{content:"";position:absolute;inset:0;background:var(--art);opacity:.95;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+  .tile:hover{transform:translateY(-4px)}
+  .tile:hover::before{transform:scale(1.12) rotate(3deg)}
+  .tile>*{position:relative}
+  .num{font-family:var(--serif);font-size:clamp(44px,5vw,64px);line-height:.8;letter-spacing:-.04em;font-style:italic}
+  .tag{font:11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;opacity:.85;text-align:right}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .name{font-size:17px;font-weight:600;line-height:1.15;letter-spacing:-.01em;text-wrap:balance}
+  .tech{font:11px/1.3 var(--mono);opacity:.8;margin-top:6px}
+  .empty{font-family:var(--serif);font-size:24px;color:var(--mute);padding:60px 0;text-align:center}
+  footer{border-top:1px solid var(--ink);padding:24px 0 48px;font:12px var(--mono);color:var(--mute);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  @media (prefers-reduced-motion:reduce){.tile,.tile::before{transition:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <div class="kicker"><span>A collection in one hundred parts</span><span>No frameworks · no network · no two alike</span></div>
+  <h1>One <em>Hundred</em></h1>
+  <div class="lede">
+    <p>One hundred standalone pages, each built by hand in a single file. Generative paintings, playable toys, period styles and small living worlds.</p>
+    <div class="kicker" style="justify-content:flex-end"><span>Open any tile ↓</span></div>
+  </div>
+</header>
+
+<div class="bar"><div class="wrap">
+  <div class="chips" id="chips" role="group" aria-label="Filter by kind"></div>
+  <input type="search" id="q" placeholder="Search the hundred" aria-label="Search pieces">
+  <span class="count" id="count" aria-live="polite"></span>
+</div></div>
+
+<main class="wrap">
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty" hidden>Nothing by that name. Try “neon”, “paper” or “canvas”.</p>
+</main>
+
+<footer class="wrap"><span>One Hundred — every page is a single self-contained .html file</span><span>Made with HTML, CSS, SVG, Canvas &amp; WebAudio</span></footer>
+
+<script>
+// [slug, title, kind, technique, bg, fg, accent]
+const P = [
+["01-aurora-observatory","Aurora Observatory","Scene","canvas ribbons","#06122b","#d9fff0","#3dffa8"],
+["02-brutalist-zine","Brutalist Zine","Style","pure CSS type","#e8ff00","#000000","#000000"],
+["03-art-deco-hotel","Art Deco Hotel","Style","SVG ornament","#0c3b2e","#e9c877","#e9c877"],
+["04-synthwave-drive","Synthwave Drive","Scene","CSS 3D grid","#1a0533","#ffd6f6","#ff2bd1"],
+["05-ink-wash-haiku","Ink Wash Haiku","Generative","SVG filters","#efe9dc","#1b1b1b","#b3261e"],
+["06-phosphor-terminal","Phosphor Terminal","Play","command interpreter","#031a08","#5dff7a","#5dff7a"],
+["07-stained-glass","Stained Glass","Scene","SVG light","#190b2e","#ffe7a8","#d7263d"],
+["08-papercut-valley","Papercut Valley","Scene","parallax layers","#f7d9c4","#3b2a4a","#e76f51"],
+["09-constellation-maker","Constellation Maker","Play","canvas drawing","#070b1f","#e8ecff","#8ab4ff"],
+["10-swiss-grid-poster","Swiss Grid Poster","Style","typographic grid","#e30613","#ffffff","#000000"],
+["11-liquid-metaballs","Liquid Metaballs","Generative","goo filter","#3a1206","#ffd9a0","#ff7a1a"],
+["12-victorian-broadsheet","Victorian Broadsheet","Style","columns & engraving","#e9dfc6","#231c12","#231c12"],
+["13-memphis-playground","Memphis Playground","Play","bouncing shapes","#ffd1e3","#111111","#00b5ad"],
+["14-deep-sea-descent","Deep Sea Descent","Scene","scroll journey","#012a4a","#c8f4ff","#35e0ff"],
+["15-neon-alley","Neon Alley","Scene","CSS neon + rain","#0a0612","#ff5fa2","#28f0ff"],
+["16-blueprint-machine","Blueprint Machine","Style","SVG line drawing","#0b3d91","#dfeaff","#ffffff"],
+["17-kaleidoscope","Kaleidoscope","Generative","canvas mirrors","#22003a","#fff3c4","#ff3d81"],
+["18-herbarium-plates","Herbarium Plates","Generative","procedural plants","#ece3cf","#34432b","#7a8f4e"],
+["19-glass-exoplanet-weather","Exoplanet Weather","Style","glassmorphism","#3b2f7a","#f3f0ff","#ffb86b"],
+["20-typewriter-noir","Typewriter Noir","Play","branching story","#101010","#e6e6e6","#bdbdbd"],
+["21-fractal-tree-seasons","Fractal Tree Seasons","Generative","recursive canvas","#dfeee2","#2e3b2a","#e88aa6"],
+["22-bauhaus-composition","Bauhaus Composition","Style","geometric motion","#f2ead7","#111111","#d62828"],
+["23-vaporwave-desktop","Vaporwave Desktop","Play","draggable windows","#ff9de2","#1b0a4a","#00e5ff"],
+["24-brass-orrery","Brass Orrery","Scene","SVG orbits","#14100a","#e8c274","#c08a2b"],
+["25-pixel-campfire","Pixel Campfire","Scene","low-res canvas","#0d1030","#ffd98a","#ff7a2f"],
+["26-illuminated-manuscript","Illuminated Manuscript","Style","gold leaf SVG","#e6d3a3","#3a1d0e","#a3211a"],
+["27-flow-field","Flow Field","Generative","noise painting","#f5f1ea","#20242c","#e0633a"],
+["28-isometric-city","Isometric City","Scene","day / night","#bfe3f2","#1e2a44","#ffb703"],
+["29-origami-unfold","Origami Unfold","Style","CSS 3D folds","#fafafa","#d7263d","#d7263d"],
+["30-jazz-club-poster","Jazz Club Poster","Style","duotone rhythm","#103a5c","#f6c445","#f6c445"],
+["31-glyph-rain-poem","Glyph Rain Poem","Generative","canvas text","#020a06","#a8ffcf","#39ff9c"],
+["32-terrazzo-ceramics","Terrazzo Ceramics","Style","generated chips","#efe4d6","#5a3e36","#c97b5a"],
+["33-lighthouse-night","Lighthouse Night","Scene","beam & waves","#0a1a2f","#fff2c2","#ffd166"],
+["34-glitch-id-card","Glitch ID Card","Style","RGB split","#07070d","#00fff0","#ff004d"],
+["35-watercolor-garden","Watercolor Garden","Play","turbulence blooms","#fdf6ee","#56406b","#e58fb0"],
+["36-clockwork-gears","Clockwork Gears","Scene","meshing SVG gears","#2a1c10","#e2b062","#b87333"],
+["37-zen-sand-garden","Zen Sand Garden","Play","rake the sand","#e6dcc8","#4a463e","#8a8372"],
+["38-pop-art-comic","Pop Art Comic","Style","halftone panels","#ffe600","#111111","#ff2d2d"],
+["39-mission-control","Mission Control","Scene","live telemetry","#1b1f22","#ffb000","#19c7b0"],
+["40-girih-tiles","Girih Tiles","Generative","star patterns","#0d4f6b","#f4e3b1","#19b5a5"],
+["41-pocket-synth","Pocket Synth","Play","WebAudio keys","#d9d4c7","#1c1c1c","#ff5a1f"],
+["42-antique-treasure-map","Antique Treasure Map","Generative","coastline maker","#e2cfa0","#4a2f14","#8c2f1b"],
+["43-neumorphic-home","Neumorphic Home","Style","soft UI","#e3e7ee","#51607a","#6c8cff"],
+["44-fireworks-skyline","Fireworks Skyline","Play","particle shells","#05061a","#ffe9a8","#ff4d6d"],
+["45-dada-collage","Dada Collage","Generative","cut-up poems","#d8cdb8","#101010","#c1121f"],
+["46-crystal-cave","Crystal Cave","Scene","low-poly light","#120a2a","#c9b8ff","#7df9ff"],
+["47-arcade-cabinet","Arcade Cabinet","Play","original mini-game","#14002b","#fff200","#ff2e88"],
+["48-nordic-furniture","Nordic Furniture","Style","quiet catalogue","#eeeae3","#3c3a36","#b08968"],
+["49-dna-helix-lab","DNA Helix Lab","Scene","pseudo-3D canvas","#f1f7f9","#0b3954","#00a6a6"],
+["50-gothic-cathedral","Gothic Cathedral","Style","blackletter & candles","#0d0a0f","#d9c9a3","#7a1022"],
+["51-rainy-window","Rainy Window","Scene","droplet physics","#1a2436","#ffd9a0","#ff9f6b"],
+["52-constructivist-poster","Constructivist Poster","Style","diagonals","#e9e0c9","#111111","#d21f1f"],
+["53-coral-reef-boids","Coral Reef Boids","Scene","flocking fish","#0a6c8a","#fff1d0","#ff7f50"],
+["54-de-stijl-generator","De Stijl Generator","Generative","grid recomposer","#f7f4ea","#111111","#1d4ed8"],
+["55-polaroid-wall","Polaroid Wall","Play","drag the photos","#b98d5e","#fdfbf4","#2d2a26"],
+["56-tarot-reading","Tarot Reading","Play","3D flip cards","#1c1033","#e8d08a","#b28cff"],
+["57-circuit-board","Circuit Board","Scene","pulsing traces","#0b3d24","#f0c75e","#f0c75e"],
+["58-desert-dunes","Desert Dunes","Scene","time-of-day slider","#f2a65a","#3b1f2b","#772f1a"],
+["59-kinetic-type-specimen","Kinetic Type Specimen","Play","cursor-reactive type","#f4f4f0","#0a0a0a","#3b28cc"],
+["60-snow-globe","Snow Globe","Play","shake it","#16324f","#f4faff","#9ad1ff"],
+["61-petri-life","Petri Life","Play","game of life","#f0f4ec","#1f3b2c","#39d98a"],
+["62-art-nouveau-poster","Art Nouveau Poster","Style","whiplash curves","#dccfa4","#3d4a2a","#b5646b"],
+["63-holo-foil-cards","Holo Foil Cards","Play","tilt & shimmer","#101018","#f2f2ff","#9cf6f6"],
+["64-vinyl-turntable","Vinyl Turntable","Play","generative lo-fi","#3b2416","#f3d9b1","#e07a3f"],
+["65-cave-paintings","Cave Paintings","Scene","torchlight reveal","#2a1a12","#d98e4a","#a63d1f"],
+["66-pendulum-wave","Pendulum Wave","Generative","phase physics","#f6f2e9","#1d2a3a","#c8553d"],
+["67-chrome-diner-menu","Chrome Diner Menu","Style","50s chrome","#48c9c0","#ffffff","#d7263d"],
+["68-voronoi-mosaic","Voronoi Mosaic","Generative","living cells","#1a0b2e","#f9e7ff","#f72585"],
+["69-polar-journal","Polar Journal","Style","scroll timeline","#dceaf2","#16324f","#2f6690"],
+["70-black-hole","Black Hole","Scene","lensing canvas","#000000","#ffcf8a","#ff7b00"],
+["71-spirograph-studio","Spirograph Studio","Play","gear sliders","#f8f6ee","#274060","#e84855"],
+["72-psychedelic-concert-poster","Psychedelic Poster","Style","melting letters","#ff4f00","#2b00ff","#fff200"],
+["73-bento-dashboard","Bento Dashboard","Style","modern tiles","#f4f5f7","#14161a","#5b5bd6"],
+["74-jellyfish-drift","Jellyfish Drift","Scene","verlet tentacles","#03102a","#ffc2f0","#7ad7ff"],
+["75-papyrus-glyphs","Papyrus Glyphs","Play","invented script","#d9bf86","#3a2a12","#1f6f78"],
+["76-topographic-trail","Topographic Trail","Generative","marching squares","#f2efe4","#3f5f3a","#d95d39"],
+["77-fashion-editorial","Fashion Editorial","Style","magazine spreads","#f6f1ea","#0f0f0f","#b5122b"],
+["78-falling-sand-hourglass","Falling Sand Hourglass","Play","sand simulation","#1f1a14","#e8c98f","#c9963b"],
+["79-chalkboard-physics","Chalkboard Physics","Play","self-drawing chalk","#22382f","#f3f3e7","#ffe08a"],
+["80-music-box-sequencer","Music Box Sequencer","Play","16-step chimes","#fde6ef","#5a4a78","#8ad6c8"],
+["81-firefly-forest","Firefly Forest","Scene","parallax night","#06140f","#e9ff9a","#c6ff3d"],
+["82-woodblock-waves","Woodblock Waves","Style","flat SVG print","#e8dcc0","#1f3a5f","#1f3a5f"],
+["83-astrolabe-zodiac","Astrolabe Zodiac","Play","turn the wheel","#0b1a3a","#e3c16f","#e3c16f"],
+["84-fair-isle-knit","Fair Isle Knit","Play","stitch designer","#b33a3a","#fff5e6","#1f4e5f"],
+["85-lightning-storm","Lightning Storm","Play","procedural bolts","#0b0d1c","#e6e9ff","#a9b8ff"],
+["86-card-catalog","Card Catalog","Play","opening drawers","#6b4a2b","#f3e6c8","#c9a24b"],
+["87-blob-portfolio","Blob Portfolio","Style","morphing SVG","#ff5c8a","#ffffff","#ffd23f"],
+["88-ascii-torus","ASCII Torus","Generative","text-mode 3D","#0c0c0c","#f5f5f5","#ffcc00"],
+["89-balloon-storybook","Balloon Storybook","Scene","picture-book sky","#bfe6f5","#3a3355","#ff7b54"],
+["90-roman-mosaic","Roman Mosaic","Generative","tesserae","#d8c7a3","#5a2f1d","#2f5d62"],
+["91-double-pendulum-chaos","Double Pendulum Chaos","Generative","diverging trails","#0e0e12","#f0f0f0","#ff4d8d"],
+["92-candy-shop","Candy Shop","Play","squishy jelly UI","#ff8fc7","#ffffff","#7b2cff"],
+["93-shadow-puppet-theatre","Shadow Puppet Theatre","Scene","articulated silhouettes","#f0a53a","#1a0e05","#1a0e05"],
+["94-velvet-curtain-stage","Velvet Curtain Stage","Scene","curtains & spotlight","#6e0b14","#f1d48a","#f1d48a"],
+["95-ripple-tank","Ripple Tank","Play","wave interference","#eaf2f7","#0f2b46","#0091ad"],
+["96-travel-posters","Travel Posters","Style","flat-colour SVG","#f0b860","#17324d","#d9482b"],
+["97-split-flap-board","Split-Flap Board","Scene","flipping characters","#151515","#f6e27a","#f6e27a"],
+["98-moss-terrarium","Moss Terrarium","Generative","growing L-systems","#dfe9d8","#27412b","#5c8a4a"],
+["99-mandala-loom","Mandala Loom","Play","mirrored drawing","#0b0620","#ffd6ff","#9b5de5"],
+["100-supernova-finale","Supernova Finale","Scene","particle burst","#050208","#fff3d6","#ff8a3d"]
+];
+const ARTS = [
+  a=>`radial-gradient(circle at 78% 68%, ${a} 0 22%, transparent 22.5%)`,
+  a=>`repeating-linear-gradient(135deg, ${a} 0 3px, transparent 3px 16px)`,
+  a=>`conic-gradient(from 210deg at 70% 62%, ${a} 0 25%, transparent 0 100%)`,
+  a=>`radial-gradient(circle at 70% 60%, transparent 0 14%, ${a} 14.5% 16%, transparent 16.5% 27%, ${a} 27.5% 29%, transparent 29.5%)`,
+  a=>`linear-gradient(160deg, transparent 0 58%, ${a} 58% 100%)`,
+  a=>`radial-gradient(${a} 1.5px, transparent 2px) 0 0/14px 14px`,
+  a=>`repeating-radial-gradient(circle at 100% 100%, transparent 0 14px, ${a} 14px 16px)`,
+  a=>`linear-gradient(${a},${a}) 62% 58%/34% 34% no-repeat`,
+  a=>`repeating-linear-gradient(0deg, transparent 0 12px, ${a} 12px 13px), repeating-linear-gradient(90deg, transparent 0 12px, ${a} 12px 13px)`,
+  a=>`conic-gradient(from 0deg at 72% 62%, ${a} 0 8%, transparent 0 16%, ${a} 0 24%, transparent 0 32%, ${a} 0 40%, transparent 0 48%, ${a} 0 56%, transparent 0 64%, ${a} 0 72%, transparent 0 80%, ${a} 0 88%, transparent 0)`
+];
+const grid=document.getElementById('grid'), chips=document.getElementById('chips'),
+      q=document.getElementById('q'), count=document.getElementById('count'), empty=document.getElementById('empty');
+let kind='All';
+P.forEach((p,i)=>{
+  const [slug,title,k,tech,bg,fg,ac]=p, a=document.createElement('a');
+  a.className='tile'; a.href=slug+'.html';
+  a.dataset.k=k; a.dataset.s=(title+' '+tech+' '+k).toLowerCase();
+  a.style.setProperty('--bg',bg); a.style.setProperty('--fg',fg);
+  a.style.setProperty('--art',ARTS[(i*7+Math.floor(i/10))%ARTS.length](ac+'cc'));
+  a.innerHTML=`<div class="top"><span class="num">${String(i+1).padStart(2,'0')}</span><span class="tag">${k}</span></div>
+    <div><div class="name">${title}</div><div class="tech">${tech}</div></div>`;
+  grid.appendChild(a);
+});
+['All','Generative','Play','Scene','Style'].forEach(k=>{
+  const b=document.createElement('button'); b.className='chip'; b.type='button'; b.textContent=k;
+  b.setAttribute('aria-pressed',k===kind);
+  b.onclick=()=>{kind=k;[...chips.children].forEach(c=>c.setAttribute('aria-pressed',c===b));apply()};
+  chips.appendChild(b);
+});
+function apply(){
+  const t=q.value.trim().toLowerCase(); let n=0;
+  for(const a of grid.children){
+    const ok=(kind==='All'||a.dataset.k===kind)&&(!t||a.dataset.s.includes(t));
+    a.hidden=!ok; if(ok)n++;
+  }
+  count.textContent=n+' / '+P.length; empty.hidden=n>0;
+}
+q.addEventListener('input',apply); apply();
+</script>
+</body>
+</html>
