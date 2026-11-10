@@ -43,7 +43,7 @@
   main{padding:clamp(20px,3vw,40px) 0 80px}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,210px),1fr));gap:clamp(10px,1.4vw,18px)}
   .tile{position:relative;display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:4/5;padding:14px;text-decoration:none;color:var(--fg);background:var(--bg);overflow:hidden;border-radius:4px;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
-  .tile::before{content:"";position:absolute;inset:0;background:var(--art);opacity:.95;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+  .tile::before{content:"";position:absolute;inset:0;background:var(--art);opacity:.42;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
   .tile:hover{transform:translateY(-4px)}
   .tile:hover::before{transform:scale(1.12) rotate(3deg)}
   .tile>*{position:relative}
