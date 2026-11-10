@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Girih — a star-pattern loom in turquoise, lapis and gold</title>
+<meta name="description" content="An Islamic geometric star-pattern generator in SVG using the polygons-in-contact method: choose the symmetry, contact angle, strapwork and glaze, and save the tilework.">
+<style>
+  :root{--wall:#0c1b3a;--lapis:#16388f;--turq:#1fb5a8;--gold:#d9aa3c;--cream:#f4ead2;--ink:#071023}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--wall);color:var(--cream);font-family:"Optima","Candara","Segoe UI","Gill Sans","Trebuchet MS",sans-serif;display:grid;grid-template-columns:1fr;grid-template-rows:minmax(52vh,1fr) auto;min-height:100vh;overflow-x:hidden;
+    background-image:radial-gradient(rgba(217,170,60,.1) 1px,transparent 1.5px),linear-gradient(160deg,#102449,#081430);background-size:18px 18px,100% 100%}
+  .stage{position:relative;min-height:0;padding:clamp(12px,2.4vw,30px) clamp(12px,2.4vw,30px) 6px}
+  .stage svg{width:100%;height:100%;display:block;filter:drop-shadow(0 24px 34px rgba(0,0,0,.55))}
+  .back{position:absolute;left:clamp(14px,2.6vw,34px);top:clamp(12px,2.4vw,28px);z-index:2;color:var(--gold);font-size:11px;letter-spacing:.3em;text-decoration:none;background:rgba(7,16,35,.8);padding:7px 10px;border:1px solid rgba(217,170,60,.5)}
+  .back:hover,.back:focus-visible{background:var(--gold);color:var(--ink)}
+  .panel{padding:14px clamp(14px,3vw,34px) 24px;display:grid;gap:16px;align-content:start;border-top:1px solid rgba(217,170,60,.35);background:linear-gradient(rgba(7,16,35,.55),rgba(7,16,35,.9))}
+  h1{font-family:"Palatino Linotype",Palatino,"Book Antiqua","Hoefler Text",Georgia,serif;font-weight:400;font-size:clamp(34px,5vw,60px);line-height:.95;color:var(--cream)}
+  h1 small{display:block;font:11px "Optima","Candara","Gill Sans",sans-serif;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+  .lede{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-style:italic;font-size:15.5px;line-height:1.55;color:#c5cfe6;max-width:46ch}
+  fieldset{border:0;display:grid;gap:8px;min-width:0}
+  legend,label{font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:flex;justify-content:space-between;gap:10px}
+  label output{color:var(--cream);letter-spacing:.1em;font-variant-numeric:tabular-nums}
+  .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .seg button{font:inherit;font-size:12px;letter-spacing:.06em;padding:10px 4px 8px;background:rgba(244,234,210,.05);color:var(--cream);border:1px solid rgba(217,170,60,.35);cursor:pointer;display:grid;justify-items:center;gap:3px;line-height:1.1}
+  .seg b{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:24px;font-weight:400;color:var(--gold)}
+  .seg button[aria-pressed=true]{background:var(--gold);color:var(--ink);border-color:var(--gold)}.seg button[aria-pressed=true] b{color:var(--ink)}
+  .seg button:hover,.seg button:focus-visible{border-color:var(--cream)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:linear-gradient(90deg,var(--turq),var(--gold))}
+  input[type=range]::-moz-range-track{height:2px;background:linear-gradient(90deg,var(--turq),var(--gold))}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-7px;background:var(--cream);border:2px solid var(--gold);transform:rotate(45deg)}
+  input[type=range]::-moz-range-thumb{width:13px;height:13px;background:var(--cream);border:2px solid var(--gold);border-radius:0;transform:rotate(45deg)}
+  .sl{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px}
+  .gl{display:flex;gap:8px;flex-wrap:wrap}
+  .gl button{width:58px;height:34px;border:1px solid rgba(217,170,60,.4);cursor:pointer;padding:0;background:linear-gradient(90deg,var(--a) 0 34%,var(--b) 34% 67%,var(--c) 67%)}
+  .gl button[aria-pressed=true]{outline:2px solid var(--cream);outline-offset:2px}
+  .acts{display:flex;gap:10px;flex-wrap:wrap}
+  .acts button{font:inherit;font-size:11px;letter-spacing:.26em;text-transform:uppercase;padding:12px 16px;background:none;color:var(--cream);border:1px solid var(--cream);cursor:pointer}
+  .acts button:hover,.acts button:focus-visible{background:var(--cream);color:var(--ink)}
+  #pat{transition:opacity .35s}
+  @media(min-width:900px){body{grid-template-columns:1fr minmax(340px,400px);grid-template-rows:1fr;height:100vh}
+    .panel{border-top:0;border-left:1px solid rgba(217,170,60,.35);padding:clamp(24px,3vw,44px);gap:22px;overflow-y:auto;align-content:center}.stage{padding-bottom:clamp(12px,2.4vw,30px)}}
+  @media(prefers-reduced-motion:reduce){#pat{transition:none}}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <a class="back" href="index.html">← 100</a>
+  <svg id="svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Geometric star pattern in glazed tile colours, framed by a pointed arch">
+    <defs><clipPath id="arch"><path id="archP" d=""/></clipPath>
+      <linearGradient id="gl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient></defs>
+    <g clip-path="url(#arch)"><g id="pat"></g><rect id="glaze" fill="url(#gl)" style="pointer-events:none"/></g>
+    <path id="frame2" fill="none" stroke="#071023" stroke-width="13"/><path id="frame" fill="none" stroke="#d9aa3c" stroke-width="5"/><path id="frame3" fill="none" stroke="#f4ead2" stroke-width="1" stroke-opacity=".7"/>
+  </svg>
+</div>
+<aside class="panel">
+  <div><h1><small>Workshop of the Seven Kilns · No. 40</small>Girih</h1></div>
+  <p class="lede">Every line here leaves the middle of a tile's edge at one chosen angle and runs until it meets its neighbour. Stars are simply what is left when that rule is obeyed everywhere.</p>
+  <fieldset><legend>Symmetry</legend><div class="seg" id="seg"></div></fieldset>
+  <div class="sl">
+    <div><label for="ang">Contact angle <output id="angO"></output></label><input id="ang" type="range" min="25" max="80" value="60"></div>
+    <div><label for="strap">Strapwork <output id="strapO"></output></label><input id="strap" type="range" min="0" max="10" value="5"></div>
+    <div><label for="size">Tile size <output id="sizeO"></output></label><input id="size" type="range" min="44" max="120" value="70"></div>
+    <div><label for="turn">Turn <output id="turnO"></output></label><input id="turn" type="range" min="0" max="45" value="0"></div>
+  </div>
+  <fieldset><legend>Glaze</legend><div class="gl" id="glz"></div></fieldset>
+  <div class="acts"><button type="button" id="rand">Cast anew</button><button type="button" id="save">Save SVG</button></div>
+</aside>
+<script>
+(() => {
+  const $ = id => document.getElementById(id), svg = $('svg'), pat = $('pat'), NS = 'http://www.w3.org/2000/svg';
+  const S3 = Math.sqrt(3), TAU = Math.PI * 2;
+  // regular polygon: n sides, circumradius R, a0 = angle of first vertex
+  const poly = (cx, cy, n, R, a0, kind) => ({ kind, v: Array.from({ length: n }, (_, i) => [cx + R * Math.cos(a0 + i * TAU / n), cy + R * Math.sin(a0 + i * TAU / n)]) });
+  // four tilings, each returns polygons covering (w,h) for edge length s
+  const TILINGS = [
+    { n: '4', name: 'Squares', gen: (w, h, s) => { const o = []; for (let y = -s; y < h + s; y += s) for (let x = -s; x < w + s; x += s) o.push(poly(x + s / 2, y + s / 2, 4, s / Math.SQRT2, Math.PI / 4, (Math.round((x + y) / s) & 1) ? 0 : 1)); return o; }, k: 1 },
+    { n: '6', name: 'Hexagons', gen: (w, h, s) => { const o = [], dx = s * S3, dy = s * 1.5; for (let j = -1; j * dy < h + s; j++) for (let i = -1; i * dx < w + dx; i++) o.push(poly(i * dx + (j & 1 ? dx / 2 : 0), j * dy, 6, s, Math.PI / 6, 0)); return o; }, k: .62 },
+    { n: '8', name: 'Octagons', gen: (w, h, s) => { const o = [], a = s * (1 + Math.SQRT2), R = s / (2 * Math.sin(Math.PI / 8)); for (let y = -a; y < h + a; y += a) for (let x = -a; x < w + a; x += a) { o.push(poly(x, y, 8, R, Math.PI / 8, 0)); o.push(poly(x + a / 2, y + a / 2, 4, s / Math.SQRT2, 0, 1)); } return o; }, k: .5 },
+    { n: '12', name: 'Dodecagons', gen: (w, h, s) => { const o = [], d = s * (2 + S3), R = s / (2 * Math.sin(Math.PI / 12)), dy = d * S3 / 2, t = d / S3, rt = s / S3;
+        for (let j = -1; j * dy < h + d; j++) for (let i = -1; i * d < w + d; i++) { const x = i * d + (j & 1 ? d / 2 : 0), y = j * dy;
+          o.push(poly(x, y, 12, R, Math.PI / 12, 0)); o.push(poly(x + d / 2, y + t / 2, 3, rt, Math.PI / 6, 1)); o.push(poly(x + d / 2, y - t / 2, 3, rt, -Math.PI / 6, 1)); } return o; }, k: .34 }
+  ];
+  const GLAZES = [
+    { a: '#16388f', b: '#1fb5a8', c: '#d9aa3c', line: '#f4ead2', edge: '#071023' },
+    { a: '#0e6f78', b: '#f4ead2', c: '#16388f', line: '#d9aa3c', edge: '#062a30' },
+    { a: '#f4ead2', b: '#16388f', c: '#1fb5a8', line: '#16388f', edge: '#f4ead2' },
+    { a: '#101a33', b: '#d9aa3c', c: '#b8442f', line: '#1fb5a8', edge: '#050a16' }
+  ];
+  const st = { til: 2, ang: 60, strap: 5, size: 70, turn: 0, glz: 0 };
+  const f = n => n.toFixed(1);
+  // polygons in contact: from each edge midpoint, two rays at the contact angle; cut each where it meets its neighbour's
+  function star(p, theta) {
+    const n = p.v.length, M = [], D = [];
+    for (let i = 0; i < n; i++) { const a = p.v[i], b = p.v[(i + 1) % n], ex = b[0] - a[0], ey = b[1] - a[1], l = Math.hypot(ex, ey); M.push([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]); D.push([ex / l, ey / l]); }
+    const cx = p.v.reduce((s, q) => s + q[0], 0) / n, cy = p.v.reduce((s, q) => s + q[1], 0) / n;
+    const sgn = (D[0][0] * (cy - M[0][1]) - D[0][1] * (cx - M[0][0])) > 0 ? 1 : -1; // which way is inward
+    const rot = (d, a) => [d[0] * Math.cos(a) - d[1] * Math.sin(a), d[0] * Math.sin(a) + d[1] * Math.cos(a)];
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n, d1 = rot(D[i], sgn * theta), d2 = rot([-D[j][0], -D[j][1]], -sgn * theta);
+      const den = d1[0] * d2[1] - d1[1] * d2[0]; let P;
+      if (Math.abs(den) < 1e-6) P = [(M[i][0] + M[j][0]) / 2, (M[i][1] + M[j][1]) / 2];
+      else { const t = ((M[j][0] - M[i][0]) * d2[1] - (M[j][1] - M[i][1]) * d2[0]) / den; P = [M[i][0] + d1[0] * t, M[i][1] + d1[1] * t]; }
+      pts.push(M[i], P);
+    }
+    return pts;
+  }
+  let W = 0, H = 0, raf = 0;
+  function archPath(x, y, w, h) { // pointed (four-centred-ish) arch
+    const sp = y + Math.min(h * .42, w * .62), r = w * .86;
+    return `M${f(x)} ${f(y + h)}V${f(sp)}A${f(r)} ${f(r)} 0 0 1 ${f(x + w / 2)} ${f(y)}A${f(r)} ${f(r)} 0 0 1 ${f(x + w)} ${f(sp)}V${f(y + h)}Z`;
+  }
+  function draw() {
+    raf = 0;
+    const r = svg.getBoundingClientRect(); W = Math.max(200, r.width); H = Math.max(200, r.height);
+    svg.setAttribute('viewBox', `0 0 ${f(W)} ${f(H)}`);
+    const aw = Math.min(W - 16, H * .86), ax = (W - aw) / 2, d = archPath(ax, 8, aw, H - 16);
+    ['archP', 'frame', 'frame2', 'frame3'].forEach(id => $(id).setAttribute('d', d));
+    const gz = $('glaze'); gz.setAttribute('x', ax); gz.setAttribute('y', 0); gz.setAttribute('width', aw); gz.setAttribute('height', H);
+    const T = TILINGS[st.til], G = GLAZES[st.glz], s = st.size * T.k * Math.max(.7, Math.min(1.3, aw / 620)), theta = st.ang * Math.PI / 180;
+    // generate on an enlarged, centred field so rotation never exposes an edge
+    const F = Math.hypot(aw, H) + s * 4, polys = T.gen(F, F, s);
+    const sd = ['', ''], lines = [];
+    polys.forEach(p => { const pts = star(p, theta); let dd = ''; pts.forEach((q, i) => dd += (i ? 'L' : 'M') + f(q[0]) + ' ' + f(q[1])); sd[p.kind] += dd + 'Z'; lines.push(dd + 'Z'); });
+    const sw = st.strap * Math.max(.5, s / 40), all = lines.join('');
+    pat.setAttribute('transform', `translate(${f(W / 2)} ${f(H / 2)}) rotate(${st.turn}) translate(${f(-F / 2)} ${f(-F / 2)})`);
+    pat.innerHTML = `<rect width="${f(F)}" height="${f(F)}" fill="${G.a}"/><path d="${sd[0]}" fill="${G.b}"/><path d="${sd[1]}" fill="${G.c}"/>` +
+      (st.strap > 0 ? `<path d="${all}" fill="none" stroke="${G.edge}" stroke-width="${f(sw + 3)}" stroke-linejoin="miter" stroke-miterlimit="6"/><path d="${all}" fill="none" stroke="${G.line}" stroke-width="${f(sw)}" stroke-linejoin="miter" stroke-miterlimit="6"/>`
+        : `<path d="${all}" fill="none" stroke="${G.edge}" stroke-width="1.2"/>`);
+    $('angO').textContent = st.ang + '°'; $('strapO').textContent = st.strap ? st.strap : 'none'; $('sizeO').textContent = st.size; $('turnO').textContent = st.turn + '°';
+  }
+  const queue = () => { if (!raf) raf = requestAnimationFrame(draw); };
+  // controls
+  const segs = TILINGS.map((t, i) => { const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `<b>${t.n}</b>${t.name}`; b.addEventListener('click', () => { st.til = i; sync(); queue(); }); $('seg').appendChild(b); return b; });
+  const gls = GLAZES.map((g, i) => { const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', 'Glaze ' + (i + 1)); b.style.cssText = `--a:${g.a};--b:${g.b};--c:${g.c}`; b.addEventListener('click', () => { st.glz = i; sync(); queue(); }); $('glz').appendChild(b); return b; });
+  function sync() { segs.forEach((b, i) => b.setAttribute('aria-pressed', i === st.til)); gls.forEach((b, i) => b.setAttribute('aria-pressed', i === st.glz)); ['ang', 'strap', 'size', 'turn'].forEach(k => $(k).value = st[k]); }
+  ['ang', 'strap', 'size', 'turn'].forEach(k => $(k).addEventListener('input', e => { st[k] = +e.target.value; queue(); }));
+  $('rand').addEventListener('click', () => { const R = (a, b) => Math.round(a + Math.random() * (b - a)); Object.assign(st, { til: R(0, 3), ang: R(35, 75), strap: R(0, 8), size: R(48, 104), turn: [0, 0, 15, 22, 30, 45][R(0, 5)], glz: R(0, 3) }); sync(); queue(); });
+  $('save').addEventListener('click', () => {
+    const c = svg.cloneNode(true); c.removeAttribute('id'); c.setAttribute('width', Math.round(W)); c.setAttribute('height', Math.round(H)); c.style.filter = '';
+    const url = URL.createObjectURL(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(c)], { type: 'image/svg+xml' }));
+    const a = document.createElement('a'); a.href = url; a.download = `girih-${TILINGS[st.til].n}fold-${st.ang}deg.svg`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+  });
+  new ResizeObserver(queue).observe($('stage'));
+  sync(); draw();
+})();
+</script>
+</body>
+</html>

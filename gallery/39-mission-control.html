@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HALCYON 9 — Flight Control Console 3</title>
+<meta name="description" content="A retro space-age mission control console: live SVG telemetry strip charts, a launch countdown, needle gauges, working toggle switches and an event sequencer in amber and teal on charcoal.">
+<style>
+  :root{--bg:#17191a;--panel:#232627;--edge:#0e0f10;--amber:#ffb23e;--teal:#3fd6c2;--dim:#6f7a78;--red:#ff5a45;--crt:#0b1513;--label:#c9c2ae}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--label);font-family:"Eurostile","Bank Gothic","Microgramma","Franklin Gothic Medium","Arial Narrow","Helvetica Neue",Arial,sans-serif;min-height:100vh;padding:clamp(8px,1.6vw,22px);overflow-x:hidden;
+    background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0 1px,transparent 1px 3px)}
+  .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace}
+  .console{max-width:1320px;margin:0 auto;background:linear-gradient(#2c3031,#1f2223);border:2px solid #050606;border-radius:14px;padding:clamp(8px,1.4vw,18px);box-shadow:inset 0 1px 0 #454a4b,0 30px 60px -30px #000}
+  .head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 20px;padding:4px 6px 12px;font-size:11px;letter-spacing:.3em;text-transform:uppercase}
+  .head h1{font-size:clamp(15px,2vw,22px);font-weight:700;letter-spacing:.34em;color:#ece5d0}
+  .head h1 span{color:var(--amber)}
+  .head a{color:var(--label);text-decoration:none;border:1px solid #555b5c;padding:5px 9px;border-radius:3px}
+  .head a:hover,.head a:focus-visible{border-color:var(--amber);color:var(--amber)}
+  .grid{display:grid;grid-template-columns:1fr;gap:clamp(8px,1.2vw,14px)}
+  .pn{position:relative;background:var(--panel);border:1px solid var(--edge);border-radius:8px;padding:26px 14px 14px;box-shadow:inset 0 1px 0 #393e3f,inset 0 -1px 0 #121414;min-width:0}
+  .pn::before,.pn::after{content:"";position:absolute;top:7px;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#8d9596,#2a2d2e 70%);box-shadow:0 0 0 1px #0b0c0c}
+  .pn::before{left:8px}.pn::after{right:8px}
+  .pn>h2{position:absolute;top:6px;left:26px;right:26px;text-align:center;font-size:9.5px;font-weight:400;letter-spacing:.34em;text-transform:uppercase;color:#a8a290;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .crt{position:relative;background:radial-gradient(120% 120% at 50% 40%,#11241f 0,var(--crt) 70%);border-radius:12px/14px;border:3px solid #050606;box-shadow:inset 0 0 28px #000,0 1px 0 #3b4041;overflow:hidden}
+  .crt::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.28) 2px 3px),radial-gradient(80% 60% at 30% 20%,rgba(255,255,255,.06),transparent 60%)}
+  body.noscan .crt::after{background:radial-gradient(80% 60% at 30% 20%,rgba(255,255,255,.06),transparent 60%)}
+  .crt svg{display:block;width:100%;height:auto}
+  .clock{text-align:center}
+  .tm{font-size:clamp(34px,9vw,84px);font-weight:700;letter-spacing:.04em;color:var(--amber);text-shadow:0 0 18px rgba(255,178,62,.55);line-height:1;padding:18px 6px 8px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .tm.up{color:var(--teal);text-shadow:0 0 18px rgba(63,214,194,.55)}
+  .tm.hold{animation:bl 1s steps(2) infinite}
+  @keyframes bl{50%{opacity:.35}}
+  .sub{display:flex;justify-content:space-between;padding:6px 14px 14px;font-size:10px;letter-spacing:.24em;color:var(--teal);text-transform:uppercase;gap:10px}
+  .charts{display:grid;gap:10px}
+  .ch{display:grid;grid-template-columns:1fr;gap:4px}
+  .ch .lb{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.22em;text-transform:uppercase}
+  .ch .lb b{font-weight:400;color:var(--amber)}
+  .gr{stroke:#1f4a42;stroke-width:1}
+  .tr{fill:none;stroke-width:2;stroke-linejoin:round;filter:drop-shadow(0 0 3px currentColor)}
+  .seq{list-style:none;display:grid;gap:7px;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+  .seq li{display:grid;grid-template-columns:16px 62px 1fr;align-items:center;gap:8px;color:var(--dim)}
+  .seq i{width:12px;height:12px;border-radius:50%;background:#33302a;box-shadow:inset 0 0 0 2px #17191a,0 0 0 1px #050606}
+  .seq li.next{color:var(--amber)}.seq li.next i{background:var(--amber);box-shadow:0 0 10px var(--amber),inset 0 0 0 2px #7a4d0a;animation:bl 1s steps(2) infinite}
+  .seq li.done{color:#d6efe9}.seq li.done i{background:var(--teal);box-shadow:0 0 9px var(--teal),inset 0 0 0 2px #116255}
+  .sw{display:grid;grid-template-columns:repeat(auto-fit,minmax(74px,1fr));gap:14px 8px;justify-items:center}
+  .t{display:grid;justify-items:center;gap:7px;background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:2px;font-size:9px;letter-spacing:.2em;text-transform:uppercase;text-align:center}
+  .t .lamp{width:9px;height:9px;border-radius:50%;background:#3a2b16;box-shadow:0 0 0 1px #050606}
+  .t .base{position:relative;width:34px;height:52px;border-radius:6px;background:linear-gradient(#0f1011,#2b2f30);box-shadow:inset 0 0 0 1px #050606,0 1px 0 #454a4b}
+  .t .base::before{content:"";position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#9aa3a4,#3a3f40)}
+  .t .lev{position:absolute;left:50%;top:50%;width:10px;height:26px;margin-left:-5px;border-radius:5px 5px 3px 3px;background:linear-gradient(90deg,#8f989a,#f2f4f4 45%,#7b8486);transform-origin:50% 0;transform:rotate(0deg) scaleY(1);transition:transform .14s cubic-bezier(.3,1.6,.5,1);box-shadow:0 3px 5px rgba(0,0,0,.6)}
+  .t[aria-checked=true] .lev{transform:rotate(180deg)}
+  .t[aria-checked=true] .lamp{background:var(--teal);box-shadow:0 0 9px var(--teal),0 0 0 1px #050606}
+  .t.warn[aria-checked=true] .lamp{background:var(--red);box-shadow:0 0 9px var(--red),0 0 0 1px #050606}
+  .t:focus-visible{outline:1px dashed var(--amber);outline-offset:3px}
+  .gauges{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .gauges svg{width:100%;height:auto;display:block}
+  .gt{font:9px "Eurostile","Arial Narrow",Arial,sans-serif;letter-spacing:2px;fill:#2b2b28;text-anchor:middle}
+  .ndl{transition:transform .5s cubic-bezier(.3,1.4,.5,1);transform-origin:60px 62px}
+  .log{height:118px;overflow:hidden;font-size:11px;line-height:1.65;color:var(--teal);padding:10px 12px;display:flex;flex-direction:column;justify-content:flex-end}
+  .log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .log div:last-child{color:#eafff9}
+  .rec{font:inherit;font-size:10px;letter-spacing:.26em;text-transform:uppercase;margin-top:10px;width:100%;padding:11px;border-radius:5px;border:1px solid #050606;background:linear-gradient(#c8462f,#8f2a1a);color:#ffe9d9;cursor:pointer;box-shadow:inset 0 1px 0 #f08b74,0 3px 0 #4a140b}
+  .rec:active{transform:translateY(2px);box-shadow:inset 0 1px 0 #f08b74,0 1px 0 #4a140b}
+  @media(min-width:760px){.grid{grid-template-columns:1.25fr 1fr}.a{grid-column:1}.b{grid-column:2;grid-row:1/3}.e{grid-column:1/-1}}
+  @media(min-width:1100px){.grid{grid-template-columns:1.1fr 1.25fr .9fr}.a{grid-column:1}.b{grid-column:2;grid-row:1/4}.c{grid-column:1}.d{grid-column:3;grid-row:1/3}.e{grid-column:1}.f{grid-column:3}}
+  @media(prefers-reduced-motion:reduce){.tm.hold,.seq li.next i{animation:none}.t .lev,.ndl{transition:none}}
+</style>
+</head>
+<body>
+<div class="console">
+  <div class="head">
+    <h1>Halcyon <span>9</span> · Flight Control</h1>
+    <span>Console 3 — Booster / EECOM · Cape Tamsin Range</span>
+    <a href="index.html">← 100</a>
+  </div>
+  <div class="grid">
+    <section class="pn a"><h2>Mission Elapsed Timer</h2>
+      <div class="crt clock"><div class="tm mono" id="tm" role="timer" aria-live="off">T−00:01:30</div>
+        <div class="sub mono"><span id="state">COUNT RUNNING</span><span id="utc">--:--:-- LOCAL</span></div></div>
+    </section>
+    <section class="pn b"><h2>Telemetry — Strip Recorders</h2><div class="charts" id="charts"></div></section>
+    <section class="pn c"><h2>Auto Sequence</h2><ol class="seq" id="seq"></ol></section>
+    <section class="pn d"><h2>Propulsion</h2>
+      <div class="gauges" id="gauges"></div>
+      <div class="crt" style="margin-top:12px"><svg id="traj" viewBox="0 0 240 150" role="img" aria-label="Ascent trajectory plot">
+        <g class="gr"><path d="M20 10V130H230M20 100H230M20 70H230M20 40H230M72 10V130M124 10V130M176 10V130"/></g>
+        <path d="M20 130Q60 126 100 96T230 22" fill="none" stroke="#1f6f63" stroke-width="1.5" stroke-dasharray="3 4"/>
+        <path id="trk" d="" fill="none" stroke="#ffb23e" stroke-width="2.2" style="filter:drop-shadow(0 0 3px #ffb23e)"/><circle id="veh" cx="20" cy="130" r="3.5" fill="#fff"/>
+        <text x="24" y="20" font-size="7" fill="#3fd6c2" letter-spacing="1.5" font-family="monospace">ALT KM / DOWNRANGE</text><text id="altT" x="228" y="143" font-size="7" fill="#ffb23e" text-anchor="end" font-family="monospace">ALT 000.0</text></svg></div>
+    </section>
+    <section class="pn e"><h2>Bus &amp; Recorder Switches</h2><div class="sw" id="sw"></div></section>
+    <section class="pn f"><h2>Loop Printer</h2><div class="crt log mono" id="log" aria-live="polite"></div><button class="rec" id="rec" type="button">Recycle count</button></section>
+  </div>
+</div>
+<script>
+(() => {
+  const $ = id => document.getElementById(id), NS = 'http://www.w3.org/2000/svg';
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // ---------- strip charts
+  const CH = [
+    { k: 'cab', name: 'Cabin press', unit: 'kPa', col: '#3fd6c2', f: (t, m) => 34.5 + Math.sin(t * .4) * .5 + Math.sin(t * 2.3) * .15 + (m > 0 ? Math.min(2, m * .03) : 0), lo: 32, hi: 38 },
+    { k: 'bus', name: 'Main bus B', unit: 'V', col: '#ffb23e', f: (t, m) => 28.2 + Math.sin(t * 5) * .22 + Math.sin(t * 13.1) * .1 - (m > -31 ? .6 : 0), lo: 26, hi: 30 },
+    { k: 'bio', name: 'Cmdr heart', unit: 'bpm', col: '#3fd6c2', ecg: true, lo: -.5, hi: 1.3 },
+    { k: 'vib', name: 'Thrust chamber', unit: 'g rms', col: '#ffb23e', f: (t, m) => { const on = m > -6 ? Math.min(1, (m + 6) / 5) : 0; return on * (1.6 + Math.sin(t * 31) * .7 + Math.sin(t * 17.3) * .5 + Math.sin(t * 3) * .3) + Math.sin(t * 9) * .04; }, lo: -.3, hi: 3.2 }
+  ];
+  const NPT = 140, W = 420, H = 74;
+  CH.forEach(c => {
+    const d = document.createElement('div'); d.className = 'ch';
+    d.innerHTML = `<div class="lb"><span>${c.name}</span><b class="mono" id="v-${c.k}">---</b></div><div class="crt"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${c.name} trace">
+      <path class="gr" d="${[1, 2, 3].map(i => `M0 ${i * H / 4}H${W}`).join('')}${[1, 2, 3, 4, 5, 6, 7].map(i => `M${i * W / 8} 0V${H}`).join('')}"/><polyline class="tr" style="color:${c.col}" stroke="${c.col}" vector-effect="non-scaling-stroke" points=""/></svg></div>`;
+    $('charts').appendChild(d); c.line = d.querySelector('polyline'); c.val = d.querySelector('b'); c.buf = new Array(NPT).fill(null); c.on = true;
+  });
+  const ecg = ph => { const p = ph % 1; return p < .08 ? Math.sin(p / .08 * Math.PI) * .14 : p > .16 && p < .19 ? -.16 : p >= .19 && p < .23 ? 1.1 - Math.abs(p - .21) * 30 : p >= .23 && p < .26 ? -.28 : p > .36 && p < .52 ? Math.sin((p - .36) / .16 * Math.PI) * .25 : 0; };
+  // ---------- gauges
+  const GA = [{ k: 'thr', name: 'THRUST %', max: 110 }, { k: 'lox', name: 'LOX TANK %', max: 100 }];
+  GA.forEach(g => {
+    let ticks = ''; for (let i = 0; i <= 10; i++) { const a = (-120 + i * 24) * Math.PI / 180, r1 = i % 5 ? 41 : 37; ticks += `M${(60 + Math.sin(a) * r1).toFixed(1)} ${(62 - Math.cos(a) * r1).toFixed(1)}L${(60 + Math.sin(a) * 46).toFixed(1)} ${(62 - Math.cos(a) * 46).toFixed(1)}`; }
+    const w = document.createElement('div');
+    w.innerHTML = `<svg viewBox="0 0 120 112" role="img" aria-label="${g.name} gauge"><circle cx="60" cy="62" r="56" fill="#0a0b0b"/><circle cx="60" cy="62" r="52" fill="#e8e0c8"/><path d="${ticks}" stroke="#2b2b28" stroke-width="1.6"/>
+      <path d="M${(60 + Math.sin(1.68) * 49).toFixed(1)} ${(62 - Math.cos(1.68) * 49).toFixed(1)}A49 49 0 0 1 ${(60 + Math.sin(2.09) * 49).toFixed(1)} ${(62 - Math.cos(2.09) * 49).toFixed(1)}" stroke="#c8462f" stroke-width="5" fill="none"/>
+      <text class="gt" x="60" y="92">${g.name}</text><g class="ndl" id="n-${g.k}" style="transform:rotate(-120deg)"><path d="M58.6 70L59.4 20h1.2L61.4 70z" fill="#c8462f"/></g><circle cx="60" cy="62" r="6" fill="#1b1c1c"/></svg>`;
+    $('gauges').appendChild(w); g.n = w.querySelector('.ndl');
+  });
+  const needle = (g, v) => g.n.style.transform = `rotate(${(-120 + Math.max(0, Math.min(1, v / g.max)) * 240).toFixed(1)}deg)`;
+  // ---------- sequence
+  const SEQ = [[-75, 'Range safety: GO'], [-60, 'Auto sequence start'], [-31, 'Internal power'], [-17, 'Guidance release'], [-6, 'Ignition sequence'], [0, 'LIFTOFF'], [12, 'Tower clear · roll'], [42, 'Max-Q'], [70, 'Staging']];
+  const fmt = s => { const a = Math.abs(s), m = Math.floor(a / 60), ss = Math.floor(a % 60); return (s < 0 ? 'T−' : 'T+') + String(m).padStart(2, '0') + ':' + String(ss).padStart(2, '0'); };
+  $('seq').innerHTML = SEQ.map(([t, n]) => `<li><i></i><span class="mono">${fmt(t)}</span><span>${n}</span></li>`).join('');
+  const seqLi = [...$('seq').children];
+  // ---------- switches
+  const SW = [['bus', 'Main bus', true], ['tlm', 'Telemetry', true], ['bio', 'Biomed', true], ['scan', 'CRT scan', true], ['aud', 'Loop audio', false], ['hold', 'HOLD', false, 'warn']];
+  const sw = {};
+  SW.forEach(([k, name, on, cls]) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 't ' + (cls || ''); b.setAttribute('role', 'switch'); b.setAttribute('aria-checked', on); b.setAttribute('aria-label', name);
+    b.innerHTML = `<span class="lamp"></span><span class="base"><span class="lev"></span></span><span>${name}</span>`;
+    b.addEventListener('click', () => { sw[k] = !sw[k]; b.setAttribute('aria-checked', sw[k]); flip(k); });
+    sw[k] = on; $('sw').appendChild(b);
+  });
+  let ac = null;
+  function beep(f = 2525, d = .22) { if (!sw.aud) return; try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = f; g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.06, t + .01); g.gain.setValueAtTime(.06, t + d - .02); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g).connect(ac.destination); o.start(t); o.stop(t + d + .02); } catch (_) {} }
+  const logEl = $('log');
+  function log(msg) { const d = document.createElement('div'); d.textContent = fmt(met).replace('−', '-') + '  ' + msg; logEl.appendChild(d); while (logEl.childElementCount > 7) logEl.firstChild.remove(); }
+  function flip(k) {
+    if (k === 'scan') document.body.classList.toggle('noscan', !sw.scan);
+    if (k === 'hold') { log(sw.hold ? 'HOLD HOLD HOLD — FLIGHT CALLS A HOLD' : 'COUNT RESUMED'); beep(sw.hold ? 1200 : 2525, .3); }
+    if (k === 'bus') log(sw.bus ? 'MAIN BUS B ON LINE' : 'MAIN BUS B OPEN — GAUGES DEAD');
+    if (k === 'tlm') log(sw.tlm ? 'TELEMETRY LOCK REACQUIRED' : 'LOSS OF SIGNAL, ALL CHANNELS');
+    if (k === 'bio') log(sw.bio ? 'BIOMED SENSORS RESTORED' : 'BIOMED OFF — SURGEON OBJECTS');
+    if (k === 'aud') { log(sw.aud ? 'LOOP AUDIO PATCHED IN' : 'LOOP AUDIO MUTED'); beep(); }
+  }
+  // ---------- main loop
+  let met = -90, last = performance.now(), tick = 0, phase = 0, seqIdx = 0, trk = '';
+  const tm = $('tm'), stateEl = $('state');
+  function sample(t) {
+    CH.forEach(c => {
+      const live = sw.tlm && (c.k !== 'bio' || sw.bio) && (c.k !== 'bus' || sw.bus);
+      let v = null;
+      if (live) { if (c.ecg) { const bpm = 68 + (met > -20 ? Math.min(60, (met + 20) * 1.6) : 0) - (met > 40 ? Math.min(30, (met - 40) * .5) : 0); phase += bpm / 60 * .05; v = ecg(phase) + (Math.random() - .5) * .03; c.show = bpm.toFixed(0); } else { v = c.f(t, met); c.show = v.toFixed(c.k === 'vib' ? 2 : 1); } }
+      c.buf.push(v); c.buf.shift();
+      let pts = ''; c.buf.forEach((y, i) => { if (y !== null) pts += `${(i / (NPT - 1) * W).toFixed(1)},${(H - (y - c.lo) / (c.hi - c.lo) * H).toFixed(1)} `; });
+      c.line.setAttribute('points', pts); c.val.textContent = live ? c.show + ' ' + c.unit : 'NO SIGNAL'; c.val.style.color = live ? '' : '#ff5a45';
+    });
+  }
+  function render() {
+    tm.textContent = fmt(met).replace(':', ':00:').replace(/(T[−+])(\d\d):00:(\d\d)/, (_, s, m, ss) => `${s}00:${m}:${ss}`);
+    tm.classList.toggle('up', met >= 0); tm.classList.toggle('hold', sw.hold);
+    stateEl.textContent = sw.hold ? 'HOLDING' : met < 0 ? 'COUNT RUNNING' : 'POWERED FLIGHT';
+    seqLi.forEach((li, i) => { li.className = i < seqIdx ? 'done' : i === seqIdx ? 'next' : ''; });
+    const thrust = !sw.bus ? 0 : met < -6 ? 0 : met < 0 ? (met + 6) / 6 * 92 : met < 42 ? 100 - Math.sin(met * .4) * 2 : met < 70 ? 78 + Math.sin(met) * 2 : 0;
+    needle(GA[0], thrust); needle(GA[1], !sw.bus ? 0 : met < -6 ? 100 : Math.max(3, 100 - (met + 6) * 1.25));
+    const u = Math.max(0, Math.min(1, met / 110)), x = 20 + u * 210, y = 130 - (u * u * .55 + u * .45) * 108 * (1 - .12 * Math.sin(u * 3));
+    if (met > 0) { trk += (trk ? 'L' : 'M20 130L') + x.toFixed(1) + ' ' + y.toFixed(1); if (trk.length < 9000) $('trk').setAttribute('d', trk); }
+    $('veh').setAttribute('cx', x); $('veh').setAttribute('cy', y); $('altT').textContent = 'ALT ' + (u * u * 118).toFixed(1).padStart(5, '0');
+    const n = new Date(); $('utc').textContent = n.toTimeString().slice(0, 8) + ' LOCAL';
+  }
+  function loop(now) {
+    const dt = Math.min(.25, (now - last) / 1000); last = now; tick += dt;
+    if (!sw.hold) {
+      const prev = met; met += dt;
+      while (seqIdx < SEQ.length && met >= SEQ[seqIdx][0]) { log(SEQ[seqIdx][1].toUpperCase()); beep(seqIdx === 5 ? 1800 : 2525, seqIdx === 5 ? .6 : .2); seqIdx++; }
+      if (met < 0 && met > -10.5 && Math.floor(prev) !== Math.floor(met)) beep(880, .08);
+    }
+    if (tick >= .05) { tick = 0; sample(now / 1000); render(); }
+    requestAnimationFrame(loop);
+  }
+  function recycle() { met = -90; seqIdx = 0; trk = ''; $('trk').setAttribute('d', ''); logEl.textContent = ''; log('COUNT RECYCLED TO T-90 SECONDS'); log('ALL STATIONS, FLIGHT: STATUS CHECK'); }
+  $('rec').addEventListener('click', recycle);
+  recycle(); log('BOOSTER GO · EECOM GO · SURGEON GO');
+  for (let i = 0; i < NPT; i++) sample(i * .05);
+  render();
+  if (reduce) setInterval(() => loop(performance.now()), 250), (window.requestAnimationFrame = () => 0); else requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

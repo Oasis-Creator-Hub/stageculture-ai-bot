@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Farcast — weather for worlds you'll never visit</title>
+<meta name="description" content="A glassmorphism weather dashboard for five fictional exoplanets, with animated atmospheres, a planet switcher and forecasts of glass rain and diamond snow.">
+<style>
+  :root{--a:#3fd0ff;--b:#1b2a8f;--c:#081030;--hot:#ffd27a;--ink:#f5f8ff}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;color:var(--ink);background:var(--c);
+    font-family:"SF Pro Rounded","Nunito","Quicksand","Varela Round","Arial Rounded MT Bold","Segoe UI",system-ui,sans-serif;font-weight:400}
+  .sky{position:fixed;inset:0;overflow:hidden;z-index:-2;background:linear-gradient(170deg,var(--b),var(--c) 75%);transition:background 1.2s}
+  .sky i{position:absolute;border-radius:50%;filter:blur(60px);opacity:.75;transition:background 1.2s;will-change:transform}
+  .sky i:nth-child(1){width:62vmax;height:62vmax;left:-18vmax;top:-22vmax;background:var(--a);animation:d1 26s ease-in-out infinite alternate}
+  .sky i:nth-child(2){width:48vmax;height:48vmax;right:-14vmax;top:18vh;background:var(--hot);opacity:.45;animation:d2 32s ease-in-out infinite alternate}
+  .sky i:nth-child(3){width:70vmax;height:40vmax;left:10vw;bottom:-22vmax;background:var(--b);animation:d1 38s ease-in-out infinite alternate-reverse}
+  @keyframes d1{to{transform:translate(9vmax,7vmax) scale(1.15)}}
+  @keyframes d2{to{transform:translate(-10vmax,-6vmax) scale(.85)}}
+  .orb{position:fixed;right:-12vmin;bottom:-18vmin;width:78vmin;height:78vmin;border-radius:50%;z-index:-1;
+    background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.5),transparent 32%),repeating-linear-gradient(172deg,transparent 0 7%,rgba(255,255,255,.1) 7% 9%,transparent 9% 17%,rgba(0,0,0,.14) 17% 21%),linear-gradient(140deg,var(--hot),var(--a) 45%,var(--b));
+    box-shadow:inset -8vmin -8vmin 14vmin rgba(0,0,0,.6),0 0 14vmin -2vmin var(--a);transition:background 1.2s,box-shadow 1.2s;opacity:.9}
+  canvas#fx{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:clamp(14px,3vw,34px)}
+  .bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:clamp(14px,2.4vw,26px)}
+  .logo{font-weight:800;font-size:19px;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+  .logo a{color:inherit;text-decoration:none;font-size:11px;font-weight:600;letter-spacing:.12em;padding:6px 11px;border-radius:999px}
+  .logo span{opacity:.6;font-weight:500}
+  .units{display:flex;padding:3px;border-radius:999px}
+  .units button{font:inherit;font-size:12px;font-weight:700;color:inherit;background:none;border:0;border-radius:999px;padding:6px 12px;cursor:pointer;opacity:.7}
+  .units button[aria-pressed=true]{background:rgba(255,255,255,.9);color:#0b1030;opacity:1}
+
+  .glass{background:linear-gradient(135deg,rgba(255,255,255,.2),rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.28);border-top-color:rgba(255,255,255,.5);border-left-color:rgba(255,255,255,.42);
+    -webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);box-shadow:0 18px 50px rgba(0,0,10,.28),inset 0 1px 0 rgba(255,255,255,.25)}
+  .card{border-radius:28px;padding:clamp(16px,2vw,24px);position:relative;overflow:hidden}
+  .card h3{margin:0 0 12px;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;opacity:.7}
+
+  .planets{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 12px;margin:0 -2px clamp(8px,1.4vw,16px);scrollbar-width:none}
+  .planets::-webkit-scrollbar{display:none}
+  .planets button{flex:0 0 auto;display:flex;align-items:center;gap:10px;font:inherit;color:inherit;cursor:pointer;border-radius:999px;padding:7px 16px 7px 7px;text-align:left;transition:transform .25s,background .3s}
+  .planets button:hover{transform:translateY(-2px)}
+  .planets button[aria-selected=true]{background:rgba(255,255,255,.88);color:#0b1030}
+  .planets em{width:34px;height:34px;border-radius:50%;flex:none;box-shadow:inset -5px -5px 9px rgba(0,0,0,.45)}
+  .planets b{display:block;font-size:14px;line-height:1.1}.planets small{font-size:10.5px;opacity:.7}
+  button:focus-visible,a:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+  .grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:clamp(10px,1.4vw,18px)}
+  .now{grid-row:span 2;min-height:340px;display:flex;flex-direction:column;justify-content:space-between}
+  .now .place{font-size:13px;font-weight:600;opacity:.8;letter-spacing:.04em}
+  .now h2{margin:4px 0 0;font-size:clamp(28px,4vw,46px);font-weight:800;letter-spacing:-.03em;line-height:1}
+  .temp{font-size:clamp(84px,15vw,176px);font-weight:200;line-height:.86;letter-spacing:-.06em;margin:.12em 0 0 -.04em;font-variant-numeric:tabular-nums;display:flex;align-items:flex-start}
+  .temp sup{font-size:.22em;font-weight:700;letter-spacing:0;margin:.5em 0 0 .3em;opacity:.8}
+  .cond{font-size:clamp(17px,2vw,23px);font-weight:700;margin:10px 0 4px}
+  .feels{font-size:14px;opacity:.8;max-width:30em;line-height:1.45}
+  .stat b{display:block;font-size:clamp(26px,3.2vw,40px);font-weight:300;letter-spacing:-.03em;line-height:1}
+  .stat b small{font-size:.4em;font-weight:700;letter-spacing:.04em;opacity:.7;margin-left:.3em}
+  .stat p{margin:8px 0 0;font-size:12.5px;opacity:.78;line-height:1.4}
+  .meter{height:6px;border-radius:9px;background:rgba(255,255,255,.18);margin-top:14px;overflow:hidden}
+  .meter i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#fff,var(--hot));width:0;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+  .compass{position:absolute;right:16px;top:14px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.5)}
+  .compass i{position:absolute;left:50%;top:50%;width:2px;height:18px;margin:-18px 0 0 -1px;background:#fff;transform-origin:50% 100%;transition:transform 1.2s cubic-bezier(.3,1.5,.5,1);border-radius:2px}
+  .hours{grid-column:span 2}
+  .hours svg{display:block;width:100%;height:110px;overflow:visible}
+  .hrow{display:grid;grid-template-columns:repeat(8,1fr);text-align:center;font-size:11px;opacity:.85;margin-top:6px}
+  .hrow b{display:block;font-size:13px}
+  .week{grid-column:span 2}
+  .week ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+  .week li{display:grid;grid-template-columns:4.6em 1fr auto;gap:12px;align-items:center;padding:9px 0;border-top:1px solid rgba(255,255,255,.16);font-size:14px}
+  .week li:first-child{border-top:0}
+  .week li span:first-child{font-weight:700}.week li span:last-child{font-variant-numeric:tabular-nums;opacity:.85;white-space:nowrap}
+  .alert{background:linear-gradient(135deg,rgba(255,210,122,.34),rgba(255,255,255,.06))}
+  .alert p{margin:0;font-size:14.5px;line-height:1.5}
+  .alert p b{display:block;font-size:17px;margin-bottom:6px}
+  .foot{margin-top:18px;font-size:11px;opacity:.6;text-align:center;letter-spacing:.04em}
+  .swap{animation:swap .7s cubic-bezier(.2,.8,.2,1)}
+  @keyframes swap{from{opacity:0;transform:translateY(14px)}}
+  @media (max-width:900px){.grid{grid-template-columns:1fr 1fr}.now{grid-column:span 2;grid-row:auto}}
+  @media (max-width:520px){.grid{grid-template-columns:1fr}.now,.hours,.week{grid-column:auto}.logo span{display:none}}
+  @media (prefers-reduced-motion:reduce){.sky i,.swap{animation:none}.meter i,.compass i{transition:none}}
+</style>
+</head>
+<body>
+<div class="sky"><i></i><i></i><i></i></div><div class="orb"></div><canvas id="fx" aria-hidden="true"></canvas>
+<div class="wrap">
+  <div class="bar">
+    <div class="logo"><a class="glass" href="index.html">← 100</a>Farcast <span>· off-world weather</span></div>
+    <div class="units glass" role="group" aria-label="Temperature units"><button type="button" data-u="C" aria-pressed="true">°C</button><button type="button" data-u="F" aria-pressed="false">°F</button><button type="button" data-u="K" aria-pressed="false">K</button></div>
+  </div>
+  <div class="planets" id="planets" role="tablist" aria-label="Planet"></div>
+  <main class="grid" id="grid">
+    <section class="card glass now"><div><div class="place" id="place"></div><h2 id="name"></h2></div>
+      <div><div class="temp"><span id="temp">0</span><sup id="unit">°C</sup></div><div class="cond" id="cond"></div><div class="feels" id="feels"></div></div></section>
+    <section class="card glass stat"><h3>Wind</h3><div class="compass"><i id="needle"></i></div><b><span id="wind">0</span><small>km/h</small></b><p id="windp"></p><div class="meter"><i id="windm"></i></div></section>
+    <section class="card glass stat"><h3 id="xh"></h3><b><span id="xv"></span><small id="xu"></small></b><p id="xp"></p><div class="meter"><i id="xm"></i></div></section>
+    <section class="card glass hours"><h3>Next eight local hours</h3><svg id="spark" viewBox="0 0 700 110" preserveAspectRatio="none" aria-hidden="true"></svg><div class="hrow" id="hrow"></div></section>
+    <section class="card glass week"><h3 id="weekh">Five-sol outlook</h3><ul id="week"></ul></section>
+    <section class="card glass alert"><h3>Advisory</h3><p id="alert"></p></section>
+  </main>
+  <p class="foot">Farcast makes no promises. All readings relayed by probe, rumour, and one very brave balloon.</p>
+</div>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, $ = id => document.getElementById(id);
+  const P = [
+    {id: 'Vesper-9b', sys: 'Hot giant · Kaldera system · 63 ly', col: ['#3fd0ff', '#1b2a8f', '#081030', '#fff0c2'], fx: 'rain', t: 1140, cond: 'Sideways glass rain', feels: 'Feels like being sandblasted by a chandelier. Silicate droplets condense on the night side and arrive horizontally.',
+      wind: 7200, dir: 92, windp: 'Supersonic easterly jet. Hats discouraged.', x: ['Silicate humidity', 88, '%', 'Molten haze thickening toward the terminator.'], hrs: [1140, 1162, 1190, 1175, 1120, 1060, 1010, 990],
+      week: [['Sol 1', 'Glass rain, heavy', '1,190 / 990'], ['Sol 2', 'Shard squalls', '1,210 / 1,004'], ['Sol 3', 'Clear, briefly blinding', '1,260 / 1,020'], ['Sol 4', 'Molten drizzle', '1,150 / 980'], ['Sol 5', 'Glass rain returns', '1,180 / 995']], alert: ['Shard warning in effect', 'Visibility under four metres and sharp. Remain indoors, or ideally on another planet.']},
+    {id: 'Ombra Minor', sys: 'Tidally locked · Sel-Ana system · 12 ly', col: ['#b06bff', '#3a1466', '#12061f', '#ffb86b'], fx: 'fog', t: -38, cond: 'Methane fog along the dusk line', feels: 'One face in permanent noon, one in permanent night. You are standing in the narrow, habitable evening between them.',
+      wind: 46, dir: 268, windp: 'Steady flow from day-side to night-side, as always.', x: ['Twilight width', 310, 'km', 'The band of survivable dusk, narrowing 2 km this season.'], hrs: [-38, -39, -41, -40, -38, -36, -37, -38],
+      week: [['Cycle 1', 'Fog, amber glow', '−36 / −41'], ['Cycle 2', 'Fog lifting to haze', '−34 / −40'], ['Cycle 3', 'Clear; eternal sunset', '−31 / −39'], ['Cycle 4', 'Hydrocarbon mist', '−37 / −42'], ['Cycle 5', 'Frost creeping sunward', '−40 / −46']], alert: ['Sunset continues', 'Today\'s sunset is expected to last, at current estimates, forever. Photographers are advised to pace themselves.']},
+    {id: 'Kessel\'s Rest', sys: 'Desert super-earth · Tannhault system · 140 ly', col: ['#ff8a4c', '#8f2f14', '#2a0d07', '#ffe0a3'], fx: 'dust', t: 61, cond: 'Iron dust, gusting', feels: 'Dry heat with a metallic aftertaste. Under 1.9 g, even the weather feels heavy.',
+      wind: 210, dir: 204, windp: 'Rust-front advancing from the Ochre Basin.', x: ['Airborne iron', 74, 'mg/m³', 'Compasses unreliable. Everything is slightly magnetic.'], hrs: [61, 66, 71, 74, 72, 65, 54, 43],
+      week: [['Sol 1', 'Dust storm, red', '74 / 31'], ['Sol 2', 'Dust storm, redder', '77 / 33'], ['Sol 3', 'Static lightning', '70 / 29'], ['Sol 4', 'Clear, two-sun glare', '81 / 36'], ['Sol 5', 'Dust devils, friendly', '69 / 30']], alert: ['Ferric storm watch', 'Seal filters and secure loose cutlery. The storm of Sol 2 is expected to be visible from orbit and audible from indoors.']},
+    {id: 'Mirelle IV', sys: 'Ocean world · Corwen system · 39 ly', col: ['#3df0c2', '#0b6a7a', '#04202b', '#d6fff0'], fx: 'drizzle', t: 23, cond: 'Warm drizzle, three-moon tide', feels: 'Soft, salt-sweet and thoroughly damp. No land has been reported; the forecast is, as ever, sea.',
+      wind: 28, dir: 135, windp: 'Light south-easterly across open water.', x: ['Tide height', 412, 'm', 'All three moons aligned. The horizon is noticeably taller.'], hrs: [23, 23, 24, 25, 25, 24, 23, 22],
+      week: [['Day 1', 'Drizzle, pearly', '25 / 21'], ['Day 2', 'Bioluminescent swell', '24 / 21'], ['Day 3', 'Rainbows, concentric', '26 / 22'], ['Day 4', 'Sea fog at moonrise ×3', '24 / 20'], ['Day 5', 'Drizzle (decorative)', '25 / 21']], alert: ['Syzygy tide tonight', 'Floating settlements should lengthen moorings by four hundred metres and enjoy the view.']},
+    {id: 'Halcyon Drift', sys: 'Rogue planet · no star · interstellar dark', col: ['#9fb4ff', '#1c2350', '#05060f', '#ffffff'], fx: 'snow', t: -224, cond: 'Diamond snow, perfectly still', feels: 'Starless, sunless and silent. Carbon crystallises in the upper air and falls for weeks without hurry.',
+      wind: 3, dir: 0, windp: 'Calm. It has been calm for nine thousand years.', x: ['Starlight', 0.004, 'lux', 'Brightest object in the sky: your own torch.'], hrs: [-224, -224, -224, -225, -225, -224, -224, -224],
+      week: [['Span 1', 'Diamond snow', '−224 / −225'], ['Span 2', 'Diamond snow', '−224 / −225'], ['Span 3', 'Glitter haze', '−223 / −225'], ['Span 4', 'Diamond snow', '−224 / −225'], ['Span 5', 'Dark, with dark later', '−224 / −226']], alert: ['No sunrise expected', 'There is no day here to have a forecast for. Accumulation: eleven carats per square metre.']}
+  ];
+  let cur = P[0], unit = 'C', shown = 0, anim = 0;
+  const conv = c => unit === 'C' ? c : unit === 'F' ? c * 9 / 5 + 32 : c + 273.15;
+  const fmt = v => Math.round(v).toLocaleString('en-GB').replace('-', '−');
+  function setTemp(target){
+    cancelAnimationFrame(anim); const from = shown, t0 = performance.now();
+    if (reduce){ shown = target; $('temp').textContent = fmt(conv(target)); return; }
+    const step = now => { const k = Math.min(1, (now - t0) / 900), e = 1 - Math.pow(1 - k, 3); shown = from + (target - from) * e; $('temp').textContent = fmt(conv(shown)); if (k < 1) anim = requestAnimationFrame(step); };
+    anim = requestAnimationFrame(step);
+  }
+  function spark(){
+    const h = cur.hrs.map(conv), lo = Math.min(...h), hi = Math.max(...h), span = hi - lo || 1;
+    const pts = h.map((v, i) => [43.75 + i * 87.5, 92 - (v - lo) / span * 68]);
+    let d = `M${pts[0][0]} ${pts[0][1]}`; for (let i = 1; i < pts.length; i++){ const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], mx = (x0 + x1) / 2; d += `C${mx} ${y0} ${mx} ${y1} ${x1} ${y1}`; }
+    $('spark').innerHTML = `<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".4"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+      <path d="${d}L${pts[7][0]} 110L${pts[0][0]} 110Z" fill="url(#sg)"/><path d="${d}" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`;
+    $('hrow').innerHTML = h.map((v, i) => `<div><b>${fmt(v)}°</b>${i ? '+' + i + 'h' : 'now'}</div>`).join('');
+  }
+  function show(p, first){
+    cur = p; const r = document.documentElement.style;
+    r.setProperty('--a', p.col[0]); r.setProperty('--b', p.col[1]); r.setProperty('--c', p.col[2]); r.setProperty('--hot', p.col[3]);
+    $('place').textContent = p.sys; $('name').textContent = p.id; $('cond').textContent = p.cond; $('feels').textContent = p.feels;
+    $('unit').textContent = unit === 'K' ? 'K' : '°' + unit; setTemp(p.t);
+    $('wind').textContent = p.wind.toLocaleString('en-GB'); $('windp').textContent = p.windp; $('needle').style.transform = `rotate(${p.dir}deg)`;
+    $('windm').style.width = Math.min(100, Math.log10(p.wind + 1) / 4 * 100) + '%';
+    $('xh').textContent = p.x[0]; $('xv').textContent = p.x[1].toLocaleString('en-GB'); $('xu').textContent = p.x[2]; $('xp').textContent = p.x[3];
+    $('xm').style.width = Math.max(3, Math.min(100, p.x[2] === 'm' || p.x[2] === 'km' ? p.x[1] / 5 : p.x[1])) + '%';
+    $('weekh').textContent = 'Five-' + p.week[0][0].split(' ')[0].toLowerCase() + ' outlook';
+    $('week').innerHTML = p.week.map(w => `<li><span>${w[0]}</span><span>${w[1]}</span><span>${w[2]} °C</span></li>`).join('');
+    $('alert').innerHTML = `<b>${p.alert[0]}</b>${p.alert[1]}`;
+    spark(); seed();
+    [...$('planets').children].forEach(b => b.setAttribute('aria-selected', b.dataset.id === p.id));
+    if (!first && !reduce) document.querySelectorAll('.card').forEach((c, i) => { c.classList.remove('swap'); void c.offsetWidth; c.style.animationDelay = i * 50 + 'ms'; c.classList.add('swap'); });
+  }
+  P.forEach(p => { const b = document.createElement('button'); b.type = 'button'; b.className = 'glass'; b.dataset.id = p.id; b.setAttribute('role', 'tab');
+    b.innerHTML = `<em style="background:radial-gradient(circle at 30% 28%,${p.col[3]},${p.col[0]} 45%,${p.col[1]})"></em><span><b>${p.id}</b><small>${p.cond.split(',')[0]}</small></span>`;
+    b.addEventListener('click', () => show(p)); $('planets').appendChild(b); });
+  document.querySelectorAll('.units button').forEach(b => b.addEventListener('click', () => { unit = b.dataset.u;
+    document.querySelectorAll('.units button').forEach(o => o.setAttribute('aria-pressed', o === b)); $('unit').textContent = unit === 'K' ? 'K' : '°' + unit; $('temp').textContent = fmt(conv(shown)); spark(); }));
+
+  // atmosphere particles — one small system, five behaviours
+  const cv = $('fx'), ctx = cv.getContext('2d'); let W, H, dpr, parts = [];
+  const FX = {rain: {n: 150, vx: 26, vy: 5, len: 30, w: 1.3, a: .5}, fog: {n: 14, vx: -.25, vy: 0, len: 0, w: 190, a: .07}, dust: {n: 120, vx: -7, vy: .6, len: 12, w: 1.6, a: .45},
+    drizzle: {n: 110, vx: -.8, vy: 7, len: 9, w: 1, a: .4}, snow: {n: 90, vx: 0, vy: .5, len: 0, w: 1.7, a: .9}};
+  function size(){ dpr = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); seed(); }
+  function seed(){ const c = FX[cur.fx], n = Math.round(c.n * Math.min(1, W * H / 900000 + .35));
+    parts = Array.from({length: n}, () => ({x: Math.random() * W, y: Math.random() * H, z: .4 + Math.random() * .9, p: Math.random() * 6.28})); if (reduce) draw(0, true); }
+  function draw(t, still){
+    const c = FX[cur.fx]; ctx.clearRect(0, 0, W, H); ctx.lineCap = 'round'; ctx.strokeStyle = ctx.fillStyle = cur.col[3];
+    for (const p of parts){
+      if (!still){ p.x += c.vx * p.z; p.y += c.vy * p.z + (cur.fx === 'snow' ? 0 : 0); if (cur.fx === 'snow' || cur.fx === 'fog') p.x += Math.sin(t * .0006 + p.p) * .3;
+        const m = c.w + c.len + 20; if (p.x > W + m) p.x = -m; if (p.x < -m) p.x = W + m; if (p.y > H + m) p.y = -m; if (p.y < -m) p.y = H + m; }
+      if (c.len){ ctx.globalAlpha = c.a * p.z; ctx.lineWidth = c.w * p.z; const l = c.len * p.z / Math.hypot(c.vx, c.vy); ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - c.vx * l, p.y - c.vy * l); ctx.stroke(); }
+      else if (cur.fx === 'fog'){ const r = c.w * p.z, g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r); g.addColorStop(0, cur.col[3]); g.addColorStop(1, 'transparent'); ctx.globalAlpha = c.a; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 6.283); ctx.fill(); }
+      else { ctx.globalAlpha = c.a * (.35 + .65 * Math.abs(Math.sin(t * .002 + p.p))); const s = c.w * p.z; ctx.beginPath(); ctx.moveTo(p.x, p.y - s * 2); ctx.lineTo(p.x + s, p.y); ctx.lineTo(p.x, p.y + s * 2); ctx.lineTo(p.x - s, p.y); ctx.fill(); }
+    }
+    ctx.globalAlpha = 1;
+  }
+  const loop = t => { draw(t, false); requestAnimationFrame(loop); };
+  addEventListener('resize', size);
+  W = innerWidth; H = innerHeight; show(P[0], true); size();
+  if (!reduce) requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

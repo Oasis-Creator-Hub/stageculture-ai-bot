@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KV-70 “Lantern” — A Black Hole, Observed</title>
+<meta name="description" content="A black hole on canvas: a glowing accretion disk, its far side bent over the shadow, and a starfield warped by gravity. Drag to orbit, scroll or pinch to approach, with sparse scientific captions.">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+body{color:#d9d3c7;font-family:"Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;font-weight:300}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+canvas.drag{cursor:grabbing}
+.hud{position:fixed;pointer-events:none;text-shadow:0 0 8px #000,0 0 2px #000}
+#head{left:clamp(14px,3vw,36px);top:clamp(38px,5vh,52px);max-width:min(78vw,380px)}
+#head small{font-size:10px;letter-spacing:.38em;text-transform:uppercase;color:#9b8f7c}
+#head h1{font-weight:200;font-size:clamp(30px,5vw,58px);line-height:.98;margin:6px 0 8px;letter-spacing:-.01em;color:#fff6e6}
+#head h1 i{font-family:Georgia,"Times New Roman",serif;font-weight:400;color:#ffb869}
+#head p{margin:0;font-size:12px;line-height:1.55;color:#9b8f7c;letter-spacing:.03em}
+#data{left:clamp(14px,3vw,36px);bottom:clamp(14px,3vh,30px);font:11px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#8d8475;letter-spacing:.06em}
+#data b{font-weight:400;color:#ffd9a8}
+#ctl{position:fixed;right:clamp(14px,3vw,36px);bottom:clamp(14px,3vh,30px);display:flex;gap:8px;align-items:center}
+#ctl span{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:#6f685c;margin-right:6px}
+button{font:inherit;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#d9d3c7;background:rgba(0,0,0,.5);border:1px solid #5b5347;padding:9px 12px;cursor:pointer;border-radius:2px}
+button:hover,button[aria-pressed=true]{border-color:#ffb869;color:#ffb869}
+a.back{position:fixed;left:clamp(14px,3vw,36px);top:12px;z-index:3;color:#6f685c;font-size:10px;letter-spacing:.3em;text-decoration:none}
+a.back:hover{color:#ffb869}
+@media(max-width:560px){#ctl span{display:none}#data{bottom:62px}}
+</style>
+</head>
+<body>
+<canvas id="c" aria-label="Black hole with accretion disk and gravitationally lensed stars. Drag to orbit."></canvas>
+<a class="back" href="index.html">← 100</a>
+<div class="hud" id="head">
+  <small>Deep-field object · catalogue KV-70</small>
+  <h1>The <i>Lantern</i></h1>
+  <p>6.2 million solar masses, 31,000 light-years out. Nothing here is emitting light except the matter falling in.</p>
+</div>
+<div class="hud" id="data">INCLINATION <b id="inc">78.5°</b><br>AZIMUTH <b id="az">000.0°</b><br>RANGE <b id="rg">24.0 rₛ</b></div>
+<div id="ctl"><span>Drag to orbit · scroll to approach</span><button id="cap" aria-pressed="true">Captions</button><button id="spin" aria-pressed="true">Drift</button></div>
+<script>
+(function(){
+const cv=document.getElementById('c'),ctx=cv.getContext('2d'),bl=document.createElement('canvas'),bx=bl.getContext('2d');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W=0,H=0,dpr=1,cx=0,cy=0,u=30,zoom=1,yaw=0,tilt=.2,drift=!reduce,caps=true,capA=1,dragging=false,last=0,time=0;
+const S_R=2.6,E_R=2.95,R_IN=3.05,R_OUT=9.6;
+// ---------- stars
+const NS=2800,st=new Float32Array(NS*5);
+for(let i=0;i<NS;i++){let x,y,z;
+  if(i%3===0){const a=Math.random()*6.283,h=(Math.random()+Math.random()+Math.random()-1.5)*.22;x=Math.cos(a);z=Math.sin(a);y=h;const c=Math.cos(.6),s=Math.sin(.6),yy=y*c-x*s;x=y*s+x*c;y=yy}
+  else{const a=Math.random()*6.283,v=Math.random()*2-1,r=Math.sqrt(1-v*v);x=r*Math.cos(a);y=v;z=r*Math.sin(a)}
+  const l=Math.hypot(x,y,z);st[i*5]=x/l;st[i*5+1]=y/l;st[i*5+2]=z/l;st[i*5+3]=.5+Math.pow(Math.random(),5)*2.2;st[i*5+4]=Math.random()*5|0}
+const SCOL=['#ffffff','#cfe0ff','#ffe9c9','#ffd0a0','#bcd2ff'];
+// ---------- disk
+let NP=4200,pr,pa,pw,ps,pf;
+function seed(){NP=W*H<420000?2800:4400;pr=new Float32Array(NP);pa=new Float32Array(NP);pw=new Float32Array(NP);ps=new Float32Array(NP);pf=new Float32Array(NP);
+  for(let i=0;i<NP;i++){const r=R_IN+Math.pow(Math.random(),1.7)*(R_OUT-R_IN);pr[i]=r;pa[i]=Math.random()*6.283;pw[i]=1.9*Math.pow(r/R_IN,-1.5);ps[i]=.9+Math.random()*1.5;pf[i]=.45+Math.random()*.55}}
+const RB=20,DB=9,PAL=[];
+(function(){const mix=(a,b,t)=>a+(b-a)*t;
+  for(let i=0;i<RB;i++){const t=i/(RB-1);let r,g,b;
+    if(t<.3){const k=t/.3;r=255;g=mix(246,196,k);b=mix(226,112,k)}else{const k=(t-.3)/.7;r=mix(255,176,k);g=mix(196,58,k);b=mix(112,22,k)}
+    PAL[i]=[];for(let d=0;d<DB;d++){const q=d/(DB-1)*2-1; // -1 receding … +1 approaching
+      const R=Math.min(255,r*(1+q*.02)),G=Math.min(255,g*(1+q*.2)),B=Math.min(255,b*(1+q*.75)+(q>0?q*40:0));
+      PAL[i][d]='rgb('+(R|0)+','+(G|0)+','+(B|0)+')'}}})();
+function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+  bl.width=Math.max(2,Math.round(W/7));bl.height=Math.max(2,Math.round(H/7));cx=W/2;cy=H*(W<560?.52:.5);seed()}
+function sm(a,b,x){x=Math.max(0,Math.min(1,(x-a)/(b-a)));return x*x*(3-2*x)}
+function drawStars(){
+  const f=Math.max(W,H)*.85,cyaw=Math.cos(yaw),syaw=Math.sin(yaw),ct=Math.cos(tilt),sn=Math.sin(tilt),E=E_R*u,S=S_R*u,E4=4*E*E;
+  for(let i=0;i<NS;i++){const o=i*5,x0=st[o],y0=st[o+1],z0=st[o+2];
+    const x=x0*cyaw-z0*syaw,z1=x0*syaw+z0*cyaw,zf=-y0*sn+z1*ct;if(zf<.12)continue;
+    const yu=y0*ct+z1*sn,dx=f*x/zf,dy=-f*yu/zf;if(Math.abs(dx)>W||Math.abs(dy)>H)continue;
+    const b=Math.hypot(dx,dy)||.001,q=Math.sqrt(b*b+E4),bp=(b+q)/2,k=bp/b,sz=st[o+3],px=cx+dx*k,py=cy+dy*k;
+    ctx.fillStyle=ctx.strokeStyle=SCOL[st[o+4]];
+    if(bp<E*2.1){const ang=Math.atan2(dy,dx),da=Math.min(.5,sz*.9*Math.min(9,E/b+1)/bp);
+      ctx.globalAlpha=Math.min(1,.5+sz*.25);ctx.lineWidth=Math.min(2,sz*.8);ctx.beginPath();ctx.arc(cx,cy,bp,ang-da,ang+da);ctx.stroke()}
+    else if(px>-4&&px<W+4&&py>-4&&py<H+4){ctx.globalAlpha=Math.min(1,.28+sz*.3);ctx.fillRect(px-sz/2,py-sz/2,sz,sz);
+      if(sz>2.2){ctx.globalAlpha=.3;ctx.fillRect(px-sz*2.6,py-.4,sz*5.2,.8);ctx.fillRect(px-.4,py-sz*2.6,.8,sz*5.2)}}
+    const bs=(q-b)/2;if(bs>S*1.01&&b<E*5){const ang=Math.atan2(-dy,-dx),da=Math.min(.6,sz*1.2*(E/b)/bs);
+      ctx.globalAlpha=Math.min(.8,.25+.2*sz)*Math.pow(bs/E,3);ctx.lineWidth=Math.min(1.6,sz*.7);ctx.beginPath();ctx.arc(cx,cy,bs,ang-da,ang+da);ctx.stroke()}}
+  ctx.globalAlpha=1}
+function drawDisk(back){
+  const sn=Math.sin(tilt),ct=Math.cos(tilt),E=E_R*u,S=S_R*u,E4=4*E*E,spin=time;
+  for(let i=0;i<NP;i++){const r=pr[i],a=pa[i]+pw[i]*spin,ca=Math.cos(a),sa=Math.sin(a),z=r*sa;
+    if((z>0)!==back)continue;
+    let x=r*ca*u,y=-z*sn*u;
+    // rotation sense: matter on the left (x<0) approaches the observer
+    const dop=-ca*ct,di=Math.max(0,Math.min(DB-1,Math.round((dop+1)/2*(DB-1)))),ri=Math.min(RB-1,(r-R_IN)/(R_OUT-R_IN)*RB|0);
+    let al=pf[i]*(.34+.5*(1-(r-R_IN)/(R_OUT-R_IN)))*Math.pow(1+dop*.62,2.2);const s=ps[i]*(u/34+.45);
+    ctx.fillStyle=PAL[ri][di];
+    if(back){const w=sm(0,.5,sa),b=Math.hypot(x,y)||.001,q=Math.sqrt(b*b+E4),bp=b+((b+q)/2-b)*w,k=bp/b;
+      if(w>.25){const bs=(q-b)/2;if(bs>S){ctx.globalAlpha=Math.min(1,al*.5*w);ctx.fillRect(cx-x/b*bs-s*.4,cy-y/b*bs-s*.4,s*.8,s*.8)}}
+      x*=k;y*=k}
+    ctx.globalAlpha=Math.min(1,al);ctx.fillRect(cx+x-s/2,cy+y-s/2,s,s)}
+  ctx.globalAlpha=1}
+function drawHole(){const S=S_R*u;
+  ctx.globalCompositeOperation='source-over';ctx.fillStyle='#000';ctx.beginPath();ctx.arc(cx,cy,S,0,6.2832);ctx.fill();
+  ctx.globalCompositeOperation='lighter';
+  const g=ctx.createLinearGradient(cx-S,0,cx+S,0);g.addColorStop(0,'rgba(255,236,200,.95)');g.addColorStop(.55,'rgba(255,170,90,.6)');g.addColorStop(1,'rgba(200,80,30,.35)');
+  ctx.strokeStyle=g;ctx.lineWidth=Math.max(1,u*.05);ctx.beginPath();ctx.arc(cx,cy,S+u*.05,0,6.2832);ctx.stroke();
+  ctx.globalAlpha=.25;ctx.lineWidth=u*.3;ctx.beginPath();ctx.arc(cx,cy,S+u*.16,0,6.2832);ctx.stroke();ctx.globalAlpha=1}
+const LAB=[
+ {f:[1.1,-1.1],t:[6.6,-6.4],a:['SHADOW · 2.6 rₛ','no path leads back out']},
+ {f:[-2.1,-2.75],t:[-6.4,-6.6],a:['FAR SIDE OF THE DISK','its light bent over the top']},
+ {f:[-6.6,.5],t:[-7.4,5.6],a:['APPROACHING SIDE','Doppler-boosted · 0.4 c']},
+ {f:[2.0,1.85],t:[6.8,5.8],a:['PHOTON RING · 1.5 rₛ','light held in orbit']}];
+function drawCaps(){if(capA<.02)return;ctx.globalCompositeOperation='source-over';ctx.font='10px ui-monospace,"SF Mono",Menlo,Consolas,monospace';ctx.textBaseline='middle';
+  const small=W<560,sn=Math.sin(tilt);
+  LAB.forEach((l,i)=>{if(small&&(i===2))return;
+    let fx=cx+l.f[0]*u,fy=cy+l.f[1]*u;if(i===2)fy=cy+(.3+sn*2.2)*u;
+    const tw=Math.max(ctx.measureText(l.a[0]).width,ctx.measureText(l.a[1]).width),right=l.t[0]>0;
+    let ex=cx+l.t[0]*u,ey=Math.max(96,Math.min(H-110,cy+l.t[1]*u*(small?1.15:1)));
+    let tx=right?Math.min(ex+8,W-14-tw):Math.max(14,ex-8-tw);ex=right?tx-8:tx+tw+8;
+    ctx.globalAlpha=capA*.55;ctx.strokeStyle='#d9d3c7';ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(fx,fy);ctx.lineTo(ex,ey);ctx.lineTo(right?ex+5:ex-5,ey);ctx.stroke();
+    ctx.beginPath();ctx.arc(fx,fy,2.2,0,6.2832);ctx.stroke();
+    ctx.globalAlpha=capA;ctx.textAlign='left';ctx.fillStyle='#fff1dc';ctx.fillText(l.a[0],tx,ey-6);ctx.fillStyle='#9b8f7c';ctx.fillText(l.a[1],tx,ey+8)});
+  ctx.globalAlpha=1}
+const eInc=document.getElementById('inc'),eAz=document.getElementById('az'),eRg=document.getElementById('rg');
+function frame(t){const dt=Math.min(.05,(t-last)/1000);last=t;time+=dt*(reduce?.12:1);
+  if(drift&&!dragging)yaw+=dt*.035;
+  u=Math.min(W,H)*.043*zoom;capA+=((caps&&!dragging?1:0)-capA)*Math.min(1,dt*5);
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  ctx.globalCompositeOperation='lighter';drawStars();drawDisk(true);drawHole();drawDisk(false);
+  // bloom
+  bx.globalCompositeOperation='copy';bx.drawImage(cv,0,0,bl.width,bl.height);
+  ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.6;ctx.imageSmoothingEnabled=true;ctx.drawImage(bl,0,0,W,H);ctx.globalAlpha=1;
+  drawCaps();
+  eInc.textContent=(90-tilt*180/Math.PI).toFixed(1)+'°';const az=((yaw*180/Math.PI)%360+360)%360;eAz.textContent=('00'+az.toFixed(1)).slice(-5)+'°';eRg.textContent=(24/zoom).toFixed(1)+' rₛ';
+  requestAnimationFrame(frame)}
+// ---------- input
+const pts=new Map();let pinch=0;
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);dragging=true;cv.classList.add('drag');
+  if(pts.size===2){const p=[...pts.values()];pinch=Math.hypot(p[0][0]-p[1][0],p[0][1]-p[1][1])}});
+cv.addEventListener('pointermove',e=>{const p=pts.get(e.pointerId);if(!p)return;const dx=e.clientX-p[0],dy=e.clientY-p[1];p[0]=e.clientX;p[1]=e.clientY;
+  if(pts.size===1){yaw-=dx*.0045;tilt=Math.max(.06,Math.min(1.3,tilt+dy*.0045))}
+  else if(pts.size===2){const q=[...pts.values()],d=Math.hypot(q[0][0]-q[1][0],q[0][1]-q[1][1]);if(pinch>0)zoom=Math.max(.55,Math.min(2.4,zoom*d/pinch));pinch=d}});
+const up=e=>{pts.delete(e.pointerId);pinch=0;if(!pts.size){dragging=false;cv.classList.remove('drag')}};
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+cv.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.55,Math.min(2.4,zoom*Math.exp(-e.deltaY*.0012)))},{passive:false});
+addEventListener('keydown',e=>{const k=e.key;if(k==='ArrowLeft')yaw+=.06;else if(k==='ArrowRight')yaw-=.06;else if(k==='ArrowUp')tilt=Math.min(1.3,tilt+.04);else if(k==='ArrowDown')tilt=Math.max(.06,tilt-.04)});
+const bc=document.getElementById('cap'),bs=document.getElementById('spin');
+bc.onclick=()=>{caps=!caps;bc.setAttribute('aria-pressed',caps)};
+bs.setAttribute('aria-pressed',drift);bs.onclick=()=>{drift=!drift;bs.setAttribute('aria-pressed',drift)};
+addEventListener('resize',resize);resize();requestAnimationFrame(t=>{last=t;frame(t)});
+})();
+</script>
+</body>
+</html>

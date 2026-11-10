@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lecture 9: Things That Are Thrown — a chalkboard physics lesson</title>
+<meta name="description" content="A dusty chalkboard lecture on projectile motion: hand-drawn chalk diagrams and equations that draw themselves, plus a working throw-it-in-the-bucket demo.">
+<style>
+  :root{--board:#23463c;--chalk:#f1eee4;--yel:#f3dc7c;--pink:#f3a0ad;--blue:#a5d4ec;--wood:#8a5a2c}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:#cfc6b4;min-height:100vh;padding:clamp(8px,2vw,26px);
+    background-image:linear-gradient(#d8d0bf 0 60%,#b9ae98 60% 61%,#c8bea9 61%);
+    font-family:"Chalkboard SE","Chalkboard","Segoe Print","Bradley Hand","Comic Neue","Comic Sans MS","Marker Felt",cursive;color:var(--chalk)}
+  .frame{max-width:1120px;margin:0 auto;padding:clamp(8px,1.4vw,16px);border-radius:4px;
+    background:linear-gradient(90deg,#6f4520,#9b6a36 8%,#7d5127 50%,#9b6a36 92%,#6f4520);
+    box-shadow:0 24px 40px -18px rgba(40,25,5,.7),inset 0 0 0 1px rgba(255,255,255,.15)}
+  .board{position:relative;padding:clamp(14px,2.6vw,30px) clamp(12px,2.6vw,34px) 10px;overflow:hidden;background-color:var(--board);
+    box-shadow:inset 0 0 50px rgba(0,0,0,.5);
+    background-image:radial-gradient(ellipse 40% 30% at 22% 30%,rgba(255,255,255,.07),transparent),radial-gradient(ellipse 50% 22% at 70% 64%,rgba(255,255,255,.06),transparent),
+      radial-gradient(ellipse 30% 18% at 84% 14%,rgba(255,255,255,.05),transparent),linear-gradient(100deg,transparent 30%,rgba(255,255,255,.035) 34% 37%,transparent 44%)}
+  .dust{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.26;mix-blend-mode:screen}
+  .board>*:not(.dust){position:relative}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+  h1{font-size:clamp(24px,4.4vw,46px);font-weight:400;margin:0;line-height:1.05;filter:url(#chalk)}
+  h1 small{display:block;font-size:.42em;color:var(--yel);letter-spacing:.06em;margin-bottom:4px}
+  .squig{display:block;width:min(100%,430px);height:14px;margin-top:2px}
+  .corner{font-size:13px;line-height:1.5;text-align:right;color:var(--blue);filter:url(#chalk)}
+  .corner b{display:inline-block;border:2px solid var(--pink);color:var(--pink);font-weight:400;padding:1px 8px;transform:rotate(3deg);margin-top:4px;letter-spacing:.1em}
+  .corner a{color:var(--chalk);text-decoration:none;border-bottom:1.5px dashed currentColor}
+  .cols{display:grid;grid-template-columns:1.1fr 1fr;gap:10px 24px;margin-top:8px;align-items:center}
+  svg{display:block;width:100%;height:auto;overflow:visible}
+  svg text{font-family:inherit}
+  .c{fill:none;stroke:var(--chalk);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+  .y{stroke:var(--yel)}.p{stroke:var(--pink)}.b{stroke:var(--blue)}.dash{stroke-dasharray:.02 .035}
+  .t{fill:var(--chalk);font-size:17px}.ty{fill:var(--yel);color:var(--yel)}.tp{fill:var(--pink);color:var(--pink)}.tb{fill:var(--blue);color:var(--blue)}
+  /* self-drawing */
+  .go .d{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1s ease-in-out forwards;animation-delay:calc(var(--i)*.33s)}
+  .go .d.dash{stroke-dasharray:1;animation-name:draw2}
+  .go .w{stroke:currentColor;stroke-width:.9;stroke-dasharray:500;stroke-dashoffset:500;fill-opacity:0;animation:write 1.5s ease-out forwards;animation-delay:calc(var(--i)*.33s)}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @keyframes draw2{99%{stroke-dasharray:1;stroke-dashoffset:0}100%{stroke-dasharray:.02 .035;stroke-dashoffset:0}}
+  @keyframes write{60%{fill-opacity:.2}100%{stroke-dashoffset:0;fill-opacity:1}}
+  .eq text{font-size:25px;fill:var(--chalk);color:var(--chalk)}
+  .eq text.ty{fill:var(--yel)}.eq text.tp{fill:var(--pink)}.eq text.tb{fill:var(--blue)}
+  h2{font-size:clamp(17px,2.4vw,23px);font-weight:400;margin:14px 0 0;color:var(--yel);filter:url(#chalk)}
+  h2 span{color:var(--chalk);font-size:.8em;margin-left:10px}
+  #demo{touch-action:pan-y}
+  #msg{font-size:19px}
+  .tray{background:linear-gradient(#a8763f,#7a4f24 55%,#5c3a18);margin-top:clamp(8px,1.4vw,16px);border-radius:3px;padding:12px clamp(10px,2vw,22px);
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.25),0 6px 8px -4px rgba(0,0,0,.6);display:grid;grid-template-columns:1fr 1fr auto auto auto;gap:12px 22px;align-items:center;color:#fff3dc}
+  .tray label{font-size:14px;display:grid;grid-template-columns:1fr auto;gap:2px 8px}
+  .tray label output{color:var(--yel)}
+  .tray input{grid-column:1/-1}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;margin:0;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:3px;background:rgba(40,20,5,.55);box-shadow:inset 0 1px 2px rgba(0,0,0,.6)}
+  input[type=range]::-moz-range-track{height:5px;border-radius:3px;background:rgba(40,20,5,.55)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:44px;height:15px;margin-top:-5px;border-radius:4px;background:linear-gradient(#fff,#ddd8ca);box-shadow:0 2px 3px rgba(0,0,0,.5)}
+  input[type=range]::-moz-range-thumb{width:44px;height:15px;border:0;border-radius:4px;background:linear-gradient(#fff,#ddd8ca);box-shadow:0 2px 3px rgba(0,0,0,.5)}
+  button{font:inherit;cursor:pointer;font-size:16px;padding:9px 16px;border-radius:5px;border:0;color:#3a2410;background:linear-gradient(#fdf7e6,#d9d0ba);box-shadow:0 3px 0 #4a2f12,0 5px 6px rgba(0,0,0,.4);transition:transform .08s,box-shadow .08s;white-space:nowrap}
+  button:active{transform:translateY(3px);box-shadow:0 0 0 #4a2f12}
+  button.throw{background:linear-gradient(#f8e48e,#e2bf45)}
+  button.felt{background:linear-gradient(#5d6a72,#39434a);color:#f1eee4}
+  @media (max-width:820px){.cols{grid-template-columns:1fr}.tray{grid-template-columns:1fr 1fr}.tray button.throw{grid-column:1/-1}.corner{text-align:left}}
+  @media (prefers-reduced-motion:reduce){.go .d,.go .w{animation:none;stroke-dashoffset:0;fill-opacity:1}.go .d.dash{stroke-dasharray:.02 .035}.go .w{stroke:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="chalk" x="-3%" y="-8%" width="106%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="4" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" result="d"/><feColorMatrix in="n" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -2.4 0 0 0 2" result="m"/><feComposite in="d" in2="m" operator="in"/></filter>
+  <filter id="dustf"><feTurbulence type="fractalNoise" baseFrequency=".012 .05" numOctaves="3" seed="11"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 -.2"/></filter>
+  <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="context-stroke" stroke-width="1.6" stroke-linecap="round"/></marker>
+</defs></svg>
+<div class="frame">
+  <main class="board go" id="board">
+    <svg class="dust" aria-hidden="true"><rect width="100%" height="100%" filter="url(#dustf)"/></svg>
+    <div class="top">
+      <div><h1><small>PHYSICS I · LECTURE 9</small>Things That Are Thrown</h1>
+        <svg class="squig" viewBox="0 0 430 14" preserveAspectRatio="none" filter="url(#chalk)"><path class="c y d" style="--i:0" pathLength="1" d="M3 8q14-9 28 0t28 0t28 0t28 0t28 0t28 0t28 0t28 0t28 0t28 0t28 0t28 0t28 0t28 0t28 0"/></svg></div>
+      <p class="corner">Prof. O. Brandt — rm 214<br><a href="index.html">← back to all 100</a><br><b>DO NOT ERASE</b></p>
+    </div>
+    <div class="cols">
+      <svg viewBox="0 0 420 300" role="img" aria-label="Chalk diagram of a projectile arc with launch velocity, its components, apex height H and range R" filter="url(#chalk)">
+        <path class="c d" style="--i:1" pathLength="1" marker-end="url(#ah)" d="M50 250H404"/><path class="c d" style="--i:1" pathLength="1" marker-end="url(#ah)" d="M50 250V26"/>
+        <path class="c y d" style="--i:3;stroke-width:3.2" pathLength="1" d="M50 250Q210 -90 370 250"/>
+        <path class="c p d" style="--i:5;stroke-width:3" pathLength="1" marker-end="url(#ah)" d="M50 250L88 169"/>
+        <path class="c p d dash" style="--i:6" pathLength="1" d="M50 256H88"/><path class="c p d dash" style="--i:6" pathLength="1" d="M88 250V169"/>
+        <path class="c d" style="--i:7;stroke-width:1.8" pathLength="1" d="M84 250A34 34 0 0 0 64.5 219.2"/>
+        <path class="c b d dash" style="--i:8" pathLength="1" d="M210 80V250"/><circle class="c b d" style="--i:8;fill:#a5d4ec" pathLength="1" cx="210" cy="80" r="5"/>
+        <path class="c b d" style="--i:9" pathLength="1" marker-end="url(#ah)" d="M218 80H266"/>
+        <path class="c d" style="--i:10;stroke-width:1.8" pathLength="1" d="M50 268v10M50 273H370M370 268v10"/>
+        <path class="c p d" style="--i:11" pathLength="1" marker-end="url(#ah)" d="M340 46V104"/>
+        <g class="t"><text class="w tp" style="--i:5" x="94" y="164">v₀</text><text class="w" style="--i:7" x="62" y="245" font-size="14">θ</text>
+          <text class="w tp" style="--i:6" x="94" y="216" font-size="14">v₀ sin θ</text><text class="w tb" style="--i:8" x="218" y="170">H</text>
+          <text class="w tb" style="--i:9" x="270" y="74" font-size="14">vₓ stays put</text><text class="w" style="--i:10" x="204" y="296">R</text>
+          <text class="w tp" style="--i:11" x="350" y="82">g</text><text class="w" style="--i:1" x="398" y="240" font-size="14">x</text><text class="w" style="--i:1" x="60" y="36" font-size="14">y</text></g>
+      </svg>
+      <svg class="eq" viewBox="0 0 380 290" role="img" aria-label="Equations: x equals v zero cosine theta t. y equals v zero sine theta t minus one half g t squared. Range R equals v zero squared sine two theta over g. Height H equals v zero sine theta squared over two g." filter="url(#chalk)">
+        <text class="w" style="--i:12" x="8" y="38">x = v₀ cos θ · t</text>
+        <text class="w" style="--i:14" x="8" y="88">y = v₀ sin θ · t − ½ g t²</text>
+        <path class="c y d" style="--i:18" pathLength="1" d="M4 118q150-7 300-2q5 28 0 58q-150 6-300 2q-5-30 0-58z"/>
+        <text class="w ty" style="--i:16" x="20" y="156">R = v₀² sin 2θ / g</text>
+        <path class="c p d" style="--i:19;stroke-width:2" pathLength="1" d="M338 132l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z"/>
+        <text class="w" style="--i:20" x="8" y="222">H = (v₀ sin θ)² / 2g</text>
+        <text class="w tb" style="--i:22" x="8" y="268" font-size="19">g = 9.81 m/s²  (always. sorry.)</text>
+      </svg>
+    </div>
+    <h2>Try it → <span id="tally">land the chalk in the bucket</span></h2>
+    <svg id="demo" viewBox="0 0 600 300" role="img" aria-label="Projectile demonstration: trajectories are drawn across a ruled ground line" filter="url(#chalk)">
+      <path class="c" d="M14 260H592"/><g id="ruler"></g>
+      <g id="trails"></g>
+      <g id="bucket"><path class="c b" style="stroke-width:3" d="M-10 -15L-7 0H7L10 -15"/><path class="c b" style="stroke-width:1.6" d="M-10 -15q10-12 20 0"/></g>
+      <path id="arm" class="c p" style="stroke-width:3.4" marker-end="url(#ah)" d="M40 260L80 220"/>
+      <path class="c" style="stroke-width:2" d="M22 260l18-12 0 12"/>
+      <circle id="ball" cx="40" cy="260" r="5.5" fill="#f1eee4"/>
+      <text id="msg" class="t ty" x="590" y="30" text-anchor="end"></text>
+    </svg>
+  </main>
+  <div class="tray">
+    <label>angle θ <output id="oa"></output><input id="ang" type="range" min="10" max="80" value="45" aria-label="Launch angle in degrees"></label>
+    <label>speed v₀ <output id="ov"></output><input id="spd" type="range" min="8" max="30" value="20" step=".5" aria-label="Launch speed in metres per second"></label>
+    <button class="throw" id="throw">Throw!</button><button class="felt" id="wipe">Eraser</button><button id="redo">Re-draw lecture</button>
+  </div>
+</div>
+<script>
+(function(){
+  const $=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg',S=5.6,OX=40,GY=260,G=9.81;
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mk=(tag,at,par)=>{const e=document.createElementNS(NS,tag);for(const k in at)e.setAttribute(k,at[k]);par.appendChild(e);return e};
+  for(let m=0;m<=95;m+=5){const x=OX+m*S,big=m%10===0;mk('path',{class:'c',d:'M'+x+' 260v'+(big?9:5),style:'stroke-width:1.5'},$('ruler'));
+    if(big&&m)mk('text',{class:'t',x:x,y:285,'text-anchor':'middle','font-size':12},$('ruler')).textContent=m+(m===90?' m':'')}
+  let dist=52,flying=false,hits=0,throws=0;
+  const A=()=>+$('ang').value*Math.PI/180,V=()=>+$('spd').value;
+  function aim(){const a=A(),L=22+V()*1.6;$('arm').setAttribute('d','M40 260L'+(40+L*Math.cos(a)).toFixed(1)+' '+(260-L*Math.sin(a)).toFixed(1));
+    $('oa').textContent=$('ang').value+'°';$('ov').textContent=V().toFixed(1)+' m/s'}
+  function place(){$('bucket').setAttribute('transform','translate('+(OX+dist*S)+',260)')}
+  function tally(){$('tally').textContent=throws?('in the bucket: '+hits+'  ·  throws: '+throws):'land the chalk in the bucket'}
+  function launch(){
+    if(flying)return;flying=true;throws++;$('msg').textContent='';
+    const a=A(),v=V(),T=2*v*Math.sin(a)/G,R=v*v*Math.sin(2*a)/G,H=Math.pow(v*Math.sin(a),2)/(2*G);
+    const tr=$('trails');[...tr.children].forEach(c=>c.setAttribute('opacity',.38));while(tr.children.length>4)tr.removeChild(tr.firstChild);
+    const g=mk('g',{},tr),line=mk('polyline',{class:'c y',points:'','stroke-dasharray':'1 8',style:'stroke-width:3.4'},g),pts=[];
+    const pos=t=>[OX+v*Math.cos(a)*t*S,GY-(v*Math.sin(a)*t-.5*G*t*t)*S];
+    function land(){
+      const lx=OX+R*S,ok=Math.abs(R-dist)<1.9;
+      $('ball').setAttribute('cx',lx);$('ball').setAttribute('cy',ok?GY-6:GY-5);
+      const ap=pos(T/2);mk('path',{class:'c b',d:'M'+ap[0]+' '+(ap[1]+5)+'V'+(GY-3),'stroke-dasharray':'3 6',style:'stroke-width:1.6'},g);
+      mk('text',{class:'t tb',x:ap[0]-7,y:Math.min(GY-30,ap[1]+30),'text-anchor':'end','font-size':14},g).textContent='H = '+H.toFixed(1)+' m';
+      mk('path',{class:'c p',d:'M'+(lx-6)+' 254l12 12M'+(lx+6)+' 254l-12 12',style:'stroke-width:2.2'},g);
+      mk('text',{class:'t tp',x:Math.min(560,lx),y:246-(ok?18:0),'text-anchor':'middle','font-size':14},g).textContent='R = '+R.toFixed(1)+' m';
+      if(ok){hits++;$('msg').textContent='✓ in the bucket!  T = '+T.toFixed(2)+' s';setTimeout(()=>{dist=18+Math.round(Math.random()*66);place()},1400)}
+      else $('msg').textContent=(R<dist?'short':'long')+' by '+Math.abs(R-dist).toFixed(1)+' m  ·  T = '+T.toFixed(2)+' s';
+      tally();flying=false}
+    if(reduce){for(let i=0;i<=40;i++){const p=pos(T*i/40);pts.push(p[0].toFixed(1)+','+p[1].toFixed(1))}line.setAttribute('points',pts.join(' '));land();return}
+    let t=0,last=0;
+    (function fr(ms){const dt=last?Math.min(.05,(ms-last)/1000):0;last=ms;t=Math.min(T,t+dt*1.7);
+      const p=pos(t);pts.push(p[0].toFixed(1)+','+p[1].toFixed(1));line.setAttribute('points',pts.join(' '));
+      $('ball').setAttribute('cx',p[0]);$('ball').setAttribute('cy',p[1]);
+      if(t>=T)land();else requestAnimationFrame(fr)})(0);
+  }
+  $('ang').addEventListener('input',aim);$('spd').addEventListener('input',aim);
+  $('throw').onclick=launch;
+  $('demo').addEventListener('click',launch);
+  $('wipe').onclick=()=>{if(flying)return;$('trails').innerHTML='';$('msg').textContent='';$('ball').setAttribute('cx',40);$('ball').setAttribute('cy',260)};
+  $('redo').onclick=()=>{const b=$('board');b.classList.remove('go');void b.offsetWidth;b.classList.add('go');b.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'})};
+  addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName!=='BUTTON')launch()});
+  aim();place();tally();
+})();
+</script>
+</body>
+</html>

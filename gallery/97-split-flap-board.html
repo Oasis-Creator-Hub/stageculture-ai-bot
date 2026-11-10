@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Grand Perhaps Terminus — Departures</title>
 <meta name="description" content="A clattering split-flap departure board with a live clock, listing trains to the Edge of Tuesday, Lost Sock Island, Second Thoughts and other places you cannot quite book a ticket to.">
-<style>
+<style>html{overflow-x:clip}
 :root{--cols:38;--w:clamp(8px,calc((100vw - 56px) / var(--cols)),27px);--h:calc(var(--w) * 1.56);--flap:#1d1f22;--amber:#ffc531}
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -41,7 +41,7 @@ body{min-height:100svh;font-family:"DIN Condensed","Roboto Condensed","Arial Nar
 .foot button[aria-pressed=true]{border-color:var(--amber);color:var(--amber)}
 .back{align-self:flex-start;margin:22px 0 30px 16px;color:#cfe3df;text-decoration:none;font-size:13px;letter-spacing:.24em}
 .rmk{display:flex}
-@media(max-width:700px){:root{--cols:27}.rmk{display:none}}
+@media(max-width:700px){:root{--cols:27}.rmk{display:none!important}}
 @media(prefers-reduced-motion:reduce){.lamp.on{animation:none}}
 </style>
 </head>

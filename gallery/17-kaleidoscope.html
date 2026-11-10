@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prisma Wheel — a pointer-driven kaleidoscope</title>
+<meta name="description" content="A full-screen canvas kaleidoscope. Move your pointer to turn the mirrors, change the segment count, swap palettes, freeze and save the pattern.">
+<style>
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:#050506}
+  body{overflow:hidden;color:#f4efe6;font-family:"Optima","Candara","Gill Sans","Segoe UI",sans-serif}
+  canvas#k{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:none}
+  .brand{position:fixed;left:0;right:0;top:clamp(14px,3vh,30px);text-align:center;pointer-events:none;mix-blend-mode:difference}
+  .brand h1{margin:0;font-weight:400;font-size:clamp(13px,1.5vw,17px);letter-spacing:.9em;text-indent:.9em;text-transform:uppercase}
+  .brand p{margin:.7em 0 0;font-size:10px;letter-spacing:.4em;text-indent:.4em;text-transform:uppercase;opacity:.7;transition:opacity 1.2s}
+  .brand p.gone{opacity:0}
+  .back{position:fixed;left:clamp(12px,2.5vw,28px);top:clamp(12px,3vh,28px);width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+    color:#fff;text-decoration:none;font-size:11px;letter-spacing:.06em;border:1px solid rgba(255,255,255,.7);mix-blend-mode:difference;z-index:3}
+  .back:hover,.back:focus-visible{background:#fff;color:#000;outline:none}
+  /* control ring: a brass eyepiece collar along the bottom */
+  .dock{position:fixed;left:50%;bottom:clamp(10px,3vh,26px);transform:translateX(-50%);z-index:3;width:min(94vw,660px);
+    display:grid;grid-template-columns:1.2fr auto auto;gap:8px 18px;align-items:center;padding:12px 20px;border-radius:999px;
+    background:linear-gradient(#17140f,#0a0907);border:1px solid #6b5a36;box-shadow:0 0 0 4px #0a0907,0 0 0 5px #3d3320,0 14px 40px rgba(0,0,0,.7);
+    transition:opacity .6s,transform .6s}
+  .dock.hide{opacity:0;transform:translate(-50%,30px);pointer-events:none}
+  .seg{display:flex;align-items:center;gap:10px;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#cdb985;min-width:0}
+  .seg output{font:italic 22px/1 "Didot","Bodoni MT","Times New Roman",serif;color:#f4efe6;min-width:1.3em;text-align:right;letter-spacing:0}
+  input[type=range]{-webkit-appearance:none;appearance:none;flex:1;min-width:60px;height:22px;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:repeating-linear-gradient(90deg,#cdb985 0 2px,transparent 2px 8px)}
+  input[type=range]::-moz-range-track{height:2px;background:repeating-linear-gradient(90deg,#cdb985 0 2px,transparent 2px 8px)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-7px;transform:rotate(45deg);background:#f4efe6;border:3px solid #0a0907;box-shadow:0 0 0 1px #cdb985}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;transform:rotate(45deg);border-radius:0;background:#f4efe6;border:3px solid #0a0907;box-shadow:0 0 0 1px #cdb985}
+  .pals{display:flex;gap:7px}
+  .pals button{width:26px;height:26px;border-radius:50%;border:2px solid #0a0907;box-shadow:0 0 0 1px #6b5a36;cursor:pointer;padding:0;transition:transform .2s}
+  .pals button[aria-pressed=true]{box-shadow:0 0 0 2px #f4efe6;transform:scale(1.12)}
+  .acts{display:flex;gap:6px}
+  .acts button{font:inherit;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#cdb985;background:none;border:1px solid #6b5a36;border-radius:999px;padding:7px 12px;cursor:pointer}
+  .acts button:hover,.acts button[aria-pressed=true]{background:#cdb985;color:#0a0907}
+  button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:3px}
+  @media (max-width:560px){.dock{grid-template-columns:1fr auto;border-radius:26px;padding:12px 16px}.seg{grid-column:1 / -1}}
+</style>
+</head>
+<body>
+<canvas id="k" aria-label="Kaleidoscope pattern"></canvas>
+<a class="back" href="index.html" aria-label="Back to the 100">←100</a>
+<div class="brand"><h1>Prisma Wheel</h1><p id="hint">Move · drag · turn the glass</p></div>
+<div class="dock" id="dock">
+  <label class="seg">Mirrors <input type="range" id="segs" min="3" max="16" step="1" value="7" aria-label="Mirror pairs"><output id="segOut">14</output></label>
+  <div class="pals" id="pals" role="group" aria-label="Palette"></div>
+  <div class="acts"><button type="button" id="freeze" aria-pressed="false">Freeze</button><button type="button" id="save">Save</button></div>
+</div>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cv = document.getElementById('k'), ctx = cv.getContext('2d');
+  const T = 420, src = document.createElement('canvas'); src.width = src.height = T; const sx = src.getContext('2d');
+  const palettes = [
+    {name: 'Cathedral', bg: '#0b0720', c: ['#ff3b5c', '#ffb400', '#2d6bff', '#1fd1a5', '#f7f1ff']},
+    {name: 'Peacock', bg: '#021a1c', c: ['#00c2a8', '#0b6cff', '#7a2cff', '#e4ff3a', '#01313a']},
+    {name: 'Marigold', bg: '#2a0a05', c: ['#ff7a00', '#ffd23f', '#e0245e', '#fff3d6', '#7a1f00']},
+    {name: 'Opal', bg: '#f3eee6', c: ['#ff9eb5', '#8fd3ff', '#b6f2c8', '#c9a8ff', '#ffffff']},
+    {name: 'Ink', bg: '#050505', c: ['#ffffff', '#9a9a9a', '#2b2b2b', '#e8e0d0', '#ff3b30']}
+  ];
+  let pal = palettes[0], pairs = 7, frozen = false;
+  let W, H, dpr, R;
+  // wandering glass chips drawn into a small wrapping tile
+  const chips = Array.from({length: 16}, (_, i) => ({x: Math.random() * T, y: Math.random() * T, vx: (Math.random() - .5) * .9, vy: (Math.random() - .5) * .9,
+    s: 18 + Math.random() * 60, a: Math.random() * 6.28, va: (Math.random() - .5) * .02, k: i % 4, c: i % 5}));
+  const ptr = {x: .5, y: .5, tx: .5, ty: .5, last: -1e9, spin: 0};
+  let ox = 0, oy = 0, rot = 0;
+
+  function size(){ dpr = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); R = Math.hypot(W, H) / 2 + 4; }
+  function chip(c, x, y){
+    sx.save(); sx.translate(x, y); sx.rotate(c.a); sx.globalAlpha = .82; sx.fillStyle = pal.c[c.c]; sx.strokeStyle = pal.c[(c.c + 2) % 5]; sx.lineWidth = 3;
+    const s = c.s; sx.beginPath();
+    if (c.k === 0){ sx.moveTo(0, -s); sx.lineTo(s * .87, s * .5); sx.lineTo(-s * .87, s * .5); sx.closePath(); sx.fill(); }
+    else if (c.k === 1){ sx.arc(0, 0, s * .6, 0, 6.283); sx.fill(); sx.beginPath(); sx.arc(0, 0, s * .32, 0, 6.283); sx.fillStyle = pal.c[(c.c + 1) % 5]; sx.fill(); }
+    else if (c.k === 2){ sx.rect(-s * .9, -s * .14, s * 1.8, s * .28); sx.fill(); sx.beginPath(); sx.rect(-s * .14, -s * .6, s * .28, s * 1.2); sx.fillStyle = pal.c[(c.c + 3) % 5]; sx.fill(); }
+    else { sx.arc(0, 0, s * .7, 0, Math.PI); sx.stroke(); sx.beginPath(); sx.arc(0, 0, s * .45, .3, Math.PI + .3); sx.stroke(); }
+    sx.restore();
+  }
+  function paintTile(k){
+    sx.globalAlpha = 1; sx.fillStyle = pal.bg; sx.fillRect(0, 0, T, T);
+    for (const c of chips){
+      c.x = ((c.x + c.vx * k) % T + T) % T; c.y = ((c.y + c.vy * k) % T + T) % T; c.a += c.va * k;
+      for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++){        // wrap so the tile repeats seamlessly
+        const x = c.x + i * T, y = c.y + j * T; if (x > -c.s && x < T + c.s && y > -c.s && y < T + c.s) chip(c, x, y); }
+    }
+  }
+  function render(){
+    const n = pairs * 2, seg = Math.PI * 2 / n, pat = ctx.createPattern(src, 'repeat');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.fillStyle = pal.bg; ctx.fillRect(0, 0, W, H);
+    for (let i = 0; i < n; i++){
+      ctx.save(); ctx.translate(W / 2, H / 2);
+      if (i % 2){ ctx.rotate((i + 1) * seg); ctx.scale(1, -1); } else ctx.rotate(i * seg);
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(R, -.6); ctx.arc(0, 0, R, 0, seg + .004); ctx.closePath(); ctx.clip();
+      ctx.rotate(rot); ctx.translate(-ox, -oy); ctx.fillStyle = pat; ctx.fillRect(ox - R * 1.5, oy - R * 1.5, R * 3, R * 3);
+      ctx.restore();
+    }
+    // soft eyepiece falloff + centre jewel
+    const g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .3, W / 2, H / 2, R);
+    g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.6)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = pal.c[4]; ctx.beginPath(); ctx.arc(W / 2, H / 2, 3, 0, 6.283); ctx.fill();
+  }
+  let prev = performance.now(), running = false;
+  function frame(now){
+    const k = Math.min(3, (now - prev) / 16.7); prev = now;
+    const idle = now - ptr.last > 2500;
+    if (idle && !reduce){ ptr.tx = .5 + Math.cos(now * .00013) * .32; ptr.ty = .5 + Math.sin(now * .00017) * .32; }
+    if (!frozen){
+      const px = ptr.x, py = ptr.y;
+      ptr.x += (ptr.tx - ptr.x) * .06 * k; ptr.y += (ptr.ty - ptr.y) * .06 * k;
+      ox = ptr.x * T * 1.6; oy = ptr.y * T * 1.6;
+      ptr.spin = ptr.spin * .94 + ((ptr.x - px) - (ptr.y - py)) * .9;
+      rot += (reduce ? 0 : .0012 * k) + ptr.spin;
+      paintTile(reduce ? (idle ? 0 : .5) : k);
+    }
+    render();
+    if ((reduce && idle) || frozen){ running = false; return; }
+    requestAnimationFrame(frame);
+  }
+  const kick = () => { if (!running){ running = true; prev = performance.now(); requestAnimationFrame(frame); } };
+
+  const dock = document.getElementById('dock'), hint = document.getElementById('hint'); let hideT;
+  function wake(){ dock.classList.remove('hide'); clearTimeout(hideT); hideT = setTimeout(() => { if (!dock.matches(':hover,:focus-within')) dock.classList.add('hide'); }, 4200); }
+  function move(e){ ptr.tx = e.clientX / W; ptr.ty = e.clientY / H; ptr.last = performance.now(); hint.classList.add('gone'); wake(); kick(); }
+  cv.addEventListener('pointermove', move); cv.addEventListener('pointerdown', move);
+  addEventListener('keydown', wake); dock.addEventListener('pointermove', wake);
+  addEventListener('resize', () => { size(); render(); });
+
+  const segs = document.getElementById('segs'), out = document.getElementById('segOut');
+  segs.addEventListener('input', () => { pairs = +segs.value; out.textContent = pairs * 2; render(); wake(); });
+  const pals = document.getElementById('pals');
+  palettes.forEach((p, i) => { const b = document.createElement('button'); b.type = 'button'; b.title = p.name; b.setAttribute('aria-label', p.name + ' palette'); b.setAttribute('aria-pressed', i === 0);
+    b.style.background = `conic-gradient(${p.c[0]} 0 25%,${p.c[1]} 0 50%,${p.c[2]} 0 75%,${p.c[3]} 0)`;
+    b.addEventListener('click', () => { pal = p; [...pals.children].forEach(o => o.setAttribute('aria-pressed', o === b)); paintTile(0); render(); wake(); });
+    pals.appendChild(b); });
+  const fz = document.getElementById('freeze');
+  fz.addEventListener('click', () => { frozen = !frozen; fz.setAttribute('aria-pressed', frozen); fz.textContent = frozen ? 'Thaw' : 'Freeze'; if (!frozen) kick(); });
+  document.getElementById('save').addEventListener('click', () => { render(); const a = document.createElement('a'); a.download = 'prisma-wheel.png'; a.href = cv.toDataURL('image/png'); document.body.appendChild(a); a.click(); a.remove(); });
+
+  size(); paintTile(0); render(); wake(); kick();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Petit Carillon — a toy music-box step sequencer</title>
+<meta name="description" content="A pastel toy step sequencer: paint pins on a 16-step pentatonic grid and a little brass drum turns, plucking WebAudio chimes from its comb.">
+<style>
+  :root{--cream:#fff6e9;--plum:#4f3f63;--mint:#bfe8d4;--peach:#ffc9ae;--lilac:#d9c8f3;--butter:#ffe69a;--rose:#ffb3c4;--sky:#b9defa}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{min-height:100vh;color:var(--plum);padding:18px 12px 30px;
+    font-family:ui-rounded,"SF Pro Rounded","Arial Rounded MT Bold","Nunito","Varela Round","Hiragino Maru Gothic ProN","Trebuchet MS",sans-serif;
+    background-color:var(--cream);
+    background-image:radial-gradient(circle at 12px 12px,var(--rose) 3px,transparent 3.5px),radial-gradient(circle at 46px 40px,var(--sky) 4px,transparent 4.5px),radial-gradient(circle at 76px 14px,var(--butter) 3px,transparent 3.5px);
+    background-size:92px 64px}
+  a.back{position:fixed;top:10px;right:12px;z-index:5;background:var(--butter);border:2.5px solid var(--plum);border-radius:99px;padding:4px 12px;color:var(--plum);
+    text-decoration:none;font-weight:700;font-size:13px;box-shadow:2px 3px 0 var(--plum)}
+  .box{max-width:780px;margin:0 auto;background:var(--lilac);border:3.5px solid var(--plum);border-radius:38px;padding:clamp(14px,3vw,26px);box-shadow:7px 9px 0 var(--plum);position:relative}
+  header{display:flex;align-items:center;gap:14px;margin:0 6px 14px;flex-wrap:wrap}
+  h1{font-size:clamp(26px,5.5vw,42px);margin:0;letter-spacing:-.02em;line-height:1;font-weight:800}
+  h1 span{color:#fff;-webkit-text-stroke:2.5px var(--plum);paint-order:stroke fill;text-shadow:3px 3px 0 var(--plum)}
+  header p{margin:0;font-size:13.5px;line-height:1.35;flex:1;min-width:180px;font-weight:600;opacity:.85}
+  .stage{background:var(--mint);border:3.5px solid var(--plum);border-radius:26px;overflow:hidden;position:relative;height:clamp(150px,30vw,220px)}
+  .stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .grid{margin-top:14px;background:#fff;border:3.5px solid var(--plum);border-radius:26px;padding:clamp(8px,1.8vw,14px);display:grid;grid-template-columns:auto 1fr;gap:0 8px;touch-action:none;user-select:none;-webkit-user-select:none}
+  .names{display:grid;grid-template-rows:repeat(8,1fr);font-size:10.5px;font-weight:800;align-items:center;text-align:right;opacity:.7}
+  .cells{display:grid;grid-template-columns:repeat(16,1fr);gap:clamp(2px,.6vw,5px)}
+  .cells button{aspect-ratio:1;min-width:0;padding:0;border-radius:42%;border:2px solid rgba(79,63,99,.22);background:#f6f0fb;cursor:pointer;position:relative;
+    transition:transform .12s cubic-bezier(.3,2.2,.5,1),background .12s,border-color .12s;-webkit-tap-highlight-color:transparent}
+  .cells button.bar{background:#efe6f8}
+  .cells button[aria-pressed=true]{background:var(--c);border-color:var(--plum);box-shadow:inset 0 -3px 0 rgba(79,63,99,.25),inset 0 2px 0 rgba(255,255,255,.7)}
+  .cells button.now{border-color:var(--plum);border-style:dashed}
+  .cells button.now[aria-pressed=true]{transform:scale(1.28);border-style:solid;z-index:1}
+  .cells button:focus-visible{outline:3px solid var(--plum);outline-offset:1px}
+  .ctl{display:grid;grid-template-columns:auto 1fr auto;gap:12px 16px;align-items:center;margin:16px 4px 0}
+  button.toy{font:inherit;font-weight:800;font-size:14px;color:var(--plum);border:3px solid var(--plum);border-radius:99px;padding:9px 16px;background:#fff;cursor:pointer;
+    box-shadow:3px 4px 0 var(--plum);transition:transform .08s,box-shadow .08s}
+  button.toy:active{transform:translate(3px,4px);box-shadow:0 0 0 var(--plum)}
+  #play{width:74px;height:74px;border-radius:50%;padding:0;background:var(--rose);font-size:13px;display:grid;place-items:center}
+  #play svg{width:30px;height:30px;fill:var(--plum)}
+  #play[aria-pressed=true]{background:var(--butter)}
+  .tempo{display:grid;gap:2px;font-weight:800;font-size:13px}
+  .tempo span{display:flex;justify-content:space-between}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:30px;background:transparent;margin:0;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:12px;border-radius:9px;border:3px solid var(--plum);background:linear-gradient(90deg,var(--sky),var(--mint),var(--butter),var(--peach),var(--rose))}
+  input[type=range]::-moz-range-track{height:8px;border-radius:9px;border:3px solid var(--plum);background:linear-gradient(90deg,var(--sky),var(--mint),var(--butter),var(--peach),var(--rose))}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;margin-top:-10px;border-radius:50%;background:#fff;border:3px solid var(--plum);box-shadow:2px 2px 0 var(--plum)}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--plum)}
+  .more{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  .foot{text-align:center;font-size:12.5px;font-weight:600;margin:16px 0 0;opacity:.7}
+  @media (max-width:560px){.ctl{grid-template-columns:auto 1fr}.more{grid-column:1/-1;justify-content:center}.names{font-size:8.5px}.box{border-radius:28px;box-shadow:4px 6px 0 var(--plum)}.cells button{border-width:1.5px}}
+  @media (prefers-reduced-motion:reduce){.cells button{transition:none}}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← 100</a>
+<main class="box">
+  <header><h1><span>Petit</span> Carillon</h1><p>Push pins into the drum, wind it up, and let it sing. Five notes, no wrong ones.</p></header>
+  <div class="stage" id="stage"><canvas id="drum" aria-label="Rotating music-box drum with pins and a comb"></canvas></div>
+  <div class="grid" id="grid"><div class="names" id="names" aria-hidden="true"></div><div class="cells" id="cells" role="group" aria-label="Sixteen-step note grid"></div></div>
+  <div class="ctl">
+    <button class="toy" id="play" aria-pressed="false" aria-label="Play"><svg viewBox="0 0 24 24" id="ico"><path d="M7 4.5v15l13-7.5z"/></svg></button>
+    <label class="tempo"><span>Winding speed <output id="bpmOut"></output></span><input type="range" id="bpm" min="60" max="180" value="104" aria-label="Tempo in beats per minute"></label>
+    <div class="more"><button class="toy" id="tune">Lullaby</button><button class="toy" id="dice">Scatter</button><button class="toy" id="clear">Pull pins</button></div>
+  </div>
+  <p class="foot">Drag across the grid to paint. Top rows ring highest.</p>
+</main>
+<script>
+(function(){
+  const $=id=>document.getElementById(id),STEPS=16,ROWS=8;
+  const FREQ=[523.25,587.33,659.25,783.99,880,1046.5,1174.66,1318.51],NAME=['C5','D5','E5','G5','A5','C6','D6','E6'];
+  const COL=['#ffb3c4','#ffc9ae','#ffe69a','#bfe8d4','#b9defa','#d9c8f3','#ffb3c4','#ffe69a'];
+  const grid=Array.from({length:ROWS},()=>new Array(STEPS).fill(false)),btn=Array.from({length:ROWS},()=>[]);
+  const vib=new Float32Array(ROWS);
+  let ac=null,master=null,playing=false,nextTime=0,nextStep=0,timer=null,shown=-1,posIdle=0;
+  // ---------- grid ----------
+  const cells=$('cells');
+  for(let n=ROWS-1;n>=0;n--){const d=document.createElement('div');d.textContent=NAME[n];$('names').appendChild(d);
+    for(let s=0;s<STEPS;s++){const b=document.createElement('button');b.style.setProperty('--c',COL[n]);b.dataset.n=n;b.dataset.s=s;
+      if((s>>2)&1)b.className='bar';b.setAttribute('aria-pressed','false');b.setAttribute('aria-label',NAME[n]+', step '+(s+1));btn[n][s]=b;cells.appendChild(b)}}
+  function set(n,s,on,quiet){if(grid[n][s]===on)return;grid[n][s]=on;btn[n][s].setAttribute('aria-pressed',on);if(on&&!quiet){audio();chime(n,ac?ac.currentTime:0);vib[n]=1}}
+  let paint=null;
+  function cellAt(e){const el=document.elementFromPoint(e.clientX,e.clientY);return el&&el.dataset&&el.dataset.n!==undefined&&cells.contains(el)?el:null}
+  cells.addEventListener('pointerdown',e=>{const c=cellAt(e);if(!c)return;e.preventDefault();paint=!grid[c.dataset.n][c.dataset.s];set(+c.dataset.n,+c.dataset.s,paint)});
+  cells.addEventListener('pointermove',e=>{if(paint===null)return;const c=cellAt(e);if(c)set(+c.dataset.n,+c.dataset.s,paint)});
+  addEventListener('pointerup',()=>paint=null);addEventListener('pointercancel',()=>paint=null);
+  cells.addEventListener('keydown',e=>{const b=e.target;if(b.dataset.n===undefined)return;const n=+b.dataset.n,s=+b.dataset.s;
+    if(e.key===' '||e.key==='Enter'){e.preventDefault();set(n,s,!grid[n][s])}
+    const mv={ArrowRight:[0,1],ArrowLeft:[0,-1],ArrowUp:[1,0],ArrowDown:[-1,0]}[e.key];
+    if(mv){e.preventDefault();const t=btn[Math.max(0,Math.min(ROWS-1,n+mv[0]))][(s+mv[1]+STEPS)%STEPS];t.focus()}});
+  // ---------- audio ----------
+  function audio(){
+    if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)();master=ac.createGain();master.gain.value=.5;
+      const comp=ac.createDynamicsCompressor();master.connect(comp).connect(ac.destination)}catch(e){ac=null}}
+    else if(ac.state==='suspended')ac.resume()}
+  function chime(n,t){
+    if(!ac)return;const f=FREQ[n];t=Math.max(t,ac.currentTime);
+    [[1,.5,1.5,'sine'],[2,.16,.8,'sine'],[5.4,.07,.18,'triangle']].forEach(p=>{const o=ac.createOscillator(),g=ac.createGain();o.type=p[3];o.frequency.value=f*p[0];
+      g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(p[1],t+.004);g.gain.exponentialRampToValueAtTime(.0001,t+p[2]);
+      o.connect(g).connect(master);o.start(t);o.stop(t+p[2]+.05)})}
+  const stepDur=()=>60/(+$('bpm').value)/2;
+  function schedule(){while(nextTime<ac.currentTime+.12){const s=nextStep%STEPS;for(let n=0;n<ROWS;n++)if(grid[n][s])chime(n,nextTime);nextTime+=stepDur();nextStep++}}
+  function toggle(){
+    audio();if(!ac)return;playing=!playing;
+    if(playing){nextStep=Math.ceil(posIdle);nextTime=ac.currentTime+.06+(nextStep-posIdle)*stepDur();schedule();timer=setInterval(schedule,25)}
+    else{clearInterval(timer);posIdle=pos();mark(-1)}
+    $('play').setAttribute('aria-pressed',playing);$('play').setAttribute('aria-label',playing?'Stop':'Play');
+    $('ico').innerHTML=playing?'<path d="M6 5h4.5v14H6zM13.5 5H18v14h-4.5z"/>':'<path d="M7 4.5v15l13-7.5z"/>'}
+  function pos(){return playing&&ac?nextStep-(nextTime-ac.currentTime)/stepDur():posIdle}
+  function mark(s){if(shown>=0)for(let n=0;n<ROWS;n++)btn[n][shown].classList.remove('now');shown=s;if(s>=0)for(let n=0;n<ROWS;n++)btn[n][s].classList.add('now')}
+  $('play').onclick=toggle;
+  $('bpm').addEventListener('input',()=>$('bpmOut').textContent=$('bpm').value+' bpm');$('bpmOut').textContent=$('bpm').value+' bpm';
+  function wipe(){for(let n=0;n<ROWS;n++)for(let s=0;s<STEPS;s++)set(n,s,false,true)}
+  function lullaby(){wipe();[[0,2],[0,0],[2,3],[4,4],[6,3],[7,5],[8,2],[8,0],[10,1],[12,0],[12,5],[14,6],[15,7]].forEach(p=>set(p[1],p[0],true,true))}
+  $('clear').onclick=wipe;$('tune').onclick=lullaby;
+  $('dice').onclick=()=>{wipe();for(let s=0;s<STEPS;s++){if(Math.random()<(s%2?.4:.8))set(Math.floor(Math.random()*ROWS),s,true,true);if(s%4===0&&Math.random()<.6)set(Math.floor(Math.random()*3),s,true,true)}};
+  // ---------- drum ----------
+  const cv=$('drum'),ctx=cv.getContext('2d');let W=0,H=0,dpr=1,lastStep=-1;
+  function resize(){const b=$('stage').getBoundingClientRect();dpr=Math.min(2,devicePixelRatio||1);W=b.width;H=b.height;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}
+  function draw(){
+    const p=pos(),cur=Math.floor(p);
+    if(playing&&cur!==lastStep&&cur>=0){lastStep=cur;const s=cur%STEPS;mark(s);for(let n=0;n<ROWS;n++)if(grid[n][s])vib[n]=1}
+    ctx.clearRect(0,0,W,H);
+    const R=H*.25,cy=H*.68,x0=W*.1,x1=W*.84,len=x1-x0,AP=.85,PL='#4f3f63';
+    ctx.lineJoin=ctx.lineCap='round';
+    // shadow + axle + crank
+    ctx.fillStyle='rgba(79,63,99,.16)';ctx.beginPath();ctx.ellipse((x0+x1)/2+6,cy+R+9,len/2+10,7,0,0,7);ctx.fill();
+    ctx.strokeStyle=PL;ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(x0-18,cy);ctx.lineTo(x1+30,cy);ctx.stroke();
+    const ca=-p/STEPS*Math.PI*2,kx=x1+30,ky=cy,hx=kx+Math.cos(ca)*5,hy=ky-Math.sin(ca)*R*.75;
+    ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(kx,ky);ctx.lineTo(hx,hy);ctx.stroke();
+    ctx.fillStyle='#ffb3c4';ctx.lineWidth=3;ctx.beginPath();ctx.arc(hx+7,hy,9,0,7);ctx.fill();ctx.stroke();
+    // drum body
+    const g=ctx.createLinearGradient(0,cy-R,0,cy+R);g.addColorStop(0,'#f3c96a');g.addColorStop(.3,'#fff0b8');g.addColorStop(.62,'#ffd97a');g.addColorStop(1,'#d99a4e');
+    ctx.fillStyle=g;ctx.lineWidth=3.5;ctx.beginPath();ctx.roundRect(x0,cy-R,len,2*R,R*.22);ctx.fill();
+    // engraved step lines roll with the drum
+    ctx.save();ctx.beginPath();ctx.roundRect(x0,cy-R,len,2*R,R*.22);ctx.clip();
+    for(let s=0;s<STEPS;s++){let a=AP-(s-p)/STEPS*Math.PI*2;a=Math.atan2(Math.sin(a),Math.cos(a));const c=Math.cos(a);if(c<=0)continue;
+      const y=cy-R*Math.sin(a);ctx.strokeStyle='rgba(79,63,99,'+(s%4===0?.3:.12)*c+')';ctx.lineWidth=s%4===0?2:1.2;ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke()}
+    ctx.restore();
+    ctx.strokeStyle=PL;ctx.lineWidth=3.5;ctx.beginPath();ctx.roundRect(x0,cy-R,len,2*R,R*.22);ctx.stroke();
+    // pins
+    const sp=len/ROWS;
+    for(let s=0;s<STEPS;s++){let a=AP-(s-p)/STEPS*Math.PI*2;a=Math.atan2(Math.sin(a),Math.cos(a));const c=Math.cos(a);if(c<=.05)continue;
+      const y=cy-R*Math.sin(a);
+      for(let n=0;n<ROWS;n++){if(!grid[n][s])continue;const x=x0+(n+.5)*sp,r=Math.max(2.4,Math.min(7,sp*.16))*(.55+.45*c);
+        ctx.fillStyle=COL[n];ctx.strokeStyle=PL;ctx.lineWidth=2.2;ctx.beginPath();ctx.ellipse(x,y,r,r*(.5+.5*c),0,0,7);ctx.fill();ctx.stroke();
+        ctx.fillStyle='rgba(255,255,255,.8)';ctx.beginPath();ctx.arc(x-r*.3,y-r*.3,r*.28,0,7);ctx.fill()}}
+    // comb: a bar with eight teeth, long for low notes; they shiver when plucked
+    const py=cy-R*Math.sin(AP),by=H*.08,t=performance.now()/1000;
+    for(let n=0;n<ROWS;n++){const x=x0+(n+.5)*sp,tw=Math.max(5,sp*.3),top=by+10+n*(py-by-22)/(ROWS+2),wob=Math.sin(t*70+n)*vib[n]*3.2;
+      ctx.fillStyle=vib[n]>.05?COL[n]:'#fff';ctx.strokeStyle=PL;ctx.lineWidth=2.6;ctx.beginPath();
+      ctx.moveTo(x-tw/2,top);ctx.lineTo(x+tw/2,top);ctx.lineTo(x+tw/2+wob,py-5);ctx.quadraticCurveTo(x+wob,py+2,x-tw/2+wob,py-5);ctx.closePath();ctx.fill();ctx.stroke();
+      vib[n]*=.93}
+    ctx.fillStyle='#b9defa';ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(x0-10,by);ctx.lineTo(x1+10,by);ctx.lineTo(x1+10,by+10+(ROWS-1)*(py-by-22)/(ROWS+2)+4);ctx.lineTo(x0-10,by+14);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle=PL;[x0+2,x1-2].forEach(x=>{ctx.beginPath();ctx.arc(x,by+8,2.6,0,7);ctx.fill()});
+    requestAnimationFrame(draw)}
+  if(!ctx.roundRect)CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h){this.rect(x,y,w,h)};
+  new ResizeObserver(resize).observe($('stage'));resize();lullaby();requestAnimationFrame(draw);
+  addEventListener('keydown',e=>{if(e.code==='Space'&&e.target===document.body){e.preventDefault();toggle()}});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&playing)toggle()});
+})();
+</script>
+</body>
+</html>

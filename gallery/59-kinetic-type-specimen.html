@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tensile Grotesk — Specimen Nº 59</title>
+<meta name="description" content="An experimental kinetic type specimen: giant letters that stretch, skew and recoil from your cursor, with foundry-style specimen copy for an invented elastic grotesk.">
+<style>
+  :root{--blue:#1b2cf0;--paper:#f4f1ea;--lime:#d8ff3e;--ink:#0b0e2a;
+    --display:"Arial Black","Helvetica Neue","Archivo Black","Franklin Gothic Heavy",Impact,"Segoe UI Black","DejaVu Sans",sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--blue);color:var(--paper)}
+  body{font-family:var(--mono);font-size:12px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  .bar{display:flex;justify-content:space-between;gap:16px;padding:16px clamp(16px,3vw,36px);letter-spacing:.14em;text-transform:uppercase;font-size:10.5px;border-bottom:1px solid rgba(244,241,234,.35)}
+  .bar a{color:inherit;text-decoration:none}.bar a:hover{color:var(--lime)}
+  .bar span:nth-child(2){text-align:right}
+  #hero{position:relative;overflow:hidden;touch-action:pan-y;cursor:crosshair;border-bottom:1px solid rgba(244,241,234,.35)}
+  #word{position:absolute;left:50%;bottom:0;width:max-content;transform:translateX(-50%);white-space:nowrap;font-family:var(--display);font-weight:900;line-height:.8;letter-spacing:-.02em;user-select:none;-webkit-user-select:none}
+  #word span{display:inline-block;transform-origin:50% 88%;will-change:transform}
+  .rule{position:absolute;left:0;right:0;height:0;border-top:1px dashed rgba(244,241,234,.4);pointer-events:none}
+  .rule i{position:absolute;right:clamp(16px,3vw,36px);top:-15px;font-style:normal;font-size:9px;letter-spacing:.16em;text-transform:uppercase;opacity:.7}
+  .meter{position:absolute;left:clamp(16px,3vw,36px);top:16px;display:grid;grid-template-columns:auto auto;gap:2px 14px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;pointer-events:none}
+  .meter b{font-weight:400;color:var(--lime);font-variant-numeric:tabular-nums}
+  .styles{position:absolute;right:clamp(16px,3vw,36px);top:14px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .styles button{font:inherit;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper);background:none;border:1px solid var(--paper);padding:7px 10px;cursor:pointer;border-radius:99px}
+  .styles button[aria-pressed=true]{background:var(--lime);border-color:var(--lime);color:var(--ink)}
+  .intro{display:grid;grid-template-columns:1fr 1.5fr;gap:clamp(18px,4vw,60px);padding:clamp(26px,5vw,64px) clamp(16px,3vw,36px);border-bottom:1px solid rgba(244,241,234,.35)}
+  .intro h1{margin:0;font-family:var(--display);font-size:clamp(26px,4vw,54px);line-height:.95;letter-spacing:-.03em;text-transform:uppercase}
+  .intro h1 em{font-style:normal;color:var(--lime)}
+  .intro p{margin:0 0 1em;font-size:clamp(12.5px,1.15vw,15px);line-height:1.6;max-width:44em}
+  .glyphs{display:grid;grid-template-columns:repeat(8,1fr);background:var(--lime);color:var(--ink)}
+  .glyphs button{all:unset;box-sizing:border-box;aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;cursor:pointer;
+    border-right:1px solid var(--ink);border-bottom:1px solid var(--ink);font-family:var(--display);font-weight:900;font-size:clamp(30px,6.2vw,92px);letter-spacing:-.04em}
+  .glyphs button span{display:block;transition:transform .5s cubic-bezier(.2,1.7,.35,1)}
+  .glyphs button small{position:absolute;left:7px;top:6px;font:400 9px/1 var(--mono);letter-spacing:.1em}
+  .glyphs button:hover,.glyphs button.on,.glyphs button:focus-visible{background:var(--ink);color:var(--lime)}
+  .glyphs button:nth-child(4n+1):hover span,.glyphs button:nth-child(4n+1).on span{transform:scaleY(2.1)}
+  .glyphs button:nth-child(4n+2):hover span,.glyphs button:nth-child(4n+2).on span{transform:scaleX(1.9) skewX(-18deg)}
+  .glyphs button:nth-child(4n+3):hover span,.glyphs button:nth-child(4n+3).on span{transform:scale(.6,2.4) skewX(12deg)}
+  .glyphs button:nth-child(4n):hover span,.glyphs button:nth-child(4n).on span{transform:scale(2.3,.55)}
+  .fall{padding:clamp(26px,5vw,60px) clamp(16px,3vw,36px);border-bottom:1px solid rgba(244,241,234,.35);overflow:hidden}
+  .fall div{display:grid;grid-template-columns:64px 1fr;align-items:baseline;border-top:1px solid rgba(244,241,234,.3);padding:.35em 0}
+  .fall div small{font-size:10px;letter-spacing:.1em;opacity:.75}
+  .fall div p{margin:0;font-family:var(--display);font-weight:900;line-height:1;letter-spacing:-.03em;text-transform:uppercase;white-space:nowrap;transform-origin:0 100%;will-change:transform}
+  .specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));background:var(--paper);color:var(--ink)}
+  .specs div{padding:20px clamp(16px,3vw,36px) 24px;border-right:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+  .specs h3{margin:0 0 10px;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;font-weight:400;color:var(--blue)}
+  .specs p{margin:0;font-family:var(--display);font-weight:900;font-size:clamp(17px,1.8vw,24px);line-height:1.1;letter-spacing:-.02em}
+  .specs p small{display:block;font:400 11px/1.5 var(--mono);letter-spacing:0;margin-top:8px}
+  footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:20px clamp(16px,3vw,36px) 30px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase}
+  footer a{color:var(--lime);text-decoration:none}footer a:hover{text-decoration:underline}
+  @media (max-width:700px){.intro{grid-template-columns:1fr}.glyphs{grid-template-columns:repeat(4,1fr)}.fall div{grid-template-columns:44px 1fr}.meter{top:auto;bottom:10px;font-size:9px}}
+  @media (prefers-reduced-motion:reduce){.glyphs button span{transition:none}}
+</style>
+</head>
+<body>
+<div class="bar"><span><a href="index.html">← 100</a> &nbsp;/&nbsp; Hollow Mountain Type Foundry</span><span>Specimen Nº 59 — Tensile Grotesk</span></div>
+<section id="hero" aria-label="Interactive display of the word Tensile">
+  <div class="meter"><span>Stretch</span><b id="mS">1.00×</b><span>Skew</span><b id="mK">0.0°</b><span>Recoil</span><b id="mR">0 px</b></div>
+  <div class="styles" id="styles" role="group" aria-label="Weight of elasticity">
+    <button type="button" data-s="slack" aria-pressed="false">Slack</button><button type="button" data-s="taut" aria-pressed="true">Taut</button><button type="button" data-s="over" aria-pressed="false">Overstrung</button>
+  </div>
+  <div class="rule" id="capline"><i>cap height, nominally</i></div>
+  <div class="rule" id="baseline"><i>baseline</i></div>
+  <div id="word" aria-hidden="true"></div>
+</section>
+<section class="intro">
+  <h1>A grotesk that <em>refuses</em> to hold still.</h1>
+  <div>
+    <p>Tensile was drawn on rubber. Every stem is a spring under load, every bowl a held breath; the outlines you see at rest are only the place the letters agree to return to. Run a cursor or a thumb through the word above and it will lean away, lengthen, and snap back with whatever dignity it can find.</p>
+    <p>Three tensions ship in the family. <b>Slack</b> sulks. <b>Taut</b> is the text cut, polite until provoked. <b>Overstrung</b> should not be set near deadlines, glassware or nervous clients.</p>
+  </div>
+</section>
+<section class="glyphs" id="glyphs" aria-label="Selected glyphs"></section>
+<section class="fall" id="fall" aria-label="Size waterfall"></section>
+<section class="specs">
+  <div><h3>Drawn by</h3><p>Odile Vantongeren &amp; Ruben Ashcombe<small>Hollow Mountain, studio above the old funicular, 2024–26</small></p></div>
+  <div><h3>Styles</h3><p>Slack · Taut · Overstrung<small>each with a Recoil italic that leans the wrong way on purpose</small></p></div>
+  <div><h3>Axes</h3><p>Tension 0–1000<br>Recoil −12°…+12°<small>plus an undocumented third axis we call “Nerves”</small></p></div>
+  <div><h3>Character set</h3><p>684 glyphs, 212 languages<small>incl. eleven arrows, a flexed ampersand and one glyph that is simply tired</small></p></div>
+  <div><h3>Licence</h3><p>Desk, Web, Trampoline<small>trial fonts available to anyone who asks nicely and stretches first</small></p></div>
+</section>
+<footer><span>© Hollow Mountain Type Foundry — set entirely in whatever your machine had lying around, bent by hand</span><a href="index.html">← back to the 100</a></footer>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hero = document.getElementById('hero'), word = document.getElementById('word');
+  const STYLES = { slack: { k: .035, d: .88, stretch: .55, push: .12, skew: 14, idle: .1 }, taut: { k: .085, d: .8, stretch: 1.05, push: .22, skew: 26, idle: .2 }, over: { k: .2, d: .9, stretch: 2, push: .42, skew: 42, idle: .42 } };
+  let S = STYLES.taut, fs = 100, letters = [], ptr = { x: 0, y: 0, on: false, t: 0 };
+  'TENSILE'.split('').forEach(ch => { const s = document.createElement('span'); s.textContent = ch; word.appendChild(s); letters.push({ el: s, cx: 0, cy: 0, w: 0, tx: 0, ty: 0, sx: 1, sy: 1, sk: 0, v: [0, 0, 0, 0, 0] }); });
+
+  function fit() {
+    letters.forEach(l => l.el.style.transform = 'none');
+    word.style.fontSize = '100px';
+    fs = 100 * hero.clientWidth * .93 / word.scrollWidth; word.style.fontSize = fs + 'px';
+    const hh = Math.max(fs * 1.9, Math.min(innerHeight * .6, 380)); hero.style.height = hh + 'px'; word.style.bottom = fs * .1 + 'px';
+    const hr = hero.getBoundingClientRect();
+    letters.forEach(l => { const r = l.el.getBoundingClientRect(); l.cx = r.left - hr.left + r.width / 2; l.cy = r.top - hr.top + r.height / 2; l.w = r.width; });
+    document.getElementById('baseline').style.top = (hh - fs * .1 - fs * .095) + 'px';
+    document.getElementById('capline').style.top = (hh - fs * .1 - fs * .095 - fs * .716) + 'px';
+  }
+
+  // ---- size waterfall ---------------------------------------------------------
+  const fall = document.getElementById('fall'), lines = [];
+  [[120, 'Quartz vowels flex'], [84, 'Beyond the doorjamb'], [56, 'Six elastic hymns for a jumpy alphabet'], [34, 'Pack my box with five dozen liquorice springs & run'], [20, 'The quick brown type jumps over the lazy baseline, lands badly, apologises, tries again.']].forEach(([px, txt]) => {
+    const row = document.createElement('div'); row.innerHTML = `<small>${px} pt</small><p style="font-size:clamp(${Math.max(13, px * .32)}px,${px / 12}vw,${px}px)">${txt}</p>`; fall.appendChild(row); lines.push(row.lastChild);
+  });
+  // ---- glyph tiles --------------------------------------------------------------
+  const glyphs = document.getElementById('glyphs');
+  ['Aa', 'Gg', 'Rr', '&', 'Qq', '?!', '74', '@'].forEach((gph, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', 'Glyph ' + gph);
+    b.innerHTML = `<small>U+${(0x41 + i * 37).toString(16).toUpperCase().padStart(4, '0')}</small><span>${gph}</span>`;
+    b.addEventListener('click', () => { b.classList.toggle('on'); }); glyphs.appendChild(b);
+  });
+
+  const mS = document.getElementById('mS'), mK = document.getElementById('mK'), mR = document.getElementById('mR');
+  let lastY = scrollY, scrollV = 0, lean = 0, leanV = 0, frameNo = 0;
+  function tick(ms) {
+    const t = ms / 1000, hr = hero.getBoundingClientRect(), px = ptr.x - hr.left, py = ptr.y - hr.top;
+    const live = ptr.on && ms - ptr.t < 2600, R = Math.max(fs * 1.05, 150);
+    let maxS = 1, maxK = 0, maxR = 0;
+    letters.forEach((l, i) => {
+      let tx = 0, ty = 0, sx = 1, sy = 1, sk = 0;
+      if (live) {
+        const dx = px - l.cx, dy = py - l.cy, dist = Math.hypot(dx, dy) || 1, f = Math.max(0, 1 - dist / R), e = f * f * (3 - 2 * f);
+        tx = -dx / dist * e * fs * S.push; ty = -dy / dist * e * fs * S.push * .45;
+        sy = 1 + e * S.stretch; sx = 1 - e * Math.min(.5, S.stretch * .32); sk = Math.max(-1, Math.min(1, dx / (l.w * .9))) * e * S.skew;
+      } else if (!reduce) {
+        const w = Math.sin(t * 1.25 - i * .62); sy = 1 + S.idle * Math.max(0, w) * 1.5; sx = 1 - S.idle * .35 * Math.max(0, w); sk = Math.sin(t * .8 - i * .5) * S.skew * .28 * (S.idle * 3);
+      }
+      const tg = [tx, ty, sx, sy, sk], cur = [l.tx, l.ty, l.sx, l.sy, l.sk];
+      for (let n = 0; n < 5; n++) { l.v[n] = (l.v[n] + (tg[n] - cur[n]) * S.k) * S.d; cur[n] += l.v[n]; }
+      [l.tx, l.ty, l.sx, l.sy, l.sk] = cur;
+      l.el.style.transform = `translate(${l.tx.toFixed(1)}px,${l.ty.toFixed(1)}px) skewX(${l.sk.toFixed(2)}deg) scale(${l.sx.toFixed(3)},${l.sy.toFixed(3)})`;
+      const heat = Math.min(1, Math.abs(l.sy - 1) / Math.max(.3, S.stretch * .8));
+      l.el.style.color = `rgb(${Math.round(244 - 28 * heat)},${Math.round(241 + 14 * heat)},${Math.round(234 - 172 * heat)})`;
+      maxS = Math.max(maxS, l.sy); if (Math.abs(l.sk) > Math.abs(maxK)) maxK = l.sk; maxR = Math.max(maxR, Math.hypot(l.tx, l.ty));
+    });
+    if (frameNo++ % 4 === 0) { mS.textContent = maxS.toFixed(2) + '×'; mK.textContent = maxK.toFixed(1) + '°'; mR.textContent = Math.round(maxR) + ' px'; }
+    // the waterfall leans with scroll velocity, then recovers
+    scrollV = scrollY - lastY; lastY = scrollY;
+    const target = reduce ? 0 : Math.max(-26, Math.min(26, -scrollV * .9));
+    leanV = (leanV + (target - lean) * .12) * .8; lean += leanV;
+    if (Math.abs(lean) > .01 || Math.abs(leanV) > .01) lines.forEach((p, i) => { p.style.transform = `skewX(${(lean * (1 - i * .12)).toFixed(2)}deg) scaleX(${(1 + Math.abs(lean) * .006).toFixed(3)})`; });
+    requestAnimationFrame(tick);
+  }
+
+  const move = e => { ptr.x = e.clientX; ptr.y = e.clientY; ptr.on = true; ptr.t = performance.now(); };
+  hero.addEventListener('pointermove', move); hero.addEventListener('pointerdown', move);
+  hero.addEventListener('pointerleave', () => { ptr.on = false; });
+  document.getElementById('styles').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return; S = STYLES[b.dataset.s];
+    [...b.parentNode.children].forEach(x => x.setAttribute('aria-pressed', x === b));
+    letters.forEach(l => { l.v[3] += S.stretch * .25; l.v[4] += (Math.random() - .5) * S.skew * .5; });      // a flick, so the change is felt
+  });
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(fit, 120); });
+  fit(); requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

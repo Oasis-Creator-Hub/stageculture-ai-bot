@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nedervik in Glass — a snow globe</title>
+<meta name="description" content="A glass snow globe holding a tiny winter village. Drag it, tap it or shake your phone and the snow swirls, drifts and settles with real physics.">
+<style>
+  :root{--s:min(74vw,56vh,500px)}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:#17383b}
+  body{font-family:"Rockwell","Roboto Slab","Clarendon","Bookman Old Style",Georgia,serif;color:#f5ead3}
+  .room{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+    background:
+      radial-gradient(ellipse 70% 60% at 22% 8%,rgba(255,206,130,.34),rgba(255,206,130,0) 70%),
+      radial-gradient(circle at 50% 50%,rgba(240,214,150,.13) 0 3px,transparent 4px) 0 0/46px 46px,
+      radial-gradient(circle at 50% 50%,rgba(240,214,150,.08) 0 2px,transparent 3px) 23px 23px/46px 46px,
+      linear-gradient(45deg,rgba(0,0,0,.07) 25%,transparent 25% 75%,rgba(0,0,0,.07) 75%) 0 0/46px 46px,
+      linear-gradient(#1d4a4c,#123033)}
+  .title{position:absolute;top:clamp(18px,4vh,40px);left:0;right:0;text-align:center;pointer-events:none;padding:0 16px}
+  .title h1{margin:0;font-weight:400;font-size:clamp(20px,3.2vw,36px);letter-spacing:.04em}
+  .title p{margin:6px 0 0;font-size:clamp(10px,1.1vw,12.5px);letter-spacing:.3em;text-transform:uppercase;color:#f0c987}
+  .piece{position:relative;width:var(--s);flex:none;display:flex;flex-direction:column;align-items:center;z-index:2;will-change:transform;transform-origin:50% 100%}
+  .globe{position:relative;width:var(--s);height:var(--s);border-radius:50%;overflow:hidden;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent;
+    box-shadow:0 0 0 2px rgba(255,255,255,.22),0 calc(var(--s)*.03) calc(var(--s)*.09) rgba(0,0,0,.45)}
+  .globe:active{cursor:grabbing}
+  .globe svg,.globe canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .glass{position:absolute;inset:0;border-radius:50%;pointer-events:none;
+    background:
+      radial-gradient(ellipse 34% 22% at 30% 20%,rgba(255,255,255,.75),rgba(255,255,255,0) 70%),
+      radial-gradient(ellipse 9% 6% at 71% 80%,rgba(255,255,255,.35),transparent 70%),
+      radial-gradient(circle at 50% 50%,transparent 60%,rgba(190,225,255,.16) 78%,rgba(10,20,50,.5) 100%);
+    box-shadow:inset 0 0 calc(var(--s)*.07) rgba(200,230,255,.5),inset calc(var(--s)*-.03) calc(var(--s)*-.05) calc(var(--s)*.1) rgba(8,14,40,.55)}
+  .glass::after{content:"";position:absolute;inset:5%;border-radius:50%;border-top:calc(var(--s)*.012) solid rgba(255,255,255,.3);transform:rotate(-32deg);filter:blur(2px)}
+  .base{width:calc(var(--s)*.86);margin-top:calc(var(--s)*-.115);position:relative;z-index:1;pointer-events:none;display:block}
+  .shelf{flex:none;width:100%;height:clamp(64px,15vh,150px);position:relative;z-index:1;
+    background:linear-gradient(rgba(255,230,180,.22),rgba(0,0,0,0) 12px),linear-gradient(#7a4a26,#4e2c14 60%,#2e190b),repeating-linear-gradient(90deg,#000 0 1px,transparent 1px 190px);
+    box-shadow:0 -1px 0 #b98250,0 -16px 30px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,48px);gap:12px}
+  .shelf::before{content:"";position:absolute;left:50%;top:-10px;width:calc(var(--s)*.95);height:26px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.55),transparent)}
+  .shelf p,.shelf a,.shelf button{position:relative;margin:0;font:inherit;font-size:clamp(10px,1.1vw,12.5px);letter-spacing:.16em;text-transform:uppercase;color:#f3dcb4;text-decoration:none}
+  .shelf button{background:none;border:1px solid rgba(243,220,180,.6);padding:8px 12px;border-radius:3px;cursor:pointer}
+  .shelf button:hover,.shelf a:hover{color:#fff;border-color:#fff}
+  .shelf p{opacity:.8;text-align:center;flex:1}
+  @media (max-width:560px){.shelf p{display:none}}
+</style>
+</head>
+<body>
+<div class="room">
+  <div class="title"><h1>Nedervik, under glass</h1><p>give it a shake</p></div>
+  <div class="piece" id="piece">
+    <div class="globe" id="globe" role="button" tabindex="0" aria-label="Snow globe. Drag, tap or press space to shake.">
+      <svg id="village" viewBox="0 0 400 400" aria-hidden="true"></svg>
+      <canvas id="snow"></canvas>
+      <div class="glass"></div>
+    </div>
+    <svg class="base" viewBox="0 0 400 130" aria-hidden="true">
+      <defs><linearGradient id="wood" x1="0" x2="1"><stop offset="0" stop-color="#3a1f0e"/><stop offset=".3" stop-color="#8a5429"/><stop offset=".55" stop-color="#a86b38"/><stop offset="1" stop-color="#3a1f0e"/></linearGradient>
+        <linearGradient id="brass" x1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6dc8e"/><stop offset=".5" stop-color="#b98a2e"/><stop offset="1" stop-color="#f1d27c"/></linearGradient></defs>
+      <path d="M36 44C36 20 364 20 364 44L388 104C388 136 12 136 12 104Z" fill="url(#wood)"/>
+      <ellipse cx="200" cy="42" rx="164" ry="21" fill="#5a3317"/><ellipse cx="200" cy="40" rx="150" ry="16" fill="#1f1108"/>
+      <path d="M22 92q178 30 356 0" fill="none" stroke="#2c1608" stroke-width="2" opacity=".6"/>
+      <rect x="118" y="70" width="164" height="36" rx="3" fill="url(#brass)" stroke="#6d4d12"/>
+      <circle cx="126" cy="88" r="2" fill="#6d4d12"/><circle cx="274" cy="88" r="2" fill="#6d4d12"/>
+      <text x="200" y="86" text-anchor="middle" font-family="Rockwell,Georgia,serif" font-size="14" letter-spacing="4" fill="#3d2a08">NEDERVIK</text>
+      <text x="200" y="99" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="8.5" fill="#3d2a08">winter of the long blue</text>
+    </svg>
+  </div>
+  <div class="shelf"><a href="index.html">← 100</a><p>drag · tap · or shake the phone in your hand</p><button id="shake" type="button">Shake</button></div>
+</div>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const piece = document.getElementById('piece'), globe = document.getElementById('globe'), cv = document.getElementById('snow'), ctx = cv.getContext('2d');
+  const rnd = (a, b) => a + Math.random() * (b - a), TAU = Math.PI * 2;
+  const ground = u => .47 - .075 * Math.cos(u * 2.4);          // snow line, in globe radii (x and y from centre)
+
+  // ---- the village, drawn in SVG ------------------------------------------------
+  (function village() {
+    const gy = x => 200 + 200 * ground((x - 200) / 200), P = [];
+    let hill = 'M0 400'; for (let x = 0; x <= 400; x += 10) hill += `L${x} ${gy(x).toFixed(1)}`; hill += 'L400 400Z';
+    P.push(`<defs><linearGradient id="nsky" x2="0" y2="1"><stop offset="0" stop-color="#0a1436"/><stop offset=".5" stop-color="#2b3a7c"/><stop offset=".78" stop-color="#a77aa6"/><stop offset="1" stop-color="#f0b79a"/></linearGradient>
+      <radialGradient id="lamp"><stop offset="0" stop-color="#ffe9a8" stop-opacity=".9"/><stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/></radialGradient></defs>
+      <rect width="400" height="400" fill="url(#nsky)"/>`);
+    for (let i = 0; i < 46; i++) P.push(`<circle cx="${(i * 97 + 31) % 400}" cy="${(i * 61 + 17) % 190}" r="${.5 + (i % 3) * .35}" fill="#fff" opacity="${.35 + (i % 5) * .13}"/>`);
+    P.push(`<circle cx="292" cy="92" r="24" fill="#fdf3cf"/><circle cx="302" cy="84" r="21" fill="#18235a" opacity=".92"/>
+      <path d="M0 290L60 190l40 52 54-92 62 104 48-60 60 70 76-84v210H0z" fill="#27336e"/><path d="M154 150l-18 31 14-7 8 12 9-14 12 6zM60 190l-13 22 11-5 6 9 8-11 7 3z" fill="#dfe6ff" opacity=".75"/>
+      <path d="M0 300q100-52 200-22t200-18v140H0z" fill="#6f80bd"/>`);
+    const pine = (x, s) => { const y = gy(x) + 6; return `<rect x="${x - 2 * s}" y="${y - 10 * s}" width="${4 * s}" height="${12 * s}" fill="#3b2414"/>` +
+      [0, 1, 2].map(i => `<path d="M${x} ${y - (58 - i * 4) * s + i * 15 * s}l${(11 + i * 5) * s} ${22 * s}h${-(22 + i * 10) * s}z" fill="#12403a"/><path d="M${x} ${y - (58 - i * 4) * s + i * 15 * s}l${(5 + i * 2) * s} ${9 * s}q${-(5 + i * 2) * s} ${4 * s} ${-(10 + i * 4) * s} 0z" fill="#f4f8ff"/>`).join(''); };
+    const house = (x, w, h, wall, roofH, door) => { const y = gy(x) + 8, l = x - w / 2;
+      return `<rect x="${l}" y="${y - h}" width="${w}" height="${h}" fill="${wall}"/><path d="M${l - 5} ${y - h}L${x} ${y - h - roofH}L${l + w + 5} ${y - h}z" fill="#3a2230"/>
+        <path d="M${l - 7} ${y - h + 1}L${x} ${y - h - roofH - 3}L${l + w + 7} ${y - h + 1}l-4 2L${x} ${y - h - roofH + 5}L${l - 3} ${y - h + 3}z" fill="#f7faff"/>
+        <rect x="${l + 5}" y="${y - h + 8}" width="9" height="10" fill="#ffd77a"/><path d="M${l + 9.5} ${y - h + 8}v10M${l + 5} ${y - h + 13}h9" stroke="#8a5a1c" stroke-width="1"/>
+        ${w > 34 ? `<rect x="${l + w - 14}" y="${y - h + 8}" width="9" height="10" fill="#ffc45e"/>` : ''}
+        <rect x="${x - 4 + door}" y="${y - 15}" width="8" height="15" fill="#5a2a1c"/><rect x="${l + w - 12}" y="${y - h - roofH * .7}" width="6" height="${roofH * .55}" fill="#5c3a34"/><rect x="${l + w - 13}" y="${y - h - roofH * .7 - 2}" width="8" height="3" fill="#f7faff"/>`; };
+    P.push(pine(52, 1.05), pine(84, .8), pine(338, 1.1), pine(366, .75));
+    P.push(house(124, 40, 30, '#b9473a', 20, -4), house(268, 44, 32, '#d49a3e', 22, 6), house(304, 30, 24, '#4d7a8c', 16, 0));
+    const cy = gy(196) + 8;                                           // the chapel
+    P.push(`<rect x="170" y="${cy - 40}" width="52" height="40" fill="#e9e2d4"/><path d="M165 ${cy - 40}L196 ${cy - 64}L227 ${cy - 40}z" fill="#3a2230"/><path d="M163 ${cy - 39}L196 ${cy - 67}L229 ${cy - 39}l-4 2L196 ${cy - 59}L167 ${cy - 37}z" fill="#f7faff"/>
+      <rect x="188" y="${cy - 92}" width="16" height="36" fill="#e9e2d4"/><path d="M185 ${cy - 92}L196 ${cy - 126}L207 ${cy - 92}z" fill="#3a2230"/><path d="M196 ${cy - 126}l5 15q-5 3-10 0z" fill="#f7faff"/><path d="M196 ${cy - 136}v10M192 ${cy - 132}h8" stroke="#f0c987" stroke-width="1.6"/>
+      <circle cx="196" cy="${cy - 78}" r="4" fill="#ffd77a"/><path d="M190 ${cy}v-14a6 6 0 0 1 12 0v14z" fill="#5a2a1c"/><path d="M176 ${cy - 12}v-12a4 4 0 0 1 8 0v12zM208 ${cy - 12}v-12a4 4 0 0 1 8 0v12z" fill="#ffd77a"/>`);
+    P.push(`<path d="${hill}" fill="#eef3fc"/>`);
+    const lx = 232, ly = gy(232) + 12;
+    P.push(`<circle cx="${lx}" cy="${ly - 34}" r="26" fill="url(#lamp)"/><path d="M${lx} ${ly}v-32" stroke="#1c1c28" stroke-width="2.4"/><rect x="${lx - 4}" y="${ly - 40}" width="8" height="9" fill="#ffe9a8" stroke="#1c1c28" stroke-width="1.2"/>
+      <path d="M0 400V${gy(0) + 34}q100-26 200-8t200-14v112z" fill="#ffffff"/><ellipse cx="150" cy="${gy(150) + 44}" rx="34" ry="7" fill="#b9d3f2" opacity=".8"/>
+      <path d="M96 ${gy(96) + 26}l3 9M102 ${gy(96) + 25}l3 9" stroke="#3b2414" stroke-width="1.4"/><circle cx="101" cy="${gy(96) + 17}" r="6" fill="#fff" stroke="#c9d6ee"/><circle cx="101" cy="${gy(96) + 8}" r="4.2" fill="#fff" stroke="#c9d6ee"/><path d="M101 ${gy(96) + 8}h5" stroke="#e8742a" stroke-width="1.6"/>`);
+    document.getElementById('village').innerHTML = P.join('');
+  })();
+
+  // ---- snow ------------------------------------------------------------------------
+  let S, R, dpr, flakes = [], ux = 0, uy = 0, om = 0;
+  function size() {
+    S = globe.clientWidth; R = S / 2; dpr = Math.min(window.devicePixelRatio || 1, 2); cv.width = cv.height = Math.round(S * dpr);
+    const n = Math.round(Math.max(220, Math.min(520, S * 1.05)));
+    flakes = Array.from({ length: n }, () => { const a = rnd(0, TAU), d = Math.sqrt(Math.random()) * R * .9, x = Math.cos(a) * d;
+      return { x, y: Math.min(Math.sin(a) * d, ground(x / R) * R - 2), vx: 0, vy: 0, r: rnd(.7, 2.3) * Math.max(.7, S / 460), ph: rnd(0, TAU), rest: false }; });
+  }
+  function stir(e) {
+    om += (Math.random() < .5 ? -1 : 1) * e * .0045;
+    for (const f of flakes) if ((f.rest && Math.random() < e / 5) || !f.rest) { f.rest = false; f.vx += rnd(-1, 1) * e * .8; f.vy -= rnd(.2, 1) * e * (f.y > 0 ? 1 : .3); }
+  }
+  function physics() {
+    const k = R / 250, calm = Math.abs(om) * R + Math.hypot(ux, uy) < 1.1 * k;
+    ux *= .955; uy *= .955; om *= .987;
+    for (const f of flakes) {
+      if (f.rest) continue;
+      const fx = ux - om * f.y + Math.sin(f.ph += .05) * .25 * k, fy = uy + om * f.x + (.42 + f.r * .22) * k;
+      f.vx += (fx - f.vx) * .07; f.vy += (fy - f.vy) * .07; f.x += f.vx; f.y += f.vy;
+      const d = Math.hypot(f.x, f.y), lim = R * .955;
+      if (d > lim) { const nx = f.x / d, ny = f.y / d, vn = f.vx * nx + f.vy * ny; f.x = nx * lim; f.y = ny * lim; if (vn > 0) { f.vx -= nx * vn * 1.3; f.vy -= ny * vn * 1.3; } }
+      const gy = ground(f.x / R) * R + f.r;
+      if (f.y > gy) { f.y = gy; if (calm && Math.hypot(f.vx, f.vy) < 1.4 * k) { f.rest = true; f.y += rnd(0, 5) * k; f.vx = f.vy = 0; } else { f.vy = -Math.abs(f.vy) * .25; f.vx *= .9; } }
+    }
+  }
+  function drawSnow() {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, S, S); ctx.fillStyle = '#fff';
+    for (const f of flakes) { ctx.globalAlpha = f.rest ? .9 : .55 + f.r * .18; ctx.beginPath(); ctx.arc(R + f.x, R + f.y, f.r, 0, TAU); ctx.fill(); }
+    ctx.globalAlpha = 1;
+  }
+
+  // ---- the globe as an object you can pick up ---------------------------------------
+  let gx = 0, gyy = 0, gvx = 0, gvy = 0, pvx = 0, pvy = 0, drag = null, moved = 0;
+  function frame() {
+    const ox = gx, oy = gyy;
+    if (drag) { gx += (drag.tx - gx) * .55; gyy += (drag.ty - gyy) * .55; gvx = gx - ox; gvy = gyy - oy; }
+    else { gvx = (gvx - gx * .14) * .86; gvy = (gvy - gyy * .14) * .86; gx += gvx; gyy += gvy; }
+    const ax = gvx - pvx, ay = gvy - pvy, a = Math.hypot(ax, ay); pvx = gvx; pvy = gvy;
+    if (a > .05) { ux -= ax * .55; uy -= ay * .55; if (a > 1.6) stir(Math.min(9, a * .55)); }   // water lags behind the glass
+    piece.style.transform = `translate(${gx.toFixed(1)}px,${gyy.toFixed(1)}px) rotate(${(gx * .12).toFixed(2)}deg)`;
+    physics(); drawSnow(); requestAnimationFrame(frame);
+  }
+  function shake(power = 1) { gvx += (Math.random() < .5 ? -1 : 1) * rnd(18, 30) * power * (reduce ? .25 : 1); gvy -= rnd(4, 12) * power * (reduce ? .25 : 1); stir(8 * power); chime(); }
+
+  const lim = () => Math.min(90, innerWidth * .16);
+  globe.addEventListener('pointerdown', e => {
+    try { globe.setPointerCapture(e.pointerId); } catch (_) {}
+    drag = { sx: e.clientX - gx, sy: e.clientY - gyy, tx: gx, ty: gyy }; moved = 0; audio(); motionPermission();
+  });
+  globe.addEventListener('pointermove', e => { if (!drag) return; const L = lim(), tx = e.clientX - drag.sx, ty = e.clientY - drag.sy;
+    moved += Math.abs(tx - drag.tx) + Math.abs(ty - drag.ty); drag.tx = Math.max(-L, Math.min(L, tx)); drag.ty = Math.max(-L * .8, Math.min(L * .5, ty)); });
+  const release = () => { if (!drag) return; drag = null; if (moved < 6) shake(); else chime(); };
+  globe.addEventListener('pointerup', release); globe.addEventListener('pointercancel', release);
+  globe.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); audio(); shake(); } });
+  document.getElementById('shake').addEventListener('click', () => { audio(); motionPermission(); shake(1.2); });
+
+  // device shake, where the browser allows it
+  let lastA = null, cool = 0, asked = false;
+  function onMotion(e) {
+    const g = e.accelerationIncludingGravity; if (!g || g.x == null) return;
+    if (lastA) { const d = Math.abs(g.x - lastA.x) + Math.abs(g.y - lastA.y) + Math.abs(g.z - lastA.z), now = performance.now();
+      if (d > 14 && now > cool) { cool = now + 350; ux += (g.x - lastA.x) * 1.2; uy -= (g.y - lastA.y) * 1.2; shake(Math.min(1.6, d / 22)); } }
+    lastA = { x: g.x, y: g.y, z: g.z };
+  }
+  function motionPermission() {
+    if (asked) return; asked = true;
+    try { if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function')
+      DeviceMotionEvent.requestPermission().then(s => { if (s === 'granted') addEventListener('devicemotion', onMotion); }).catch(() => {}); } catch (_) {}
+  }
+  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission !== 'function') addEventListener('devicemotion', onMotion);
+
+  // ---- a few notes from the music box in the base ------------------------------------
+  let ac = null, lastChime = 0, phrase = 0;
+  const TUNES = [[659, 784, 988, 880, 784, 659, 587, 659], [523, 659, 784, 1047, 988, 784, 880, 659], [587, 740, 880, 740, 988, 880, 740, 587]];
+  function audio() { try { if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch (_) { ac = null; } }
+  function chime() {
+    if (!ac || ac.state !== 'running' || performance.now() - lastChime < 2600) return; lastChime = performance.now();
+    const t0 = ac.currentTime + .05, tune = TUNES[phrase++ % TUNES.length];
+    tune.forEach((f, i) => { const t = t0 + i * .21, o = ac.createOscillator(), o2 = ac.createOscillator(), g = ac.createGain();
+      o.type = 'sine'; o.frequency.value = f; o2.type = 'sine'; o2.frequency.value = f * 3.01;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.11, t + .008); g.gain.exponentialRampToValueAtTime(.0008, t + 1.1);
+      const g2 = ac.createGain(); g2.gain.value = .18; o.connect(g); o2.connect(g2); g2.connect(g); g.connect(ac.destination);
+      o.start(t); o2.start(t); o.stop(t + 1.2); o2.stop(t + 1.2); });
+  }
+
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(size, 150); });
+  size(); stir(reduce ? 2 : 6); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

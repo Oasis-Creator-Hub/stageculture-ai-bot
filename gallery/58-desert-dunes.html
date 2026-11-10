@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Erg of Tamsalit — a day in the dunes</title>
+<meta name="description" content="Layered SVG dunes under a sky that turns with a time-of-day slider: the sun and moon cross, the palette shifts from dawn rose to noon glare to indigo night, and a tiny caravan keeps walking.">
+<style>
+  :root{--ink:#fff7e8;--soft:rgba(255,247,232,.7)}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b1330}
+  body{font-family:"Cormorant Garamond","Didot","Bodoni 72","Bodoni MT","Playfair Display","Times New Roman",serif;color:var(--ink)}
+  #scene{position:fixed;inset:0;width:100%;height:100%;display:block}
+  .tw{animation:tw 3.2s ease-in-out infinite}
+  @keyframes tw{50%{opacity:.25}}
+  .head{position:fixed;top:clamp(18px,4vh,44px);left:clamp(18px,4vw,56px);right:clamp(18px,4vw,56px);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+    pointer-events:none;transition:color .6s}
+  .head h1{margin:0;font-weight:400;font-size:clamp(25px,4.2vw,56px);line-height:.98;letter-spacing:.01em;max-width:9em}
+  .head h1 em{display:block;font-size:.34em;letter-spacing:.34em;text-transform:uppercase;font-style:normal;color:var(--soft);margin-bottom:.9em;
+    font-family:"Gill Sans","Gill Sans MT","Trebuchet MS",sans-serif}
+  .read{text-align:right;font-family:"Gill Sans","Gill Sans MT","Trebuchet MS",sans-serif;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--soft);line-height:1.9}
+  .read b{display:block;font-family:"Cormorant Garamond","Didot","Bodoni 72","Times New Roman",serif;font-weight:400;font-size:clamp(34px,6vw,76px);letter-spacing:0;line-height:.9;color:var(--ink);font-variant-numeric:tabular-nums}
+  .dock{position:fixed;left:0;right:0;bottom:0;padding:0 clamp(18px,4vw,56px) clamp(16px,3.4vh,34px);color:#fff4e0;
+    background:linear-gradient(rgba(10,6,14,0),rgba(10,6,14,.5));font-family:"Gill Sans","Gill Sans MT","Trebuchet MS",sans-serif}
+  .ticks{display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;opacity:.75;margin-bottom:2px}
+  .rowx{display:flex;align-items:center;gap:14px}
+  input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:34px;background:none;margin:0;cursor:ew-resize;min-width:0}
+  input[type=range]::-webkit-slider-runnable-track{height:1px;background:rgba(255,244,224,.75)}
+  input[type=range]::-moz-range-track{height:1px;background:rgba(255,244,224,.75)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;margin-top:-11px;background:var(--thumb,#ffd58a);border:1px solid #fff4e0;box-shadow:0 0 0 5px rgba(255,244,224,.14),0 0 22px var(--thumb,#ffd58a)}
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--thumb,#ffd58a);border:1px solid #fff4e0;box-shadow:0 0 0 5px rgba(255,244,224,.14),0 0 22px var(--thumb,#ffd58a)}
+  input[type=range]:focus-visible{outline:1px dashed #fff4e0;outline-offset:2px}
+  .dock button,.dock a{flex:none;font:inherit;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#fff4e0;background:none;border:1px solid rgba(255,244,224,.6);
+    padding:8px 11px;border-radius:99px;cursor:pointer;text-decoration:none;white-space:nowrap}
+  .dock button:hover,.dock a:hover{background:#fff4e0;color:#2a1410}
+  @media (max-width:520px){.ticks span:nth-child(even){display:none}.dock a{padding:8px 9px}}
+  @media (prefers-reduced-motion:reduce){.tw{animation:none}}
+</style>
+</head>
+<body>
+<svg id="scene" role="img" aria-label="Sand dunes under a changing sky with a small caravan"></svg>
+<div class="head" id="head">
+  <h1><em>27°41′ N · 3°08′ W · nowhere near a road</em>The Erg of Tamsalit</h1>
+  <div class="read"><b id="clock">06:40</b><span id="phase">Dawn</span><br><span id="temp">11°C</span></div>
+</div>
+<div class="dock">
+  <div class="ticks"><span>Midnight</span><span>03</span><span>Dawn</span><span>09</span><span>Noon</span><span>15</span><span>Dusk</span><span>21</span><span>Midnight</span></div>
+  <div class="rowx">
+    <input id="time" type="range" min="0" max="1440" step="1" value="400" aria-label="Time of day">
+    <button id="drift" type="button" aria-pressed="true">Pause</button>
+    <a href="index.html">← 100</a>
+  </div>
+</div>
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg', svg = document.getElementById('scene');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t), css = c => `rgb(${c.map(v => Math.round(v)).join(',')})`;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  // hour, sky top, sky mid, horizon, far dune, near dune, stars
+  const KEYS = [
+    [0, '#050816', '#0b1330', '#1a2348', '#1b2444', '#070a18', 1],
+    [4.6, '#0a0f2c', '#241f4a', '#5e4266', '#352f55', '#0e0c1e', .8],
+    [6.4, '#3b4a86', '#d98a8a', '#ffcf9a', '#c98f86', '#4a2a3c', .05],
+    [9, '#4f9ad6', '#a7d3ea', '#f3e3c0', '#e6c79a', '#b5713d', 0],
+    [13, '#2f86d6', '#8cc6ee', '#f6ecd2', '#f0d6a4', '#c8853f', 0],
+    [17, '#3f6fb5', '#f0b070', '#ffd58a', '#eeaa62', '#8a3f22', 0],
+    [19, '#2a2a66', '#c0507a', '#ff9a5a', '#b4566a', '#3a1730', .15],
+    [20.6, '#0c1030', '#252452', '#4a3560', '#2b2c54', '#0c0c1f', .85],
+    [24, '#050816', '#0b1330', '#1a2348', '#1b2444', '#070a18', 1]
+  ].map(k => [k[0], ...k.slice(1, 6).map(hex), k[6]]);
+  const LAYERS = 6, CARAVAN_ON = 2;
+  let W, H, horizon, layers = [], el = {}, minutes = 400, playing = !reduce, caravan = [], t0 = 0;
+
+  const make = (tag, attrs, parent) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); (parent || svg).appendChild(n); return n; };
+
+  function build() {
+    W = innerWidth; H = innerHeight; horizon = H * .56; svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.textContent = ''; layers = []; caravan = [];
+    const defs = make('defs', {});
+    const sky = make('linearGradient', { id: 'sky', x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+    el.s0 = make('stop', { offset: 0 }, sky); el.s1 = make('stop', { offset: .5 }, sky); el.s2 = make('stop', { offset: .78 }, sky);
+    const glow = make('radialGradient', { id: 'glow' }, defs);
+    el.g0 = make('stop', { offset: 0 }, glow); el.g1 = make('stop', { offset: .25 }, glow); el.g2 = make('stop', { offset: 1, 'stop-opacity': 0 }, glow);
+    const mask = make('mask', { id: 'crescent' }, defs); make('rect', { x: -60, y: -60, width: 120, height: 120, fill: '#fff' }, mask); make('circle', { cx: 9, cy: -5, r: 17, fill: '#000' }, mask);
+    make('rect', { width: W, height: H, fill: 'url(#sky)' });
+    el.stars = make('g', {});
+    for (let i = 0, n = Math.round(clamp(W * H / 5200, 70, 240)); i < n; i++) {
+      const s = make('circle', { cx: (Math.random() * W).toFixed(1), cy: (Math.pow(Math.random(), 1.4) * horizon).toFixed(1), r: (Math.random() * 1.1 + .3).toFixed(2), fill: '#fff', opacity: (.4 + Math.random() * .6).toFixed(2) }, el.stars);
+      if (i % 6 === 0 && !reduce) { s.setAttribute('class', 'tw'); s.style.animationDelay = (-Math.random() * 3).toFixed(2) + 's'; }
+    }
+    el.glow = make('circle', { r: Math.max(W, H) * .42, fill: 'url(#glow)' });
+    el.sun = make('circle', { r: clamp(Math.min(W, H) * .04, 16, 34) });
+    el.moon = make('g', {}); make('circle', { r: 20, fill: '#f4efdc', mask: 'url(#crescent)' }, el.moon); make('circle', { r: 46, fill: '#dfe6ff', opacity: .08 }, el.moon);
+
+    const M = Math.max(W, 760);
+    for (let i = 0; i < LAYERS; i++) {
+      const d = i / (LAYERS - 1), base = horizon + H * (.02 + d * .36), amp = H * (.03 + d * .05), f = Math.PI * 2 / (M * (.3 + d * .62));
+      const p1 = Math.random() * 9, p2 = Math.random() * 9, p3 = Math.random() * 9, step = 10, ys = [];
+      for (let x = -step; x <= W + step * 2; x += step) {
+        const s = Math.sin(x * f + p1), v = (s + .28 * Math.sin(2 * (x * f + p1) + 1.2)) * .62 + .26 * Math.sin(x * f * 2.3 + p2) + .1 * Math.sin(x * f * 4.7 + p3);
+        ys.push(base - amp * v);
+      }
+      const X = j => (j - 1) * step, grp = make('g', {});
+      const body = make('path', { d: 'M' + ys.map((y, j) => `${X(j)} ${y.toFixed(1)}`).join('L') + `L${W + 20} ${H}L-20 ${H}Z` }, grp);
+      // slip faces: each crest gets a shaded side toward the next trough, on either flank
+      const faces = [-1, 1].map(side => {
+        let dstr = '';
+        for (let j = 2; j < ys.length - 2; j++) {
+          if (!(ys[j] < ys[j - 1] && ys[j] <= ys[j + 1])) continue;
+          let k = j; while (k + side > 0 && k + side < ys.length - 1 && ys[k + side] >= ys[k]) k += side;
+          if (Math.abs(k - j) < 3) continue;
+          const px = X(j), py = ys[j], drop = H - py; let run = `M${px} ${py.toFixed(1)}`;
+          for (let q = j + side; q !== k + side; q += side) run += `L${X(q)} ${ys[q].toFixed(1)}`;
+          const fall = ys[k] - py;                                   // a crescent hugging the lee side of the crest
+          run += `Q${(px + (X(k) - px) * .22).toFixed(1)} ${(ys[k] + fall * .55 + Math.min(drop, amp * .5)).toFixed(1)} ${px} ${py.toFixed(1)}Z`;
+          dstr += run;
+        }
+        return make('path', { d: dstr || 'M0 0', fill: '#0a0614' }, grp);
+      });
+      layers.push({ ys, step, body, faces, d });
+      if (i === CARAVAN_ON) {
+        el.caravan = make('g', {});
+        const sc = clamp(H / 760, .62, 1.15) * (W < 600 ? .85 : 1);
+        ['c', 'c', 'w', 'c', 'c', 'c', 'w', 'c'].forEach((kind, n) => {
+          const gq = make('g', {}, el.caravan);
+          if (kind === 'c') make('path', { d: 'M-10 0L-9-8Q-9-11.5-6-11.5Q-3-17.5 0-12.5Q2-11.5 4-11.5L7-16.5Q8-18.6 11-17.6L11.4-15.6L9-14.6L7.2-9L7 0L5.7 0L5-7L-5-7L-6 0L-7.4 0L-7.6-7L-8.7 0Z' }, gq);
+          else { make('path', { d: 'M-1.4 0L-.6-7.5L.9-7.5L1.6 0L.6 0L.1-4L-.5 0Z M-1.4-11.2L1.5-11.2L1.2-7L-1-7Z' }, gq); make('circle', { cx: 0, cy: -12.6, r: 1.5 }, gq); make('path', { d: 'M2.6 0L2.2-13', stroke: 'currentColor', 'stroke-width': .5 }, gq); }
+          caravan.push({ g: gq, off: n * 30 * sc + (kind === 'w' ? 6 : 0), sc: sc * (kind === 'w' ? 1 : 1) , ph: Math.random() * 6 });
+        });
+      }
+    }
+    el.haze = make('rect', { x: 0, y: horizon - H * .1, width: W, height: H * .2, fill: 'url(#hz)' });
+    const hz = make('linearGradient', { id: 'hz', x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+    el.h0 = make('stop', { offset: 0, 'stop-opacity': 0 }, hz); el.h1 = make('stop', { offset: .5, 'stop-opacity': .35 }, hz); el.h2 = make('stop', { offset: 1, 'stop-opacity': 0 }, hz);
+    paint(); walk(0);
+  }
+
+  function surface(L, x) { const f = x / L.step + 1, j = clamp(Math.floor(f), 0, L.ys.length - 2), t = f - j; return [L.ys[j] + (L.ys[j + 1] - L.ys[j]) * t, Math.atan2(L.ys[j + 1] - L.ys[j], L.step)]; }
+
+  function paint() {
+    const h = minutes / 60; let i = 0; while (i < KEYS.length - 2 && KEYS[i + 1][0] <= h) i++;
+    const A = KEYS[i], B = KEYS[i + 1], t = clamp((h - A[0]) / (B[0] - A[0]), 0, 1), e = t * t * (3 - 2 * t);
+    const c = [1, 2, 3, 4, 5].map(k => mix(A[k], B[k], e)), starA = A[6] + (B[6] - A[6]) * e;
+    el.s0.setAttribute('stop-color', css(c[0])); el.s1.setAttribute('stop-color', css(c[1])); el.s2.setAttribute('stop-color', css(c[2]));
+    [el.h0, el.h1, el.h2].forEach(s => s.setAttribute('stop-color', css(c[2])));
+    el.stars.setAttribute('opacity', starA.toFixed(3));
+    // sun: up at 06:00, down at 19:00
+    const u = (h - 6) / 13, sx = W * (.06 + .88 * u), sy = horizon + H * .04 - Math.sin(Math.PI * u) * H * .52, low = 1 - clamp(Math.sin(Math.PI * clamp(u, 0, 1)) * 1.6, 0, 1);
+    const sunC = mix([255, 252, 232], [255, 120, 60], low), up = u > -.08 && u < 1.08;
+    el.sun.setAttribute('cx', sx.toFixed(1)); el.sun.setAttribute('cy', sy.toFixed(1)); el.sun.setAttribute('fill', css(sunC)); el.sun.setAttribute('opacity', up ? 1 : 0);
+    // moon: up at 19:30, down at 05:30
+    const v = ((h - 19.5 + 24) % 24) / 10, mx = W * (.1 + .8 * v), my = horizon + H * .05 - Math.sin(Math.PI * v) * H * .46, moonUp = v < 1.05;
+    el.moon.setAttribute('transform', `translate(${mx.toFixed(1)} ${my.toFixed(1)}) scale(${clamp(Math.min(W, H) / 620, .7, 1.3)})`); el.moon.setAttribute('opacity', moonUp ? clamp(starA * 1.4, 0, 1) : 0);
+    const gx = up ? sx : mx, gy = up ? sy : my, gc = up ? sunC : [190, 205, 255];
+    el.glow.setAttribute('cx', gx.toFixed(1)); el.glow.setAttribute('cy', gy.toFixed(1)); el.glow.setAttribute('opacity', up ? .5 + low * .35 : moonUp ? .22 * starA : 0);
+    el.g0.setAttribute('stop-color', css(gc)); el.g1.setAttribute('stop-color', css(gc)); el.g1.setAttribute('stop-opacity', .35); el.g2.setAttribute('stop-color', css(gc));
+    // which flank is in shadow, and how deep
+    const k = up ? Math.cos(Math.PI * clamp(u, 0, 1)) : moonUp ? Math.cos(Math.PI * clamp(v, 0, 1)) : 0, depth = up ? .16 + low * .26 : .22 * starA;
+    layers.forEach(L => {
+      const col = mix(c[3], c[4], Math.pow(L.d, .85));
+      L.body.setAttribute('fill', css(col));
+      L.faces[1].setAttribute('opacity', (Math.max(0, k) * depth + .04).toFixed(3)); L.faces[0].setAttribute('opacity', (Math.max(0, -k) * depth + .04).toFixed(3));
+    });
+    const sil = css(mix(mix(c[3], c[4], .8), [8, 4, 14], .55)); el.caravan.setAttribute('fill', sil); el.caravan.style.color = sil;
+    // interface
+    const lum = (c[0][0] * .3 + c[0][1] * .59 + c[0][2] * .11) / 255, head = document.getElementById('head');
+    head.style.setProperty('--ink', lum > .5 ? '#2a1612' : '#fff7e8'); head.style.setProperty('--soft', lum > .5 ? 'rgba(42,22,18,.72)' : 'rgba(255,247,232,.7)');
+    const hh = Math.floor(minutes / 60) % 24, mm = Math.floor(minutes % 60);
+    document.getElementById('clock').textContent = String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
+    document.getElementById('phase').textContent = h < 4.5 ? 'Deep night' : h < 6 ? 'First light' : h < 8 ? 'Dawn' : h < 11 ? 'Morning' : h < 15 ? 'Noon glare' : h < 17.4 ? 'Long afternoon' : h < 19.2 ? 'Golden hour' : h < 20.6 ? 'Blue hour' : 'Night';
+    document.getElementById('temp').textContent = Math.round(7 + 34 * Math.pow(Math.max(0, Math.sin(Math.PI * (h - 5.5) / 15.5)), .8)) + '°C · wind light';
+    slider.style.setProperty('--thumb', up ? css(sunC) : '#cfd8ff');
+  }
+
+  function walk(sec) {
+    const L = layers[CARAVAN_ON], span = W + 320;
+    caravan.forEach(m => {
+      const x = ((sec * 5 + m.off) % span + span) % span - 160, [y, a] = surface(L, clamp(x, 0, W));
+      m.g.setAttribute('transform', `translate(${x.toFixed(1)} ${(y + 1.5 + Math.sin(sec * 2.4 + m.ph) * .35).toFixed(1)}) rotate(${(a * 40).toFixed(1)}) scale(${m.sc.toFixed(2)})`);
+    });
+  }
+
+  const slider = document.getElementById('time'), drift = document.getElementById('drift');
+  const setPlay = p => { playing = p; drift.textContent = p ? 'Pause' : 'Let it drift'; drift.setAttribute('aria-pressed', p); };
+  slider.addEventListener('input', () => { minutes = +slider.value % 1440; setPlay(false); paint(); });
+  drift.addEventListener('click', () => setPlay(!playing));
+  let last = 0;
+  function loop(ms) {
+    const dt = Math.min(.1, (ms - last) / 1000 || 0); last = ms; t0 += dt;
+    if (playing) { minutes = (minutes + dt * 9) % 1440; slider.value = Math.round(minutes); paint(); }
+    if (!reduce || playing) walk(t0 + 40);
+    requestAnimationFrame(loop);
+  }
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(build, 150); });
+  setPlay(playing); build(); requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

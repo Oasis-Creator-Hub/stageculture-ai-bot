@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Odalys Brink — squishy brands for serious people</title>
+<meta name="description" content="A bold designer portfolio with morphing organic blobs, a vivid gradient mesh and big friendly type.">
+<style>
+  :root { --bg: #fff6ea; --ink: #1d1436; --coral: #ff5a4f; --blue: #2b4bff; --lime: #c8f24a; --lilac: #c9a8ff; --sun: #ffc531; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+  main { overflow-x: hidden; overflow-x: clip; }
+  body { margin: 0; background: var(--bg); color: var(--ink); overflow-x: hidden;
+    font-family: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", "Nunito", "Varela Round", "Trebuchet MS", system-ui, sans-serif; }
+  a { color: inherit; }
+  .mesh { position: fixed; inset: -10%; z-index: 0; pointer-events: none; filter: blur(70px) saturate(1.2); opacity: .75; }
+  .mesh svg { width: 100%; height: 100%; display: block; }
+  nav, main, footer { position: relative; z-index: 1; }
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 20px clamp(18px, 5vw, 64px); font-weight: 800; }
+  .logo { display: flex; align-items: center; gap: .5em; font-size: 1.15rem; text-decoration: none; }
+  .logo i { width: 1.5em; height: 1.5em; background: var(--coral); border-radius: 60% 40% 55% 45% / 45% 60% 40% 55%; animation: wob 6s ease-in-out infinite alternate; }
+  @keyframes wob { to { border-radius: 40% 60% 42% 58% / 60% 42% 58% 40%; transform: rotate(40deg); } }
+  nav ul { display: flex; gap: clamp(4px, 1.4vw, 14px); list-style: none; margin: 0; padding: 0; }
+  nav ul a { text-decoration: none; padding: .55em .95em; border-radius: 99px; font-size: .92rem; transition: background .3s, color .3s, transform .3s cubic-bezier(.3,1.6,.5,1); display: inline-block; }
+  nav ul a:hover, nav ul a:focus-visible { background: var(--ink); color: var(--bg); transform: scale(1.08) rotate(-3deg); outline: none; }
+  .hero { display: grid; grid-template-columns: 1.1fr .9fr; align-items: center; gap: 20px; padding: clamp(10px, 4vw, 50px) clamp(18px, 5vw, 64px) clamp(40px, 8vw, 100px); min-height: 78vh; }
+  .hello { display: inline-block; background: var(--lime); padding: .45em 1em; border-radius: 99px; font-weight: 800; font-size: .9rem; transform: rotate(-3deg); }
+  h1 { font-size: clamp(3rem, 10.5vw, 8.4rem); line-height: .88; letter-spacing: -.045em; margin: .22em 0 .25em; font-weight: 900; }
+  h1 .sq { color: var(--coral); display: inline-block; transition: transform .45s cubic-bezier(.3,1.8,.5,1); cursor: default; }
+  h1 .sq:hover { transform: scale(1.12, .84) rotate(-2deg); }
+  .lede { font-size: clamp(1.05rem, 2vw, 1.35rem); line-height: 1.5; max-width: 30ch; font-weight: 600; margin: 0 0 1.6em; }
+  .btn { display: inline-flex; align-items: center; gap: .6em; background: var(--ink); color: var(--bg); text-decoration: none; font-weight: 800; padding: 1em 1.6em; border-radius: 99px; font-size: 1.05rem; transition: transform .35s cubic-bezier(.3,1.6,.5,1), background .3s, box-shadow .3s; box-shadow: 0 6px 0 var(--blue); }
+  .btn:hover, .btn:focus-visible { transform: translateY(-4px) rotate(-1.5deg); background: var(--blue); box-shadow: 0 10px 0 var(--ink); outline: none; }
+  .btn b { display: inline-block; transition: transform .3s; } .btn:hover b { transform: translateX(6px); }
+  .heroblob { position: relative; aspect-ratio: 1; width: min(100%, 520px); justify-self: center; }
+  .heroblob svg { width: 100%; height: 100%; overflow: visible; display: block; }
+  .heroblob .tag { position: absolute; font-weight: 800; font-size: .85rem; padding: .5em .9em; border-radius: 99px; background: #fff; box-shadow: 0 8px 20px -8px #1d143688; }
+  .tag.a { left: 2%; top: 20%; transform: rotate(-8deg); } .tag.b { right: 0; top: 46%; transform: rotate(6deg); background: var(--sun); } .tag.c { left: 16%; bottom: 8%; transform: rotate(3deg); background: var(--ink); color: #fff; }
+  .strip { background: var(--ink); color: var(--bg); overflow: hidden; white-space: nowrap; padding: 16px 0; transform: rotate(-1.4deg) scale(1.03); font-weight: 900; font-size: clamp(1.2rem, 3vw, 2rem); }
+  .strip div { display: inline-block; animation: slide 26s linear infinite; }
+  .strip span { color: var(--lime); margin: 0 .6em; }
+  @keyframes slide { to { transform: translateX(-50%); } }
+  section { padding: clamp(50px, 9vw, 120px) clamp(18px, 5vw, 64px); }
+  h2 { font-size: clamp(2.2rem, 6.5vw, 5rem); letter-spacing: -.04em; line-height: .95; margin: 0 0 .6em; font-weight: 900; }
+  h2 small { display: block; font-size: .95rem; letter-spacing: .02em; color: var(--blue); margin-bottom: .6em; font-weight: 800; }
+  .work { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(16px, 3vw, 34px); }
+  .proj { position: relative; display: block; text-decoration: none; background: var(--c1); border-radius: 36px; padding: clamp(20px, 3vw, 34px); min-height: clamp(260px, 34vw, 400px); overflow: hidden; transition: transform .5s cubic-bezier(.3,1.5,.5,1), border-radius .5s, box-shadow .5s; }
+  .proj:nth-child(even) { margin-top: clamp(0px, 5vw, 60px); }
+  .proj svg { position: absolute; right: -12%; bottom: -18%; width: 78%; overflow: visible; transition: transform .7s cubic-bezier(.3,1.5,.5,1); }
+  .proj path { fill: var(--c2); transition: fill .4s; }
+  .proj h3 { position: relative; font-size: clamp(1.6rem, 3.6vw, 2.7rem); line-height: 1; margin: 0 0 .3em; letter-spacing: -.03em; font-weight: 900; color: var(--t, var(--ink)); }
+  .proj p { position: relative; margin: 0; font-weight: 700; max-width: 22ch; color: var(--t, var(--ink)); opacity: .85; line-height: 1.4; }
+  .proj .yr { position: absolute; left: clamp(20px, 3vw, 34px); bottom: clamp(18px, 3vw, 30px); font-weight: 800; font-size: .82rem; background: #fff; color: var(--ink); padding: .45em .9em; border-radius: 99px; transition: transform .4s cubic-bezier(.3,1.8,.5,1); }
+  .proj:hover, .proj:focus-visible { transform: translateY(-10px) rotate(-1.2deg); border-radius: 56px 36px 60px 36px; box-shadow: 0 30px 50px -24px #1d1436aa; outline: none; }
+  .proj:hover svg, .proj:focus-visible svg { transform: scale(1.25) rotate(18deg); }
+  .proj:hover .yr { transform: scale(1.12) rotate(-5deg); }
+  .about { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(20px, 5vw, 70px); align-items: start; }
+  .about p { font-size: clamp(1.1rem, 2vw, 1.4rem); line-height: 1.55; font-weight: 600; margin: 0 0 1em; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; padding: 0; margin: 0; list-style: none; }
+  .chips li { border: 2.5px solid var(--ink); border-radius: 99px; padding: .55em 1.05em; font-weight: 800; transition: background .25s, transform .35s cubic-bezier(.3,1.8,.5,1), color .25s; cursor: default; }
+  .chips li:hover { background: var(--h, var(--coral)); transform: scale(1.1) rotate(var(--r, -4deg)); }
+  footer { background: var(--blue); color: #fff; border-radius: 60px 60px 0 0; padding: clamp(50px, 9vw, 110px) clamp(18px, 5vw, 64px) 34px; text-align: center; }
+  footer a.big { display: inline-block; font-size: clamp(2rem, 8.2vw, 6.6rem); font-weight: 900; letter-spacing: -.04em; text-decoration: none; line-height: 1; transition: transform .45s cubic-bezier(.3,1.6,.5,1), color .3s; overflow-wrap: anywhere; }
+  footer a.big:hover, footer a.big:focus-visible { color: var(--lime); transform: scale(1.04) rotate(-1.5deg); outline: none; }
+  footer p { font-weight: 700; margin: 0 0 1em; }
+  .fine { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 50px; font-size: .85rem; font-weight: 700; opacity: .9; }
+  @media (max-width: 760px) { .hero, .about { grid-template-columns: 1fr; } .work { grid-template-columns: 1fr; } .proj:nth-child(even) { margin-top: 0; } nav ul li:nth-child(2) { display: none; } .heroblob { width: min(88%, 380px); } }
+  @media (prefers-reduced-motion: reduce) { .strip div, .logo i { animation: none; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="mesh" aria-hidden="true"><svg viewBox="0 0 100 100" preserveAspectRatio="none">
+  <path class="m" data-x="18" data-y="20" data-r="26" fill="#ffc531"/><path class="m" data-x="84" data-y="16" data-r="24" fill="#c9a8ff"/>
+  <path class="m" data-x="74" data-y="76" data-r="28" fill="#ff8f86"/><path class="m" data-x="14" data-y="84" data-r="22" fill="#c8f24a"/>
+</svg></div>
+<nav>
+  <a class="logo" href="#top"><i></i>odalys brink</a>
+  <ul><li><a href="#work">Work</a></li><li><a href="#about">About</a></li><li><a href="#hi">Say hi</a></li><li><a href="index.html">&larr; 100</a></li></ul>
+</nav>
+<main id="top">
+  <div class="hero">
+    <div>
+      <span class="hello">Hello hello! Booking for spring</span>
+      <h1>I make brands feel <span class="sq">squishy.</span></h1>
+      <p class="lede">Identity, packaging and motion for companies brave enough to be liked. Round corners, loud colour, zero beige.</p>
+      <a class="btn" href="#work">See the good stuff <b>&rarr;</b></a>
+    </div>
+    <div class="heroblob">
+      <svg viewBox="-110 -110 220 220" aria-hidden="true">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5a4f"/><stop offset=".55" stop-color="#ff8a3d"/><stop offset="1" stop-color="#ffc531"/></linearGradient>
+          <linearGradient id="g2" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b4bff"/><stop offset="1" stop-color="#8f6bff"/></linearGradient>
+        </defs>
+        <path id="hb2" fill="url(#g2)" opacity=".95"/><path id="hb1" fill="url(#g1)"/><path id="hb3" fill="#c8f24a"/>
+        <g id="face" fill="none" stroke="#1d1436" stroke-width="5" stroke-linecap="round"><path d="M-30 -8q8 -12 16 0M14 -8q8 -12 16 0"/><path d="M-18 22q18 18 36 0"/></g>
+      </svg>
+      <span class="tag a">packaging</span><span class="tag b">identity</span><span class="tag c">motion &amp; goo</span>
+    </div>
+  </div>
+  <div class="strip" aria-hidden="true"><div>soft shapes <span>&#10047;</span> hard deadlines <span>&#10047;</span> colour with a pulse <span>&#10047;</span> logos you can hug <span>&#10047;</span> soft shapes <span>&#10047;</span> hard deadlines <span>&#10047;</span> colour with a pulse <span>&#10047;</span> logos you can hug <span>&#10047;</span> </div></div>
+  <section id="work">
+    <h2><small>Selected work, 2022 &ndash; now</small>Four things I&rsquo;d<br>show my mum.</h2>
+    <div class="work">
+      <a class="proj" href="#hi" style="--c1:#ff5a4f;--c2:#ffc531;--t:#fff"><h3>Pomelo &amp; Finch</h3><p>A sparkling-tea brand that tastes like a Saturday.</p><span class="yr">Packaging &middot; 2025</span><svg viewBox="-110 -110 220 220" aria-hidden="true"><path class="pb"/></svg></a>
+      <a class="proj" href="#hi" style="--c1:#c8f24a;--c2:#2b4bff"><h3>Wobble Bank</h3><p>Pocket money app for kids who count in gummy bears.</p><span class="yr">Identity &middot; 2024</span><svg viewBox="-110 -110 220 220" aria-hidden="true"><path class="pb"/></svg></a>
+      <a class="proj" href="#hi" style="--c1:#2b4bff;--c2:#c9a8ff;--t:#fff"><h3>Nightjar Radio</h3><p>Late-night station, idents that breathe in time with the bass.</p><span class="yr">Motion &middot; 2024</span><svg viewBox="-110 -110 220 220" aria-hidden="true"><path class="pb"/></svg></a>
+      <a class="proj" href="#hi" style="--c1:#c9a8ff;--c2:#ff5a4f"><h3>Dough Re Mi</h3><p>A bakery choir. Yes, really. The loaves have names.</p><span class="yr">Everything &middot; 2023</span><svg viewBox="-110 -110 220 220" aria-hidden="true"><path class="pb"/></svg></a>
+    </div>
+  </section>
+  <section id="about" class="about">
+    <h2><small>About</small>Part designer,<br>part jelly.</h2>
+    <div>
+      <p>I&rsquo;m Odalys. I trained as a ceramicist, which is why everything I draw looks like it was squeezed. For nine years I&rsquo;ve helped small, stubborn companies look like nobody else on the shelf.</p>
+      <p>I work alone, answer my own emails, and take on six projects a year so each one gets my whole wobbly heart.</p>
+      <ul class="chips">
+        <li>Brand identity</li><li style="--h:#c8f24a;--r:3deg">Packaging</li><li style="--h:#ffc531;--r:-2deg">Motion</li><li style="--h:#c9a8ff;--r:5deg">Illustration</li><li style="--h:#c8f24a;--r:-5deg">Naming</li><li style="--h:#ffc531;--r:2deg">Type that smiles</li>
+      </ul>
+    </div>
+  </section>
+</main>
+<footer id="hi">
+  <p>Got something that needs squishing?</p>
+  <a class="big" href="mailto:hello@odalysbrink.example">hello@odalysbrink.example</a>
+  <div class="fine"><span>&copy; Odalys Brink Studio, Port Calder</span><span>Made with too much coral</span><a href="index.html">&larr; back to the 100</a></div>
+</footer>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // an organic blob: N radial points wobbling on summed sines, joined with a closed Catmull-Rom spline
+  function Blob(el, o) {
+    this.el = el; this.cx = o.cx || 0; this.cy = o.cy || 0; this.r = o.r; this.n = o.n || 7; this.amp = o.amp || .22; this.speed = o.speed || 1; this.boost = 0; this.clock = Math.random() * 100;
+    this.seeds = Array.from({ length: this.n }, () => [Math.random() * 6.28, Math.random() * 6.28, .5 + Math.random() * .8]);
+  }
+  Blob.prototype.draw = function (dt) {
+    this.clock += dt * this.speed * (1 + this.boost * 2.5);
+    const t = this.clock, P = [];
+    for (let i = 0; i < this.n; i++) {
+      const s = this.seeds[i], a = i / this.n * 6.2832 + Math.sin(t * .3 + s[0]) * .12;
+      const rr = this.r * (1 + this.amp * (1 + this.boost * .6) * (Math.sin(t * s[2] + s[0]) * .6 + Math.sin(t * .47 + s[1]) * .4));
+      P.push([this.cx + Math.cos(a) * rr, this.cy + Math.sin(a) * rr]);
+    }
+    let d = `M${P[0][0].toFixed(2)} ${P[0][1].toFixed(2)}`;
+    for (let i = 0; i < this.n; i++) {
+      const p0 = P[(i - 1 + this.n) % this.n], p1 = P[i], p2 = P[(i + 1) % this.n], p3 = P[(i + 2) % this.n];
+      d += `C${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(2)} ${(p1[1] + (p2[1] - p0[1]) / 6).toFixed(2)} ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(2)} ${(p2[1] - (p3[1] - p1[1]) / 6).toFixed(2)} ${p2[0].toFixed(2)} ${p2[1].toFixed(2)}`;
+    }
+    this.el.setAttribute('d', d + 'Z');
+  };
+  const $ = id => document.getElementById(id), blobs = [];
+  const hero = [new Blob($('hb1'), { r: 70, n: 8, amp: .2, speed: .9 }), new Blob($('hb2'), { cx: 26, cy: 22, r: 74, n: 7, amp: .24, speed: .6 }), new Blob($('hb3'), { cx: -62, cy: -58, r: 20, n: 6, amp: .3, speed: 1.4 })];
+  blobs.push(...hero);
+  document.querySelectorAll('.m').forEach(p => blobs.push(new Blob(p, { cx: +p.dataset.x, cy: +p.dataset.y, r: +p.dataset.r, n: 6, amp: .35, speed: .35 })));
+  document.querySelectorAll('.proj').forEach(card => {
+    const b = new Blob(card.querySelector('.pb'), { r: 78, n: 6 + (blobs.length % 3), amp: .26, speed: .7 }); blobs.push(b);
+    const on = () => b.target = 1, off = () => b.target = 0;
+    card.addEventListener('pointerenter', on); card.addEventListener('pointerleave', off); card.addEventListener('focus', on); card.addEventListener('blur', off);
+  });
+  // the hero blob leans toward the pointer and its face follows
+  const hb = document.querySelector('.heroblob'), face = $('face'); let lx = 0, ly = 0, tx = 0, ty = 0;
+  addEventListener('pointermove', e => { const r = hb.getBoundingClientRect(); tx = Math.max(-1, Math.min(1, (e.clientX - r.left - r.width / 2) / innerWidth * 2.4)); ty = Math.max(-1, Math.min(1, (e.clientY - r.top - r.height / 2) / innerHeight * 2.4)); });
+  hb.addEventListener('pointerdown', () => { hero.forEach(b => b.boost = 1.6); });
+  let prev = 0;
+  function tick(ms) {
+    const dt = Math.min(.05, (ms - prev) / 1000 || .016); prev = ms;
+    lx += (tx - lx) * .08; ly += (ty - ly) * .08;
+    hero[0].cx = lx * 12; hero[0].cy = ly * 12; face.setAttribute('transform', `translate(${(lx * 26).toFixed(2)} ${(ly * 22).toFixed(2)})`);
+    for (const b of blobs) { if (b.target !== undefined) b.boost += (b.target - b.boost) * .1; else b.boost *= .96; b.draw(dt); }
+    if (!reduce) requestAnimationFrame(tick);
+  }
+  if (reduce) { blobs.forEach(b => b.draw(0)); addEventListener('pointermove', () => requestAnimationFrame(tick), { passive: true }); }
+  else requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IKVO 9 — International Congress for Visual Order · Poster Series</title>
+<meta name="description" content="Four posters in the International Typographic Style for a fictional design congress: strict grid, red, white and black, flush-left grotesque type. Switch posters and reveal the grid.">
+<style>
+*{box-sizing:border-box;margin:0}
+:root{--r:#e30613;--k:#0d0d0d;--w:#fff;--g:clamp(10px,1.6vw,22px)}
+body{background:var(--w);color:var(--k);font-family:"Helvetica Neue",Helvetica,"Neue Haas Grotesk Text Pro","Nimbus Sans","Nimbus Sans L","Liberation Sans",Arial,sans-serif;
+  font-size:14px;line-height:1.3;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.page{max-width:1320px;margin:0 auto;padding:var(--g) clamp(14px,3vw,40px) 40px}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--g)}
+header{border-bottom:6px solid var(--k);padding-bottom:10px;align-items:end;font-size:12px}
+header b{grid-column:span 3;font-size:clamp(20px,2.6vw,34px);letter-spacing:-.03em;line-height:1}
+header b i{font-style:normal;color:var(--r)}
+header span{grid-column:span 3}
+header a{grid-column:span 3;text-align:right;color:inherit;text-decoration:none;font-weight:700}
+header a:hover{color:var(--r)}
+main{margin-top:var(--g);align-items:start}
+.stage{grid-column:1/8;position:relative}
+.poster{position:relative;aspect-ratio:1/1.414;container-type:inline-size;overflow:hidden;background:#eee;box-shadow:0 1px 0 #0002,0 24px 50px -18px #0006}
+.p{position:absolute;inset:0;clip-path:inset(0 100% 0 0);transition:clip-path .7s cubic-bezier(.7,0,.2,1);z-index:1}
+.p.on{clip-path:inset(0);z-index:2}
+.p.was{clip-path:inset(0);z-index:1;transition:none}
+.p>*{position:absolute}
+.t{font-weight:700;letter-spacing:-.045em;line-height:.82}
+.s{font-size:2.05cqw;line-height:1.28;font-weight:500}
+.s b{display:block;font-weight:700}
+/* 01 */
+.p1{background:var(--w)}
+.p1 .disc{left:33%;top:5.657%;width:92cqw;height:92cqw;border-radius:50%;background:var(--r)}
+.p1 .t{left:5.5%;bottom:13%;font-size:86cqw;color:var(--k);mix-blend-mode:multiply}
+.p1 .a{left:8%;top:5.657%;width:24%}
+.p1 .b{left:8%;top:28.3%;width:22%}
+/* 02 */
+.p2{background:var(--k);color:var(--w)}
+.p2 svg{left:8%;top:5.657%;width:84%;height:auto}
+.p2 .t{left:7.2%;bottom:14.5%;font-size:25cqw}
+.p2 .a{left:54%;bottom:15%;width:38%}
+/* 03 */
+.p3{background:var(--r);color:var(--w)}
+.p3 .t{left:8%;bottom:6%;font-size:62cqw;transform-origin:0 100%;transform:rotate(-90deg) translate(0,100%);line-height:.74}
+.p3 .bar{left:54%;right:0;top:39.6%;height:5.657%;background:var(--k)}
+.p3 .a{left:54%;top:48%;width:38%;color:var(--k)}
+.p3 .b{left:54%;top:5.657%;width:38%}
+/* 04 */
+.p4{background:var(--w)}
+.p4 .st{left:0;right:0;top:0;height:62.2%;background:repeating-linear-gradient(-58deg,var(--k) 0 9.2cqw,var(--w) 9.2cqw 15.4cqw)}
+.p4 .sq{left:54%;top:39.6%;width:38cqw;height:38cqw;background:var(--r)}
+.p4 .t{left:7.2%;bottom:14.5%;font-size:25cqw}
+.p4 .a{left:8%;top:65.5%;width:38%}
+.foot{left:8%;right:8%;bottom:4%;display:grid;grid-template-columns:repeat(3,1fr);column-gap:3.4cqw;font-size:1.75cqw;line-height:1.3;border-top:.5cqw solid currentColor;padding-top:1.4cqw}
+.foot>*{position:static}
+.raster{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:linear-gradient(90deg,transparent 8%,rgba(0,150,255,.22) 8% 26.4%,transparent 26.4% 30.8%,rgba(0,150,255,.22) 30.8% 49.2%,transparent 49.2% 54%,rgba(0,150,255,.22) 54% 72.4%,transparent 72.4% 73.6%,rgba(0,150,255,.22) 73.6% 92%,transparent 92%),
+   repeating-linear-gradient(0deg,rgba(0,150,255,.5) 0 1px,transparent 1px 5.657%)}
+.raster.on{opacity:1}
+aside{grid-column:8/13;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));column-gap:var(--g);row-gap:clamp(18px,3vw,36px)}
+aside>*{grid-column:1/-1}
+h1{font-size:clamp(30px,4.4vw,62px);line-height:.92;letter-spacing:-.04em;font-weight:700}
+h1 i{font-style:normal;color:var(--r)}
+.lede{grid-column:1/5;font-size:clamp(14px,1.25vw,17px);line-height:1.38}
+.idx{list-style:none;padding:0;border-top:2px solid var(--k)}
+.idx button{all:unset;box-sizing:border-box;display:grid;grid-template-columns:3.2em 1fr auto;align-items:baseline;width:100%;padding:11px 0;border-bottom:1px solid var(--k);cursor:pointer;font-size:15px}
+.idx button b{font-size:clamp(20px,2.2vw,30px);letter-spacing:-.03em}
+.idx button span{font-size:11px}
+.idx button:hover b,.idx button[aria-pressed=true] b{color:var(--r)}
+.idx button[aria-pressed=true] span::after{content:" ●";color:var(--r)}
+.idx button:focus-visible{outline:3px solid var(--r);outline-offset:2px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+caption{text-align:left;font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding-bottom:8px}
+td{border-top:1px solid var(--k);padding:7px 10px 7px 0;vertical-align:top}
+td:first-child{font-weight:700;white-space:nowrap;width:5.2em}td:last-child{padding-right:0;text-align:right;white-space:nowrap}
+.tog{all:unset;cursor:pointer;font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;display:inline-flex;align-items:center;gap:10px;justify-self:start}
+.tog::before{content:"";width:34px;height:14px;background:linear-gradient(90deg,var(--k) 0 2px,transparent 2px 8px,var(--k) 8px 10px,transparent 10px 16px,var(--k) 16px 18px,transparent 18px 24px,var(--k) 24px 26px,transparent 26px 32px,var(--k) 32px 34px)}
+.tog[aria-pressed=true]{color:var(--r)}
+.tog:focus-visible{outline:3px solid var(--r);outline-offset:4px}
+footer{margin-top:calc(var(--g)*2);border-top:2px solid var(--k);padding-top:10px;font-size:11px}
+footer span{grid-column:span 4}
+@media(max-width:860px){.stage,aside{grid-column:1/-1}aside{margin-top:28px}header span:nth-of-type(2){display:none}header b{grid-column:span 5}header span{grid-column:span 4}}
+@media(max-width:520px){header span{display:none}header b{grid-column:span 9}footer span{grid-column:1/-1}}
+@media(prefers-reduced-motion:reduce){.p{transition:none}}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="grid"><b>IKVO<i>9</i></b><span>International Congress<br>for Visual Order</span><span>Kongresshalle Nordhafen<br>14–17 October 1968</span><a href="index.html">← 100</a></header>
+  <main class="grid">
+    <div class="stage"><div class="poster" id="poster">
+      <article class="p p1 on" aria-label="Poster 1: Ordnung">
+        <div class="disc"></div><div class="t">9</div>
+        <p class="s a"><b>ordnung</b>Order is not a style. It is a courtesy extended to the reader.</p>
+        <p class="s b"><b>Plakat 1 / 4</b>Opening address<br>Grosser Saal<br>14. 10. — 09.30</p>
+        <div class="foot"><span><b>IKVO 9</b><br>Internationaler Kongress für visuelle Ordnung</span><span>Kongresshalle Nordhafen<br>Kai 4, Saal A–D</span><span>14.–17. Oktober 1968<br>täglich 9–18 Uhr</span></div>
+      </article>
+      <article class="p p2" aria-label="Poster 2: Raster">
+        <svg id="dots" viewBox="0 0 840 840" aria-hidden="true"></svg>
+        <div class="t">raster</div>
+        <p class="s a"><b>Plakat 2 / 4</b>The grid does not confine. It gives every element an address, and the eye a way home.</p>
+        <div class="foot"><span><b>IKVO 9</b><br>Internationaler Kongress für visuelle Ordnung</span><span>Seminar: Das Raster<br>Leitung H. Vellacott</span><span>15. Oktober 1968<br>Saal B — 10.00 Uhr</span></div>
+      </article>
+      <article class="p p3" aria-label="Poster 3: Form">
+        <div class="t">form</div><div class="bar"></div>
+        <p class="s b"><b>Plakat 3 / 4</b>schrift ist<br>sichtbare sprache</p>
+        <p class="s a"><b>One typeface. Two weights.</b>Nothing set in capitals that does not need to shout. Flush left, ragged right, and trust the white.</p>
+        <div class="foot"><span><b>IKVO 9</b><br>Internationaler Kongress für visuelle Ordnung</span><span>Vortrag: Die Groteske<br>Dr. Annelies Roth-Mäder</span><span>16. Oktober 1968<br>Saal A — 14.00 Uhr</span></div>
+      </article>
+      <article class="p p4" aria-label="Poster 4: Fläche">
+        <div class="st"></div><div class="sq"></div><div class="t">fläche</div>
+        <p class="s a"><b>Plakat 4 / 4</b>Surface, rhythm, interval. A closing exhibition of 120 posters from 19 countries.</p>
+        <div class="foot"><span><b>IKVO 9</b><br>Internationaler Kongress für visuelle Ordnung</span><span>Ausstellung: Fläche<br>Foyer, Eintritt frei</span><span>17. Oktober 1968<br>Vernissage 18.00 Uhr</span></div>
+      </article>
+      <div class="raster" id="raster"></div>
+    </div></div>
+    <aside>
+      <h1>Four posters.<br>One grid.<br><i>No ornament.</i></h1>
+      <p class="lede">The ninth congress gathers typographers, cartographers and timetable-makers for four days on a single question: how little does a message need? Each poster is built on the same four columns and twenty-five rows.</p>
+      <ol class="idx" id="idx">
+        <li><button aria-pressed="true"><span>01</span><b>ordnung</b><span>order</span></button></li>
+        <li><button aria-pressed="false"><span>02</span><b>raster</b><span>grid</span></button></li>
+        <li><button aria-pressed="false"><span>03</span><b>form</b><span>type</span></button></li>
+        <li><button aria-pressed="false"><span>04</span><b>fläche</b><span>surface</span></button></li>
+      </ol>
+      <button class="tog" id="tog" aria-pressed="false">Show construction grid</button>
+      <table><caption>Programme</caption>
+        <tr><td>14. 10.</td><td>Opening address: order as courtesy</td><td>Saal A</td></tr>
+        <tr><td>15. 10.</td><td>Seminar: the grid, from timetable to poster</td><td>Saal B</td></tr>
+        <tr><td>16. 10.</td><td>Lecture: the grotesque and its discontents</td><td>Saal A</td></tr>
+        <tr><td>17. 10.</td><td>Exhibition opening: surface</td><td>Foyer</td></tr>
+      </table>
+    </aside>
+  </main>
+  <footer class="grid"><span>Printed in two colours, offset, 895 × 1280 mm.</span><span>Use ← → to turn the posters, G for the grid.</span><span>Secretariat: Kai 4, Nordhafen.</span></footer>
+</div>
+<script>
+(function(){
+  // poster 02: dot raster, radii growing along the diagonal, one red exception
+  var NS='http://www.w3.org/2000/svg',d=document.getElementById('dots'),n=12,c=840/n;
+  for(var y=0;y<n;y++)for(var x=0;x<n;x++){var e=document.createElementNS(NS,'circle'),t=(x+(n-1-y))/(2*n-2);
+    e.setAttribute('cx',c*(x+.5));e.setAttribute('cy',c*(y+.5));e.setAttribute('r',(2+t*t*c*.52).toFixed(1));e.setAttribute('fill',x===8&&y===3?'#e30613':'#fff');d.appendChild(e)}
+  var ps=[].slice.call(document.querySelectorAll('.p')),bs=[].slice.call(document.querySelectorAll('#idx button')),cur=0,
+      tog=document.getElementById('tog'),ras=document.getElementById('raster');
+  function show(i){i=(i+ps.length)%ps.length;if(i===cur)return;
+    ps.forEach(function(p){p.classList.remove('was')});ps[cur].classList.remove('on');ps[cur].classList.add('was');
+    void ps[i].offsetWidth;ps[i].classList.add('on');bs[cur].setAttribute('aria-pressed','false');bs[i].setAttribute('aria-pressed','true');cur=i}
+  bs.forEach(function(b,i){b.addEventListener('click',function(){show(i)})});
+  function grid(){var on=tog.getAttribute('aria-pressed')!=='true';tog.setAttribute('aria-pressed',on);ras.classList.toggle('on',on);tog.textContent=on?'Hide construction grid':'Show construction grid'}
+  tog.addEventListener('click',grid);
+  document.getElementById('poster').addEventListener('click',function(){show(cur+1)});
+  addEventListener('keydown',function(e){if(e.key==='ArrowRight')show(cur+1);else if(e.key==='ArrowLeft')show(cur-1);else if(e.key==='g'||e.key==='G')grid()});
+})();
+</script>
+</body>
+</html>

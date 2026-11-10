@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Low Lantern — Cellar Jazz, Marrow Street · November Sessions</title>
+<meta name="description" content="A mid-century record-sleeve poster for a fictional cellar jazz club: duotone blocks, tall condensed type, shapes that keep swing time, and a gig listing you can audition.">
+<style>
+  :root { --cream:#f1e7d0; --ink:#14202b; --hot:#e2502a; --cool:#1f5c73; --beat:.5s; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#0e161d; color:var(--ink); min-height:100vh; padding:clamp(0px,2.4vw,34px); overflow-x:hidden;
+    font-family:"Franklin Gothic Medium","Franklin Gothic","Arial Narrow","Helvetica Neue",Arial,sans-serif; }
+  .cond { font-family:Impact,"Haettenschweiler","Franklin Gothic Condensed","Arial Narrow Bold","League Gothic","Oswald","Arial Narrow",sans-serif; font-weight:400; font-stretch:condensed; text-transform:uppercase; }
+  .sleeve { position:relative; max-width:1120px; margin:0 auto; background:var(--cream); overflow:hidden; box-shadow:0 30px 70px rgba(0,0,0,.6);
+    display:grid; grid-template-columns:minmax(0,5fr) minmax(0,7fr); grid-template-rows:auto auto; }
+  .sleeve::after { content:""; position:absolute; inset:0; pointer-events:none; z-index:8; mix-blend-mode:multiply; opacity:.55;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .42 0 0 0 0 .3 0 0 0 .5 -.12'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E"),
+      radial-gradient(circle at 50% 50%, transparent 55%, rgba(90,60,20,.35)); }
+  .back { position:absolute; top:10px; right:12px; z-index:9; font-size:11px; letter-spacing:.2em; color:var(--ink); text-decoration:none; border-bottom:2px solid var(--hot); }
+  .back:hover { color:var(--hot); }
+
+  /* left: the tall cool block with stacked title */
+  .title { background:var(--cool); color:var(--cream); padding:clamp(18px,3vw,38px) clamp(16px,2.6vw,34px); position:relative; display:flex; flex-direction:column; min-height:clamp(420px,70vh,640px); }
+  .cat { font-size:11px; letter-spacing:.3em; text-transform:uppercase; display:flex; justify-content:space-between; gap:10px; }
+  .title h1 { font-size:clamp(88px,17vw,218px); line-height:.8; letter-spacing:-.01em; margin:auto 0 0 -.03em; }
+  .title h1 span { display:block; } .title h1 span:nth-child(2) { color:var(--hot); } .title h1 span:nth-child(3) { color:var(--ink); }
+  .title .sub { font-size:clamp(13px,1.5vw,16px); letter-spacing:.14em; text-transform:uppercase; border-top:3px solid var(--cream); margin-top:14px; padding-top:10px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .disc { position:absolute; right:-18%; top:9%; width:62%; aspect-ratio:1; border-radius:50%; background:repeating-radial-gradient(circle, #14202b 0 2px, #1d2c39 2px 4px); animation:spin calc(var(--beat) * 8) linear infinite; }
+  .disc::before { content:""; position:absolute; inset:33%; border-radius:50%; background:var(--hot); }
+  .disc::after { content:""; position:absolute; inset:48%; border-radius:50%; background:var(--cream); }
+  .disc i { position:absolute; left:50%; top:36%; width:2px; height:9%; background:var(--cream); }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* right: the rhythm section */
+  .rhythm { position:relative; display:grid; grid-template-rows:1fr auto; min-height:320px; }
+  .bars { display:flex; align-items:flex-end; gap:clamp(4px,.9vw,10px); padding:clamp(40px,6vw,70px) clamp(16px,3vw,40px) 0; position:absolute; inset:0; }
+  .barwrap { position:relative; min-height:clamp(260px,52vw,380px); }
+  .bars i { flex:1; background:var(--ink); transform-origin:50% 100%; height:var(--h); animation:swing calc(var(--beat) * 2) cubic-bezier(.3,0,.2,1) infinite; animation-delay:calc(var(--d) * var(--beat)); }
+  .bars i:nth-child(3n) { background:var(--hot); } .bars i:nth-child(5n+2) { background:var(--cool); }
+  .bars i:nth-child(7n+4) { flex:.35; } .bars i:nth-child(4n+1) { flex:1.7; }
+  /* long–short: the swung eighth */
+  @keyframes swing { 0% { transform:scaleY(1); } 8% { transform:scaleY(.62); } 60% { transform:scaleY(.98); } 66% { transform:scaleY(.8); } 100% { transform:scaleY(1); } }
+  .sun { position:absolute; left:8%; top:10%; width:clamp(54px,9vw,104px); aspect-ratio:1; border-radius:50%; background:var(--hot); mix-blend-mode:multiply; animation:bob calc(var(--beat) * 4) ease-in-out infinite; }
+  .tri { position:absolute; right:9%; top:16%; width:0; height:0; border-left:clamp(26px,4vw,46px) solid transparent; border-right:clamp(26px,4vw,46px) solid transparent; border-bottom:clamp(46px,7vw,80px) solid var(--cool); mix-blend-mode:multiply; animation:tip calc(var(--beat) * 4) steps(4) infinite; transform-origin:50% 66%; }
+  @keyframes bob { 50% { transform:translate(14%,22%) scale(.86); } }
+  @keyframes tip { to { transform:rotate(360deg); } }
+  .count { display:grid; grid-template-columns:repeat(8,1fr); background:var(--ink); }
+  .count b { height:clamp(22px,3.4vw,40px); border-right:2px solid var(--cream); background:var(--ink); transition:background .08s; font-weight:400; }
+  .count b:last-child { border-right:0; }
+  .count b.on { background:var(--hot); } .count b.on:nth-child(4n+1) { background:var(--cream); }
+  .paused .bars i, .paused .disc, .paused .sun, .paused .tri { animation-play-state:paused; }
+
+  /* bottom: listing */
+  .bill { grid-column:1 / -1; display:grid; grid-template-columns:minmax(0,5fr) minmax(0,7fr); border-top:10px solid var(--ink); }
+  .house { background:var(--hot); color:var(--ink); padding:clamp(18px,3vw,34px); }
+  .house h2 { font-size:clamp(40px,6vw,76px); line-height:.86; }
+  .house p { margin-top:14px; font-size:15px; line-height:1.45; max-width:34ch; }
+  .house .door { margin-top:16px; font-size:12px; letter-spacing:.2em; text-transform:uppercase; border-top:3px solid var(--ink); padding-top:10px; }
+  .needle { margin-top:18px; font:inherit; font-size:13px; letter-spacing:.2em; text-transform:uppercase; background:var(--ink); color:var(--cream); border:0; padding:13px 18px; cursor:pointer; }
+  .needle:hover, .needle:focus-visible { background:var(--cream); color:var(--ink); outline:3px solid var(--ink); }
+  ol.gigs { list-style:none; }
+  .gig { display:grid; grid-template-columns:clamp(58px,8vw,92px) minmax(0,1fr) auto; gap:0 clamp(10px,2vw,22px); align-items:center; width:100%; text-align:left; font:inherit; color:inherit; background:none; border:0;
+    border-bottom:2px solid var(--ink); padding:clamp(10px,1.4vw,16px) clamp(14px,2.6vw,34px); cursor:pointer; transition:background .15s, color .15s; }
+  li:last-child .gig { border-bottom:0; }
+  .gig:hover, .gig:focus-visible { background:var(--ink); color:var(--cream); outline:none; }
+  .gig[aria-pressed=true] { background:var(--cool); color:var(--cream); }
+  .gig .day { font-size:clamp(34px,5vw,60px); line-height:.86; }
+  .gig .day small { display:block; font-family:"Franklin Gothic Medium","Arial Narrow",Arial,sans-serif; font-size:11px; letter-spacing:.24em; margin-top:5px; }
+  .gig .act { font-size:clamp(22px,3vw,36px); line-height:.95; letter-spacing:.01em; }
+  .gig .who { display:block; font-size:13px; line-height:1.35; margin-top:5px; opacity:.85; }
+  .gig .bpm { font-size:11px; letter-spacing:.18em; text-transform:uppercase; text-align:right; white-space:nowrap; }
+  .gig .bpm b { display:block; font-size:22px; letter-spacing:0; font-weight:400; }
+  .gig[aria-pressed=true] .bpm::after { content:"● on the stand"; display:block; color:var(--cream); margin-top:3px; }
+  @media (max-width:760px) {
+    .sleeve, .bill { grid-template-columns:1fr; }
+    .title { min-height:0; padding-top:44px; } .title h1 { margin-top:38vw; } .disc { width:58%; right:-12%; top:6%; }
+    .gig .bpm { grid-column:2; text-align:left; margin-top:6px; } .gig .bpm b { display:inline; font-size:13px; letter-spacing:.18em; }
+    .gig { grid-template-columns:58px minmax(0,1fr); }
+  }
+  @media (prefers-reduced-motion: reduce) { .bars i, .disc, .sun, .tri { animation:none; } }
+</style>
+</head>
+<body>
+<main class="sleeve" id="sleeve">
+  <a class="back" href="index.html">← 100</a>
+  <section class="title">
+    <div class="cat"><span>LL–030 · long play</span><span>mono / stereo / cellar</span></div>
+    <div class="disc" aria-hidden="true"><i></i></div>
+    <h1 class="cond"><span>Low</span><span>Lan</span><span>tern</span></h1>
+    <div class="sub"><span>Cellar jazz nightly</span><span>9 Marrow Street, downstairs</span></div>
+  </section>
+
+  <section class="rhythm" aria-hidden="true">
+    <div class="barwrap"><div class="bars" id="bars"><div class="sun"></div><div class="tri"></div></div></div>
+    <div class="count" id="count"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div>
+  </section>
+
+  <section class="bill">
+    <div class="house">
+      <h2 class="cond">November sessions</h2>
+      <p>Forty-one seats, one upright piano with a sticky B-flat, and a ceiling low enough to keep the tall tenors humble. Two sets a night. The second one is the true one.</p>
+      <p class="door">Doors 8 · first set 9 · no talking during ballads</p>
+      <button class="needle" id="needle" aria-pressed="false">▶ Drop the needle</button>
+    </div>
+    <ol class="gigs" id="gigs">
+      <li><button class="gig" data-bpm="132" data-root="98" aria-pressed="true"><span class="day cond">07<small>THU</small></span><span><span class="act cond">Odessa Bright Quartet</span><span class="who">Hard-swinging originals. Odessa Bright, tenor; Paz Lindqvist, piano; “Slim” Abiodun, bass; Rue Calloway, drums.</span></span><span class="bpm"><b class="cond">132</b>medium swing</span></button></li>
+      <li><button class="gig" data-bpm="68" data-root="73.4" aria-pressed="false"><span class="day cond">09<small>SAT</small></span><span><span class="act cond">Marguerite Vane sings after hours</span><span class="who">Torch songs and the ones your grandmother pretended not to know. With the Tomasz Ré trio.</span></span><span class="bpm"><b class="cond">68</b>ballad</span></button></li>
+      <li><button class="gig" data-bpm="208" data-root="110" aria-pressed="false"><span class="day cond">14<small>THU</small></span><span><span class="act cond">The Kestrel Five</span><span class="who">Bebop at speeds not recommended by the fire marshal. Two horns, no mercy.</span></span><span class="bpm"><b class="cond">208</b>up-tempo</span></button></li>
+      <li><button class="gig" data-bpm="104" data-root="87.3" aria-pressed="false"><span class="day cond">21<small>THU</small></span><span><span class="act cond">Baptiste Okafor &amp; the Organ Grinders</span><span class="who">Greasy soul-jazz. Bring a handkerchief; the organ sweats.</span></span><span class="bpm"><b class="cond">104</b>shuffle</span></button></li>
+      <li><button class="gig" data-bpm="156" data-root="82.4" aria-pressed="false"><span class="day cond">30<small>SAT</small></span><span><span class="act cond">Cutting session: all comers</span><span class="who">House rhythm section, open stand. Call a tune, name a key, hold on.</span></span><span class="bpm"><b class="cond">156</b>bright</span></button></li>
+    </ol>
+  </section>
+</main>
+
+<script>
+(() => {
+  const root = document.documentElement, sleeve = document.getElementById('sleeve'), bars = document.getElementById('bars');
+  const cells = [...document.querySelectorAll('#count b')], needle = document.getElementById('needle'), gigs = [...document.querySelectorAll('.gig')];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // a skyline of bars with a composed (not random) silhouette
+  [38, 72, 54, 90, 30, 64, 82, 46, 96, 58, 26, 74, 50, 86, 40, 68, 34, 78].forEach((h, i) => {
+    const b = document.createElement('i'); b.style.setProperty('--h', h + '%'); b.style.setProperty('--d', (-(i * 5 % 8) / 4).toFixed(2)); bars.appendChild(b);
+  });
+
+  let bpm = 132, rootHz = 98, playing = false, ac = null, master = null, beat = 0, nextT = 0, timer = null, visT = null;
+  const setTempo = () => root.style.setProperty('--beat', (60 / bpm).toFixed(3) + 's');
+
+  // visual metronome runs with or without sound
+  function tickVis() { cells.forEach((c, i) => c.classList.toggle('on', i === beat % 8)); }
+  function startVis() { clearInterval(visT); if (reduce) return; visT = setInterval(() => { if (!playing) { beat++; tickVis(); } }, 60000 / bpm); }
+
+  // tiny rhythm section: walking bass + ride cymbal with a swung skip note
+  const WALK = [0, 4, 7, 9, 10, 9, 7, 4, 5, 9, 12, 14, 15, 14, 12, 11];
+  function ride(t, g) {
+    const len = .09, buf = ac.createBuffer(1, ac.sampleRate * len, ac.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
+    const s = ac.createBufferSource(), hp = ac.createBiquadFilter(), gn = ac.createGain(); s.buffer = buf; hp.type = 'highpass'; hp.frequency.value = 6500; gn.gain.value = g;
+    s.connect(hp).connect(gn).connect(master); s.start(t);
+  }
+  function bass(t, f, dur) {
+    const o = ac.createOscillator(), g = ac.createGain(), lp = ac.createBiquadFilter(); o.type = 'triangle'; o.frequency.value = f; lp.type = 'lowpass'; lp.frequency.value = 500;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.5, t + .015); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+    o.connect(lp).connect(g).connect(master); o.start(t); o.stop(t + dur + .02);
+  }
+  function schedule() {
+    const spb = 60 / bpm;
+    while (nextT < ac.currentTime + .12) {
+      const b = beat, t = nextT;
+      bass(t, rootHz * Math.pow(2, WALK[b % WALK.length] / 12), spb * .95);
+      ride(t, b % 2 ? .16 : .1); if (b % 2) ride(t + spb * .66, .07);
+      setTimeout(() => { if (playing) { beat = b; tickVis(); } }, Math.max(0, (t - ac.currentTime) * 1000));
+      nextT += spb; beat++;
+    }
+  }
+  function play() {
+    try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); } catch (e) { return; }
+    if (!master) { master = ac.createGain(); master.gain.value = .5; master.connect(ac.destination); }
+    playing = true; nextT = ac.currentTime + .06; timer = setInterval(schedule, 30);
+    needle.textContent = '■ Lift the needle'; needle.setAttribute('aria-pressed', 'true'); sleeve.classList.remove('paused');
+  }
+  function stop() { playing = false; clearInterval(timer); needle.textContent = '▶ Drop the needle'; needle.setAttribute('aria-pressed', 'false'); startVis(); }
+  needle.addEventListener('click', () => playing ? stop() : play());
+
+  gigs.forEach(g => g.addEventListener('click', () => {
+    gigs.forEach(o => o.setAttribute('aria-pressed', o === g)); bpm = +g.dataset.bpm; rootHz = +g.dataset.root; setTempo();
+    if (playing) nextT = Math.max(nextT, ac.currentTime + .05); else startVis();
+  }));
+  // clicking the shapes holds the band mid-bar
+  document.querySelector('.title').addEventListener('click', e => { if (!e.target.closest('a')) sleeve.classList.toggle('paused'); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && playing) stop(); });
+  setTempo(); startVis();
+})();
+</script>
+</body>
+</html>

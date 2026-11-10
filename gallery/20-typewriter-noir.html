@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Long Rain on Calloway Street — a typewriter noir</title>
+<meta name="description" content="A black-and-white, choice-driven detective short story, typed out one key at a time under the light of venetian blinds.">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:#0a0a0a}
+  body{color:#e9e6df;font-family:"American Typewriter","Courier Prime","Courier New","Nimbus Mono PS","Liberation Mono",monospace;overflow-x:hidden}
+  .room{position:fixed;inset:0;z-index:0;overflow:hidden;background:radial-gradient(ellipse at 70% 20%,#3a3a3a,#141414 55%,#050505)}
+  /* light through the blinds: slanted bands thrown across the whole room */
+  .blinds{position:absolute;inset:-30% -30%;transform:rotate(-17deg) skewX(-12deg);
+    background:repeating-linear-gradient(0deg,rgba(255,255,255,.2) 0 3.2vh,rgba(255,255,255,.03) 3.2vh 3.6vh,transparent 3.6vh 7vh);
+    -webkit-mask-image:radial-gradient(ellipse 55% 48% at 58% 45%,#000 30%,transparent 75%);mask-image:radial-gradient(ellipse 55% 48% at 58% 45%,#000 30%,transparent 75%);
+    animation:sway 11s ease-in-out infinite alternate;mix-blend-mode:screen}
+  @keyframes sway{from{transform:rotate(-17deg) skewX(-12deg) translateY(0)}to{transform:rotate(-16.2deg) skewX(-10deg) translateY(1.4vh)}}
+  .fan{position:absolute;left:50%;top:38%;width:150vmax;height:150vmax;margin:-75vmax;border-radius:50%;opacity:.5;
+    background:conic-gradient(rgba(0,0,0,.75) 0 7deg,transparent 12deg 90deg,rgba(0,0,0,.75) 90deg 97deg,transparent 102deg 180deg,rgba(0,0,0,.75) 180deg 187deg,transparent 192deg 270deg,rgba(0,0,0,.75) 270deg 277deg,transparent 282deg);
+    filter:blur(22px);animation:spin 9s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .silh{position:absolute;right:0;bottom:0;width:min(46vw,520px);height:auto;opacity:.92}
+  .grain{position:absolute;inset:0;width:100%;height:100%;opacity:.16;mix-blend-mode:overlay;pointer-events:none}
+  .vig{position:absolute;inset:0;background:radial-gradient(ellipse at 45% 45%,transparent 35%,rgba(0,0,0,.85));pointer-events:none}
+
+  .back{position:fixed;left:18px;top:14px;z-index:5;color:#e9e6df;text-decoration:none;font-size:12px;letter-spacing:.2em;border-bottom:1px solid #777;padding-bottom:2px}
+  .snd{position:fixed;right:18px;top:10px;z-index:5;font:inherit;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#e9e6df;background:none;border:1px solid #777;padding:6px 10px;cursor:pointer}
+  .snd[aria-pressed=true]{background:#e9e6df;color:#0a0a0a}
+  a:focus-visible,button:focus-visible{outline:2px dashed #fff;outline-offset:3px}
+
+  main{position:relative;z-index:2;min-height:100vh;display:grid;grid-template-columns:minmax(0,1fr);align-content:center;padding:64px clamp(14px,5vw,80px) 40px}
+  .title{margin:0 0 clamp(16px,3vh,30px);max-width:760px}
+  .title small{display:block;font-size:11px;letter-spacing:.5em;text-transform:uppercase;color:#aaa;margin-bottom:10px}
+  .title h1{margin:0;font-family:"Bodoni 72","Didot","Bodoni MT","Playfair Display","Times New Roman",serif;font-weight:900;font-style:italic;
+    font-size:clamp(34px,7.2vw,92px);line-height:.88;letter-spacing:-.02em;text-shadow:0 0 30px rgba(255,255,255,.25)}
+  /* the typed page */
+  .page{position:relative;max-width:660px;background:#e4e0d6;color:#151515;padding:clamp(22px,4vw,46px) clamp(18px,4vw,48px) clamp(20px,3vw,34px);
+    transform:rotate(-.8deg);box-shadow:0 30px 60px rgba(0,0,0,.7),0 0 0 1px #000;min-height:330px;cursor:text;
+    background-image:repeating-linear-gradient(163deg,transparent 0 5.4vh,rgba(0,0,0,.2) 5.4vh 9.6vh)}
+  .page::before{content:"";position:absolute;left:0;right:0;top:0;height:10px;background:repeating-linear-gradient(90deg,#0a0a0a 0 6px,transparent 6px 14px);opacity:.25}
+  .folio{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#555;margin-bottom:18px;border-bottom:1px solid #777;padding-bottom:8px}
+  #text{font-size:clamp(15px,1.75vw,18px);line-height:1.62;white-space:pre-wrap;min-height:8.5em;margin:0;text-shadow:.3px 0 0 rgba(0,0,0,.45)}
+  #text::after{content:"";display:inline-block;width:.55em;height:1.05em;background:#151515;vertical-align:-.16em;margin-left:2px;animation:caret .9s steps(1) infinite}
+  @keyframes caret{50%{opacity:0}}
+  .choices{display:grid;gap:8px;margin-top:20px;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s;visibility:hidden}
+  .choices.on{opacity:1;transform:none;visibility:visible}
+  .choices button{font:inherit;font-size:clamp(13.5px,1.5vw,15.5px);text-align:left;color:#151515;background:transparent;border:0;border-top:1px solid #333;padding:11px 4px 9px 2.2em;cursor:pointer;position:relative;line-height:1.35}
+  .choices button::before{content:"☛";position:absolute;left:2px;top:9px;transition:transform .2s}
+  .choices button:hover,.choices button:focus-visible{background:#151515;color:#e4e0d6;outline:none}
+  .choices button:hover::before,.choices button:focus-visible::before{transform:translateX(5px)}
+  .end{display:block;margin-top:14px;font-family:"Bodoni 72","Didot","Times New Roman",serif;font-style:italic;font-weight:900;font-size:26px;letter-spacing:.02em}
+  .skip{margin-top:14px;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#888;max-width:660px}
+  @media (max-width:640px){.silh{opacity:.35}}
+  @media (prefers-reduced-motion:reduce){.blinds,.fan,#text::after{animation:none}.choices{transition:none}}
+</style>
+</head>
+<body>
+<div class="room" aria-hidden="true">
+  <div class="fan"></div><div class="blinds"></div>
+  <svg class="silh" viewBox="0 0 520 420"><path fill="#030303" d="M520 420V96c-10-6-24-8-36-4l-10-34h-58l-8 32c-14 2-26 8-34 16h-28l2 12h20c-4 10-4 22 0 32-22 10-40 28-50 52-12 30-14 66-18 100-32 6-62 20-84 42-20 20-30 46-36 76z"/>
+    <path fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" opacity=".5" d="M352 112c-10-16 8-24-2-42s8-26 0-40"/><circle cx="350" cy="116" r="2.5" fill="#fff"/></svg>
+  <svg class="grain"><filter id="g"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#g)"/></svg>
+  <div class="vig"></div>
+</div>
+<a class="back" href="index.html">← 100</a>
+<button class="snd" id="snd" type="button" aria-pressed="false">Keys: off</button>
+
+<main>
+  <header class="title"><small>A Hollis Marr mystery</small><h1>The Long Rain on Calloway Street</h1></header>
+  <article class="page" id="page">
+    <div class="folio"><span id="folio">Page 1</span><span>H. Marr · Investigations</span></div>
+    <p id="text" aria-live="polite"></p>
+    <div class="choices" id="choices"></div>
+  </article>
+  <p class="skip">Click the page to finish the line · choose to turn it</p>
+</main>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const S = {
+    start: {t: "It had been raining on Calloway Street for nine days, the kind of rain that doesn't wash a city so much as rinse the evidence.\n\nI was three fingers into a bottle of rye and one payment behind on everything when she walked in. Grey gloves. A hat with a veil that did honest work. She set a brass key on my desk like she was laying down a losing hand.\n\n\"My husband is dead, Mr. Marr,\" she said. \"I'd like to know which one of me did it.\"",
+      c: [["Pick up the key.", "key"], ["Ask what she means by 'which one'.", "twin"]]},
+    key: {t: "The key was warm, which keys shouldn't be. Stamped on the bow: HOTEL ORPHEUM · 414.\n\n\"He kept a room,\" she said. \"I only learned of it this morning, when the hotel telephoned to ask whether Mrs. Vance would be wanting her usual breakfast.\"\n\nShe hadn't ordered breakfast at the Orpheum in her life. Somebody had been ordering it for six months.",
+      c: [["Go to the Orpheum. Room 414.", "hotel"], ["Tail the widow when she leaves.", "tail"]]},
+    twin: {t: "\"There's a woman,\" she said. \"She wears my face around town. Signs my name. Three nights ago she was seen leaving my house at the hour the coroner likes.\"\n\n\"A sister?\"\n\n\"I buried my sister in 'thirty-one, Mr. Marr. I was quite thorough.\"\n\nShe slid the brass key an inch closer. Outside, a streetcar screamed around the corner like it had been told the news.",
+      c: [["Take the key and the case.", "key"], ["Tell her you don't believe in ghosts — then follow her.", "tail"]]},
+    hotel: {t: "Room 414 smelled of lilies and typewriter ribbon. Two coffee cups, one lipstick. On the desk, a stack of practice sheets: the same signature, four hundred times, getting better.\n\n— Eleanor Vance. Eleanor Vance. Eleanor Vance. —\n\nIn the wardrobe hung a grey coat, grey gloves, and a hat with a veil. Still wet.\n\nBehind me, the door clicked the way doors do when they've been waiting.",
+      c: [["Turn around slowly.", "meet"], ["Go for the fire escape with the practice sheets.", "escape"]]},
+    tail: {t: "I gave her half a block and the benefit of no doubt at all. She walked like a woman being followed, which is to say, beautifully.\n\nAt Fenner and Ninth she stopped under an awning. A second woman stepped out of a taxi: grey gloves, same veil, same walk. They didn't speak. They traded handbags like relay runners and left in opposite directions.\n\nI had one pair of shoes and two widows.",
+      c: [["Follow the one from the taxi.", "hotel"], ["Follow the one who hired you.", "docks"]]},
+    meet: {t: "She had a small pistol and my client's face, minus about a year of worry.\n\n\"He hired me to be her,\" she said. \"Dinners. Signatures. The dull parts of a marriage. Then he changed the will to match the signature — mine — and thought I wouldn't read what I was signing.\"\n\n\"And three nights ago?\"\n\n\"Three nights ago I was here, practising a capital E. Ask the night clerk. Ask yourself who gains if the forger hangs for the wife.\"",
+      c: [["Believe her. Go and see the real Mrs. Vance.", "truth"], ["Take the gun off her and telephone the police.", "wrong"]]},
+    escape: {t: "The fire escape was slick as a lawyer. I made it two floors before the sheets got away from me — four hundred Eleanor Vances taking flight over Calloway Street, turning to pulp in the gutters.\n\nBy the time I reached the alley there was nothing left to prove and nobody left in 414. Just a lily in a coffee cup and the bill, made out to me.",
+      c: [["Go back to the office and pour what's left.", "lost"]]},
+    docks: {t: "She led me down to Pier 9, where the rain comes in sideways and the gulls have records. A man in a harbourmaster's cap handed her a steamer ticket and took an envelope thick enough to stop a door.\n\nShe saw me then. She didn't run. She lifted the veil and smiled the way you'd smile at a waiter who'd brought the right bill to the wrong table.\n\n\"You were supposed to follow the other one, Mr. Marr. That's what I paid you for.\"",
+      c: [["\"You hired me to be your alibi's witness.\"", "truth"], ["Let her board. Keep the retainer.", "bought"]]},
+    truth: {t: "It came apart the way wet paper does: all at once, and quietly.\n\nShe'd found the room, the forger, the new will. So she killed him in her own parlour in her own face, then hired the cheapest detective on Calloway Street to go and discover a woman who looked just like her.\n\n\"A jury would have loved her,\" she said. \"All that practice.\"\n\nI telephoned Lieutenant Okafor from the booth on the pier. The widow waited with me under the awning. Nine days of rain, and she'd never once got wet.",
+      end: "Case closed.", c: [["Read it again from the top.", "start"]]},
+    wrong: {t: "The police were grateful, which should have warned me.\n\nThey had a forger, a motive, four hundred signatures and a wet grey coat. By Friday the papers had a name for her — the Carbon-Copy Widow — and by spring the state had a date.\n\nMy client sent a cheque and a card with no message. The cheque cleared. The card was signed with a capital E so perfect that it took me a full year, and most of a bottle, to wonder who'd taught who.",
+      end: "Wrong woman.", c: [["Wind it back. Do it right.", "start"]]},
+    lost: {t: "The rye was where I'd left it. So was the key. I never did learn which of them came in that morning, or which went into the river off Pier 9 a week later with her pockets full of hotel silver.\n\nThe rain stopped on the tenth day. Nobody on Calloway Street mentioned it. You don't thank a thing like that for leaving.",
+      end: "Unsolved.", c: [["Put a fresh sheet in the machine.", "start"]]},
+    bought: {t: "The envelope she'd left on my desk that morning turned out to hold a good deal more than a retainer. Enough for the back rent, a new hat, and a conscience with a slow leak.\n\nThe steamer was called the Persephone. I watched her lights go out past the breakwater, one row at a time, like someone going through a house before a long trip.\n\nThe forger swung for it in April. I sent lilies. I'm not a monster.",
+      end: "Paid in full.", c: [["Try to sleep. Or start over.", "start"]]}
+  };
+  const text = document.getElementById('text'), choices = document.getElementById('choices'), folio = document.getElementById('folio'), page = document.getElementById('page');
+  let timer = 0, full = '', pos = 0, node = null, pages = 0, sound = false, ac = null, noise = null;
+
+  function clack(ch){
+    if (!sound || !ac || ch === ' ') return;
+    const t = ac.currentTime, s = ac.createBufferSource(), g = ac.createGain(), f = ac.createBiquadFilter();
+    s.buffer = noise; s.playbackRate.value = ch === '\n' ? .5 : .9 + Math.random() * .5; f.type = 'bandpass'; f.frequency.value = ch === '\n' ? 700 : 2300 + Math.random() * 900; f.Q.value = 1.2;
+    g.gain.setValueAtTime(ch === '\n' ? .22 : .11, t); g.gain.exponentialRampToValueAtTime(.0001, t + (ch === '\n' ? .16 : .045));
+    s.connect(f).connect(g).connect(ac.destination); s.start(t); s.stop(t + .2);
+  }
+  function finish(){
+    clearTimeout(timer); pos = full.length; text.textContent = full;
+    choices.innerHTML = '';
+    if (node.end){ const e = document.createElement('span'); e.className = 'end'; e.textContent = '— ' + node.end + ' —'; choices.appendChild(e); }
+    node.c.forEach(([label, to]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.addEventListener('click', ev => { ev.stopPropagation(); go(to); }); choices.appendChild(b); });
+    choices.classList.add('on');
+  }
+  function type(){
+    if (pos >= full.length){ finish(); return; }
+    const ch = full[pos++]; text.textContent = full.slice(0, pos); clack(ch);
+    let d = 22 + Math.random() * 34; if (ch === '.' || ch === '?' || ch === '!') d += 260; else if (ch === ',' || ch === '—' || ch === ':') d += 120; else if (ch === '\n') d += 190;
+    timer = setTimeout(type, d);
+  }
+  function go(id){
+    clearTimeout(timer); node = S[id]; full = node.t; pos = 0; if (id === 'start') pages = 0;
+    folio.textContent = 'Page ' + (++pages); choices.classList.remove('on'); choices.innerHTML = ''; text.textContent = '';
+    if (reduce) finish(); else timer = setTimeout(type, 350);
+    if (page.getBoundingClientRect().top < 0) page.scrollIntoView({block: 'start', behavior: 'auto'});
+  }
+  page.addEventListener('click', () => { if (pos < full.length) finish(); });
+  addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && pos < full.length && !e.target.closest('button,a')){ e.preventDefault(); finish(); } });
+  const snd = document.getElementById('snd');
+  snd.addEventListener('click', () => {
+    sound = !sound; snd.setAttribute('aria-pressed', sound); snd.textContent = 'Keys: ' + (sound ? 'on' : 'off');
+    if (sound && !ac){ try{ ac = new (window.AudioContext || window.webkitAudioContext)();
+        noise = ac.createBuffer(1, ac.sampleRate * .2, ac.sampleRate); const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+      }catch(_){ sound = false; snd.textContent = 'Keys: n/a'; } }
+    if (ac && ac.state === 'suspended') ac.resume();
+  });
+  go('start');
+})();
+</script>
+</body>
+</html>

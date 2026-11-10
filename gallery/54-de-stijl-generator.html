@@ -134,6 +134,7 @@
       st.left = r.x / G * 100 + '%'; st.top = r.y / G * 100 + '%'; st.width = r.w / G * 100 + '%'; st.height = r.h / G * 100 + '%';
       st.backgroundColor = COL[r.c]; share[r.c] = (share[r.c] || 0) + r.w * r.h / (G * G);
     });
+    for (let i = rs.length; i < N; i++) cells[i].style.width = cells[i].style.height = '0%';
     Object.keys(bars).forEach(k => bars[k].style.flexGrow = share[k] ? Math.max(.03, share[k]) : 0);
     const used = ['red', 'yellow', 'blue'].filter(k => share[k]), extra = ['black', 'grey'].filter(k => share[k]);
     const list = a => a.length > 1 ? a.slice(0, -1).map(cap).join(', ') + ' and ' + cap(a[a.length - 1]) : cap(a[0]);

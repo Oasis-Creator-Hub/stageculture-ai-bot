@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mandala Loom — draw once, woven many times</title>
+<meta name="description" content="A rotational-symmetry drawing tool. Every stroke you make is mirrored around the centre up to twenty-four times in luminous thread on a dark ground, or let the loom weave a mandala by itself.">
+<style>
+:root{--bg:#06050d;--gold:#d9b872;--dim:#7d7391;--panel:rgba(16,13,30,.82)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:var(--bg);color:#e9e2f5;font-family:"Avenir Next","Century Gothic","Segoe UI",system-ui,sans-serif}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+#draw{touch-action:none;cursor:crosshair}
+.mark{position:fixed;left:18px;top:14px;z-index:3;pointer-events:none}
+.mark h1{margin:0;font-family:"Cormorant Garamond","Didot","Hoefler Text",Georgia,serif;font-weight:400;font-style:italic;font-size:clamp(22px,3.4vw,34px);color:var(--gold);letter-spacing:.02em}
+.mark p{margin:2px 0 0;font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+.back{position:fixed;right:18px;top:18px;z-index:3;color:var(--gold);text-decoration:none;font-size:12px;letter-spacing:.24em;opacity:.8}
+.dock{position:fixed;z-index:3;left:50%;bottom:14px;transform:translateX(-50%);display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 16px;max-width:calc(100vw - 20px);
+  padding:10px 16px;background:var(--panel);border:1px solid rgba(217,184,114,.35);border-radius:18px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:12px}
+.g{display:flex;align-items:center;gap:7px}
+.g>span{letter-spacing:.2em;text-transform:uppercase;font-size:9.5px;color:var(--dim)}
+button{font:inherit;color:inherit;background:none;border:1px solid rgba(233,226,245,.25);border-radius:99px;min-width:32px;height:32px;padding:0 11px;cursor:pointer;touch-action:manipulation}
+button:hover{border-color:var(--gold);color:var(--gold)}
+button[aria-pressed=true]{background:var(--gold);border-color:var(--gold);color:#1a1326}
+#n{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;min-width:2ch;text-align:center;color:var(--gold)}
+.sw{width:26px;min-width:26px;height:26px;padding:0;border-width:2px;border-color:transparent}
+.sw[aria-pressed=true]{border-color:#fff;background-clip:padding-box}
+input[type=range]{width:74px;accent-color:var(--gold)}
+@media(max-width:560px){.dock{border-radius:14px;gap:6px 10px;padding:8px 10px}.g>span{display:none}input[type=range]{width:56px}}
+</style>
+</head>
+<body>
+<canvas id="guide" aria-hidden="true"></canvas>
+<canvas id="draw" aria-label="Drawing surface: strokes are repeated around the centre"></canvas>
+<div class="mark"><h1>Mandala Loom</h1><p>Draw once · woven <span id="times">12</span> times</p></div>
+<a class="back" href="index.html">← 100</a>
+<div class="dock" role="toolbar" aria-label="Loom controls">
+  <div class="g"><span>Folds</span><button id="less" type="button" aria-label="Fewer folds">−</button><b id="n">12</b><button id="more" type="button" aria-label="More folds">+</button></div>
+  <div class="g"><button id="mir" type="button" aria-pressed="true">Mirror</button></div>
+  <div class="g" id="pal"><span>Thread</span></div>
+  <div class="g"><span>Weight</span><input id="wt" type="range" min="1" max="8" step=".5" value="2.5" aria-label="Line weight"></div>
+  <div class="g"><button id="auto" type="button" aria-pressed="false">Auto-weave</button><button id="clr" type="button">Clear</button><button id="save" type="button">Save</button></div>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id),cv=$('draw'),ctx=cv.getContext('2d'),gd=$('guide'),gx=gd.getContext('2d');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const PAL=[{n:'Aurora',sw:'linear-gradient(135deg,#3affc3,#4a8bff,#c46bff)',f:(t,r)=>[150+70*Math.sin(t*.7)+r*90,95,62]},
+{n:'Ember',sw:'linear-gradient(135deg,#ffd257,#ff6a3d,#d91a6b)',f:(t,r)=>[18+26*Math.sin(t*.6)+r*40-10,100,58]},
+{n:'Opal',sw:'linear-gradient(135deg,#ff9bd2,#9be8ff,#fff3a6)',f:(t,r)=>[(t*40+r*300)%360,85,74]},
+{n:'Moonwhite',sw:'linear-gradient(135deg,#fff,#b9c6ff)',f:(t,r)=>[225+20*Math.sin(t),40+30*r,88]}];
+let W=0,H=0,dpr=1,N=12,mirror=true,pal=0,weight=2.5,T=0,down=false,lx=0,ly=0,auto=false,pen=null,threads=0,touched=false;
+PAL.forEach((p,i)=>{const b=document.createElement('button');b.type='button';b.className='sw';b.style.background=p.sw;b.title=p.n;b.setAttribute('aria-label',p.n+' thread');b.setAttribute('aria-pressed',i===0);
+  b.onclick=()=>{pal=i;[...$('pal').querySelectorAll('.sw')].forEach((s,k)=>s.setAttribute('aria-pressed',k===i))};$('pal').appendChild(b)});
+function guide(){gx.setTransform(dpr,0,0,dpr,0,0);gx.clearRect(0,0,W,H);const g=gx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*.6);g.addColorStop(0,'#141028');g.addColorStop(1,'#06050d');gx.fillStyle=g;gx.fillRect(0,0,W,H);
+  const R=Math.hypot(W,H)/2;gx.strokeStyle='rgba(217,184,114,.09)';gx.lineWidth=1;
+  for(let k=0;k<N;k++){const a=k*2*Math.PI/N-Math.PI/2;gx.beginPath();gx.moveTo(W/2,H/2);gx.lineTo(W/2+Math.cos(a)*R,H/2+Math.sin(a)*R);gx.stroke()}
+  const m=Math.min(W,H)/2;for(let i=1;i<=4;i++){gx.beginPath();gx.arc(W/2,H/2,m*i/4*.94,0,7);gx.stroke()}}
+function fit(){const keep=document.createElement('canvas');keep.width=cv.width;keep.height=cv.height;if(cv.width)keep.getContext('2d').drawImage(cv,0,0);const ow=W,oh=H,od=dpr;
+  dpr=Math.min(window.devicePixelRatio||1,2);W=innerWidth;H=innerHeight;for(const c of[cv,gd]){c.width=Math.round(W*dpr);c.height=Math.round(H*dpr)}
+  if(ow){ctx.setTransform(dpr,0,0,dpr,0,0);ctx.drawImage(keep,(W-ow)/2,(H-oh)/2,keep.width/od,keep.height/od)}guide()}
+/* one segment, in centre-relative coords, woven N times */
+function weave(x0,y0,x1,y1,w){const R=Math.min(W,H)/2,r=Math.min(1,Math.hypot(x1,y1)/R),c=PAL[pal].f(T,r),col='hsla('+c[0]+','+c[1]+'%,'+c[2]+'%,';
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.globalCompositeOperation='lighter';ctx.lineCap='round';
+  for(let pass=0;pass<2;pass++){ctx.strokeStyle=col+(pass?.85:.07)+')';ctx.lineWidth=pass?w:w*5;ctx.beginPath();
+    for(let k=0;k<N;k++){const a=k*2*Math.PI/N,ca=Math.cos(a),sa=Math.sin(a);
+      ctx.moveTo(W/2+x0*ca-y0*sa,H/2+x0*sa+y0*ca);ctx.lineTo(W/2+x1*ca-y1*sa,H/2+x1*sa+y1*ca);
+      if(mirror){ctx.moveTo(W/2-x0*ca-y0*sa,H/2-x0*sa+y0*ca);ctx.lineTo(W/2-x1*ca-y1*sa,H/2-x1*sa+y1*ca)}}
+    ctx.stroke()}ctx.globalCompositeOperation='source-over'}
+function pos(e){return[e.clientX-W/2,e.clientY-H/2]}
+cv.addEventListener('pointerdown',e=>{down=true;touched=true;setAuto(false);cv.setPointerCapture(e.pointerId);[lx,ly]=pos(e);weave(lx,ly,lx+.01,ly+.01,weight)});
+cv.addEventListener('pointermove',e=>{if(!down)return;const ev=e.getCoalescedEvents?e.getCoalescedEvents():[e];
+  for(const q of(ev.length?ev:[e])){const[x,y]=pos(q),d=Math.hypot(x-lx,y-ly);if(d<1.2)continue;T+=d*.004;weave(lx,ly,x,y,weight*Math.max(.45,Math.min(1.5,1.7-d*.05)));lx=x;ly=y}});
+const up=()=>{down=false};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+/* auto-weave: a pen riding three stacked epicycles */
+function newPen(){const R=Math.min(W,H)/2*.9,a1=.25+Math.random()*.4,a2=Math.random()*(.9-a1)*.8,a3=Math.max(.04,.9-a1-a2)*Math.random();
+  pen={R,a:[a1,a2,a3],f:[1,(2+Math.random()*5|0)*(Math.random()<.5?-1:1),(5+Math.random()*9|0)*(Math.random()<.5?-1:1)],p:[Math.random()*6,Math.random()*6,Math.random()*6],u:0,len:2*Math.PI*(.6+Math.random()*.8),w:.6+Math.random()*1.3,x:null,y:0};threads++}
+function penAt(u){let x=0,y=0;for(let i=0;i<3;i++){x+=pen.a[i]*Math.cos(pen.f[i]*u+pen.p[i]);y+=pen.a[i]*Math.sin(pen.f[i]*u+pen.p[i])}return[x*pen.R,y*pen.R]}
+function autoStep(n){for(let i=0;i<n;i++){if(!pen||pen.u>pen.len){if(threads>=7&&!reduce){fade=1;threads=0}newPen()}
+    const[x,y]=penAt(pen.u);if(pen.x!==null)weave(pen.x,pen.y,x,y,pen.w);pen.x=x;pen.y=y;pen.u+=.006;T+=.01}}
+let fade=0;
+function setAuto(v){auto=v;$('auto').setAttribute('aria-pressed',v);if(v){pen=null}}
+function clear(){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);threads=0}
+function setN(v){N=Math.max(2,Math.min(24,v));$('n').textContent=N;$('times').textContent=mirror?N*2:N;guide()}
+$('less').onclick=()=>setN(N-1);$('more').onclick=()=>setN(N+1);
+$('mir').onclick=()=>{mirror=!mirror;$('mir').setAttribute('aria-pressed',mirror);setN(N)};
+$('wt').oninput=e=>{weight=+e.target.value};
+$('clr').onclick=()=>{clear();pen=null};
+$('auto').onclick=()=>{setAuto(!auto);if(auto&&reduce){clear();pal=Math.random()*PAL.length|0;for(let k=0;k<4;k++){pen=null;autoStep(900)}setAuto(false)}};
+$('save').onclick=()=>{const o=document.createElement('canvas');o.width=cv.width;o.height=cv.height;const c=o.getContext('2d');c.drawImage(gd,0,0);c.drawImage(cv,0,0);
+  o.toBlob(b=>{if(!b)return;const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='mandala.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000)})};
+function loop(){if(auto&&!document.hidden){if(fade>0){ctx.setTransform(1,0,0,1,0,0);ctx.globalCompositeOperation='destination-out';ctx.fillStyle='rgba(0,0,0,.035)';ctx.fillRect(0,0,cv.width,cv.height);ctx.globalCompositeOperation='source-over';fade-=.012;
+      if(fade<=0)[...$('pal').querySelectorAll('.sw')][(pal+1)%PAL.length].click()}
+    else autoStep(10)}
+  requestAnimationFrame(loop)}
+addEventListener('resize',fit);fit();setN(12);
+if(reduce){for(let k=0;k<4;k++){pen=null;autoStep(900)}}else setAuto(true);
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

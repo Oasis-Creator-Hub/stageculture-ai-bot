@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Valley Cut from One Sheet — a paper-cut storybook</title>
+<meta name="description" content="A layered paper-cut valley with soft shadows that drifts with your pointer and deepens into dusk as you scroll. A short storybook in five folds about a grandmother, scissors, and a crooked house.">
+<style>
+*{box-sizing:border-box;margin:0}
+html{background:#f6dcc0}
+body{font-family:ui-rounded,"SF Pro Rounded","Hiragino Maru Gothic ProN","Arial Rounded MT Bold",Quicksand,Nunito,"Varela Round","Trebuchet MS",Verdana,sans-serif;color:#3a2440;overflow-x:hidden}
+.stage{position:fixed;inset:0;overflow:hidden;background:linear-gradient(#fbe9cf 0%,#f8d3b0 55%,#f3b79a 100%)}
+.night{position:absolute;inset:0;background:linear-gradient(#1f1a45 0%,#4a2c66 55%,#a2517a 100%);opacity:0}
+.stage svg{position:absolute;left:-6%;top:-6%;width:112%;height:112%;overflow:visible;will-change:transform}
+.cut{filter:drop-shadow(0 -5px 5px rgba(70,25,50,.30)) drop-shadow(0 -1px 0 rgba(255,255,255,.25))}
+#stars{opacity:0}
+.tint{position:absolute;inset:0;background:#33265e;mix-blend-mode:multiply;opacity:0;pointer-events:none}
+#lights{opacity:0}
+.grain{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:multiply;opacity:.55;z-index:5}
+main{position:relative;z-index:3}
+section{min-height:100vh;display:flex;align-items:flex-end;padding:clamp(1rem,5vw,4rem);padding-bottom:clamp(2rem,9vh,6rem)}
+section:nth-child(even){justify-content:flex-end}
+.card{background:#fcf3e2;max-width:27rem;padding:clamp(1.3rem,3vw,2.2rem);border-radius:20px 26px 18px 28px;transform:rotate(-1.2deg);
+  box-shadow:0 2px 0 #ead9bd,0 5px 0 #f7ecd8,0 7px 0 #e3d0b1,0 22px 34px rgba(55,20,50,.38)}
+section:nth-child(even) .card{transform:rotate(1deg);border-radius:26px 18px 28px 20px}
+.fold{display:inline-flex;align-items:center;gap:.5rem;font-size:.72rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#c9627a}
+.fold::before{content:"";width:22px;height:0;border-top:3px dashed #c9627a}
+h1{font-size:clamp(2.2rem,6.5vw,4.2rem);line-height:.98;letter-spacing:-.02em;color:#57346b;margin:.7rem 0 .8rem;font-weight:800}
+h1 span{color:#e0685c}
+h2{font-size:clamp(1.5rem,3.4vw,2.1rem);line-height:1.1;color:#57346b;margin:.6rem 0 .7rem;font-weight:800}
+p{font-size:1.06rem;line-height:1.6}
+p+p{margin-top:.8rem}
+.go{margin-top:1.2rem;font-size:.8rem;font-weight:700;letter-spacing:.12em;color:#8e4a78;display:flex;align-items:center;gap:.6rem}
+.go i{width:18px;height:28px;border:2.5px solid #8e4a78;border-radius:10px;position:relative}
+.go i::after{content:"";position:absolute;left:50%;top:5px;width:4px;height:6px;margin-left:-2px;border-radius:2px;background:#e0685c;animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateY(7px)}}
+.card a{color:#c9627a;font-weight:700;text-decoration:none;border-bottom:2px dotted #c9627a}
+.home{position:fixed;top:1rem;left:1rem;z-index:6;background:#fcf3e2;color:#57346b;text-decoration:none;font-weight:700;font-size:.78rem;letter-spacing:.08em;padding:.45rem .8rem;border-radius:999px;
+  box-shadow:0 3px 0 #e3d0b1,0 8px 14px rgba(55,20,50,.3)}
+@media(max-width:600px){section,section:nth-child(even){justify-content:center}}
+@media(prefers-reduced-motion:reduce){.go i::after{animation:none}}
+</style>
+</head>
+<body>
+<div class="stage" id="stage" aria-hidden="true"><div class="night" id="night"></div></div>
+<svg class="grain" aria-hidden="true"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="3" seed="12"/>
+  <feColorMatrix type="matrix" values="0 0 0 0 .5  0 0 0 0 .38  0 0 0 0 .3  0 0 0 .5 -.12"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg>
+<a class="home" href="index.html">← 100</a>
+<main>
+  <section><div class="card"><span class="fold">A story in five folds</span>
+    <h1>The Valley Cut from <span>One Sheet</span></h1>
+    <p>Told with scissors by Grandmother Ilka, on a kitchen table, the winter the snow came up to the letterbox.</p>
+    <div class="go"><i></i>Scroll to unfold · move to peek between the layers</div></div></section>
+  <section><div class="card"><span class="fold">Fold one</span><h2>First, the far hills</h2>
+    <p>She folded the evening in half and cut along the crease. When she opened it there were mountains — pale ones, the kind that are mostly distance.</p>
+    <p>“Never cut the far things sharply,” she said. “They haven't decided what they are yet.”</p></div></section>
+  <section><div class="card"><span class="fold">Fold two</span><h2>Then the pines</h2>
+    <p>Small triangles, snipped quick, stood up in rows along the ridge. The scraps she blew off the table became the birds.</p>
+    <p>“A tree is only a mountain that chose to stay close.”</p></div></section>
+  <section><div class="card"><span class="fold">Fold three</span><h2>Then the houses</h2>
+    <p>Nine houses, and one of them crooked. She never fixed the crooked one.</p>
+    <p>“Somebody has to live differently,” she said, “or a village is just a pattern.”</p></div></section>
+  <section><div class="card"><span class="fold">Fold four &amp; five</span><h2>Last of all, the light</h2>
+    <p>When the sun slid down behind the paper she took a pin and pricked a hole through every window.</p>
+    <p>Hold this page up to a lamp tonight. Someone in the crooked house is still awake — reading, I think, about you.</p>
+    <p><a href="index.html">← Close the book</a></p></div></section>
+</main>
+<script>
+(()=>{
+const stage=document.getElementById('stage'),night=document.getElementById('night');
+const hill=(fn,c)=>{let d='M-120 1150';for(let x=-120;x<=1320;x+=24)d+='L'+x+' '+fn(x).toFixed(1);return`<path fill="${c}" d="${d}L1320 1150Z"/>`};
+const f1=x=>455-70*Math.sin(x/210+.6)-34*Math.sin(x/83)-12*Math.sin(x/37+2);
+const f2=x=>545-44*Math.sin(x/260+2.2)-22*Math.sin(x/97+1);
+const f3=x=>612-34*Math.sin(x/230+4)-14*Math.sin(x/71);
+const f4=x=>676-30*Math.sin(x/300+1.2)-10*Math.sin(x/90+3);
+const f5=x=>748-46*Math.sin(x/340+5.2)-12*Math.sin(x/110);
+const pine=(x,y,s,c)=>`<path fill="${c}" d="M${x} ${y-64*s}l${17*s} ${30*s}h-${8*s}l${15*s} ${26*s}h-${9*s}l${14*s} ${24*s}h-${58*s}l${14*s}-${24*s}h-${9*s}l${15*s}-${26*s}h-${8*s}z"/>`;
+const houses=[[556,26,30,16],[596,30,24,20],[634,24,34,15],[682,34,26,22,7],[726,26,28,16],[772,28,24,18],[520,22,22,14],[812,24,30,15],[858,22,24,14]];
+let hs='',ws='';houses.forEach(([x,w,h,r,tilt])=>{const y=f4(x+w/2)+5,t=tilt?` transform="rotate(${tilt} ${x+w/2} ${y})"`:'';
+  hs+=`<path${t} fill="#8e4a78" d="M${x} ${y}v-${h}l${w/2}-${r}l${w/2} ${r}v${h}z"/>`;
+  ws+=`<g${t}><rect x="${x+w*.22}" y="${(y-h*.72).toFixed(1)}" width="${w*.2}" height="${h*.32}" rx="1.5"/><rect x="${x+w*.58}" y="${(y-h*.72).toFixed(1)}" width="${w*.2}" height="${h*.32}" rx="1.5"/></g>`});
+let pines3='',pines5='';for(let i=0;i<26;i++){const x=-60+i*52+(i*37%23),s=.7+(i*13%7)/10;if(x<470||x>900)pines3+=pine(x,f3(x)+8,s,'#c9627a')}
+[930,985,1030,1090,1150].forEach((x,i)=>pines5+=pine(x,f5(x)+10,1.5+i%2*.5,'#57346b'));
+let stars='';for(let i=0;i<70;i++){const x=(i*173.3)%1200,y=(i*97.7)%380;stars+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${1+(i%3)*.7}"/>`}
+const cloud=(x,y,s)=>`<path transform="translate(${x} ${y}) scale(${s})" d="M0 40a22 22 0 0 1 20-34a34 34 0 0 1 62-6a26 26 0 0 1 44 12a20 20 0 0 1 6 28z"/>`;
+const bird=(x,y,s)=>`<path transform="translate(${x} ${y}) scale(${s})" d="M0 0q9-12 20-2q11-10 20 2q-11-4-20 6q-9-10-20-6z"/>`;
+// [depth, class, markup]
+const L=[
+ [.02,'','<g id="stars" fill="#fff3cf">'+stars+'</g>'],
+ [.05,'cut','<g id="sun"><circle cx="840" cy="300" r="128" fill="#fde3b4"/><circle cx="840" cy="300" r="96" fill="#fbc682"/><circle cx="840" cy="300" r="64" fill="#f3935f"/></g>'],
+ [.09,'cut','<g fill="#fff8ea">'+cloud(120,170,1.5)+cloud(520,110,1)+cloud(980,210,1.2)+'</g><g fill="#57346b">'+bird(330,250,.8)+bird(380,280,.55)+bird(640,200,.6)+'</g>'],
+ [.16,'cut',hill(f1,'#f2bd9c')],
+ [.28,'cut',hill(f2,'#e58f85')],
+ [.42,'cut',pines3+hill(f3,'#c9627a')],
+ [.58,'cut',hs+hill(f4,'#8e4a78')+'<path fill="#f8d3b0" d="M690 1150Q560 900 690 800Q780 735 705 690q110 40 60 120Q700 900 860 1150z"/>'],
+ [.58,'','<g id="lights" fill="#ffd66b" style="filter:drop-shadow(0 0 5px #ffb43a)">'+ws+'</g>'],
+ [.78,'cut',pines5+hill(f5,'#57346b')+'<g fill="#57346b"><rect x="236" y="640" width="18" height="110" rx="6"/><circle cx="245" cy="610" r="62"/><circle cx="196" cy="650" r="44"/><circle cx="298" cy="648" r="48"/></g><g fill="#e0685c"><circle cx="222" cy="600" r="7"/><circle cx="270" cy="630" r="7"/><circle cx="250" cy="575" r="7"/><circle cx="300" cy="660" r="6"/><circle cx="190" cy="655" r="6"/></g>'],
+ [1.1,'cut','<g fill="#2a2148"><path d="M-120 1150V760Q-40 700 20 790Q50 690 120 800Q170 740 220 850Q280 820 320 1150z"/><path d="M1320 1150V740Q1230 690 1180 790Q1130 700 1070 820Q1020 770 980 880Q930 860 900 1150z"/>'+
+   [[60,830,-30],[100,840,-8],[140,860,14],[1130,850,-14],[1090,860,10],[1170,840,32]].map(([x,y,a])=>`<path transform="translate(${x} ${y}) rotate(${a})" d="M0 0Q-16-70 0-150Q16-70 0 0z"/>`).join('')+'</g>']
+];
+const els=L.map(([d,c,html])=>{const s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('viewBox','0 0 1200 800');s.setAttribute('preserveAspectRatio','xMidYMax slice');
+  if(c)s.setAttribute('class',c);s.innerHTML=html;stage.appendChild(s);return[s,d]});
+const tint=document.createElement('div');tint.className='tint';stage.insertBefore(tint,els[7][0]);
+const sun=document.getElementById('sun'),starsEl=document.getElementById('stars'),lights=document.getElementById('lights');
+const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let mx=0,my=0,cx=0,cy=0,p=0,cp=-1;
+addEventListener('pointermove',e=>{if(still)return;mx=e.clientX/innerWidth*2-1;my=e.clientY/innerHeight*2-1},{passive:true});
+const prog=()=>{const h=document.documentElement.scrollHeight-innerHeight;p=h>0?Math.min(1,Math.max(0,scrollY/h)):0};
+addEventListener('scroll',prog,{passive:true});addEventListener('resize',prog);prog();
+function tick(){
+  const tp=still?p:cp<0?p:cp+(p-cp)*.12;
+  if(Math.abs(tp-cp)>.0004||Math.abs(mx-cx)>.001||Math.abs(my-cy)>.001){
+    cp=tp;cx+=(mx-cx)*.08;cy+=(my-cy)*.08;const amp=still?0:1;
+    for(const[s,d]of els)s.style.transform='translate3d('+(-cx*d*38*amp).toFixed(1)+'px,'+((-cy*d*16+cp*d*130)*amp).toFixed(1)+'px,0)';
+    sun.setAttribute('transform','translate(0 '+(cp*330).toFixed(1)+')');
+    night.style.opacity=cp.toFixed(3);tint.style.opacity=(cp*.62).toFixed(3);
+    starsEl.style.opacity=Math.max(0,cp*1.6-.6).toFixed(3);lights.style.opacity=Math.max(0,Math.min(1,cp*2.2-1)).toFixed(3);
+  }
+  requestAnimationFrame(tick);
+}
+tick();
+})();
+</script>
+</body>
+</html>

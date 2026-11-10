@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Herbarium Vellomarense — pressed plates of an imagined flora</title>
+<meta name="description" content="A botanical herbarium of procedurally grown, pressed SVG plants on aged paper, each with an invented Latin name. Collect a new specimen whenever you like.">
+<style>
+  :root{--paper:#efe4c8;--ink:#3a2c1c;--sepia:#7b5e3b;--desk:#4b5a47}
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--ink);font-family:"Iowan Old Style","Palatino Linotype","Book Antiqua","URW Palladio L",Palatino,Georgia,serif;
+    background:
+      repeating-linear-gradient(92deg,rgba(0,0,0,.05) 0 2px,transparent 2px 9px),
+      repeating-linear-gradient(88deg,rgba(255,255,255,.03) 0 1px,transparent 1px 23px),
+      linear-gradient(#56664f,#3c4a3b);min-height:100vh}
+  header{max-width:1240px;margin:0 auto;padding:clamp(48px,7vw,84px) clamp(16px,4vw,48px) 10px;display:grid;grid-template-columns:1fr auto;gap:20px 40px;align-items:end;color:#f1e8d0}
+  header .k{font-size:11px;letter-spacing:.34em;text-transform:uppercase;opacity:.75;margin:0 0 12px;font-family:"Gill Sans","Trebuchet MS",sans-serif}
+  h1{margin:0;font-weight:400;font-style:italic;font-size:clamp(38px,7.4vw,96px);line-height:.92;letter-spacing:-.02em}
+  h1 span{display:block;font-style:normal;font-size:.3em;letter-spacing:.3em;text-transform:uppercase;margin-top:.9em;font-family:"Gill Sans","Trebuchet MS",sans-serif;opacity:.85}
+  .lede{max-width:34em;font-size:clamp(15px,1.5vw,17px);line-height:1.55;margin:18px 0 0;opacity:.9}
+  .tools{display:grid;gap:10px;justify-items:end;text-align:right}
+  .tools button{font:inherit;font-size:17px;font-style:italic;color:var(--ink);background:var(--paper);border:0;padding:13px 22px 14px;cursor:pointer;
+    box-shadow:0 2px 0 #b9a67a,0 8px 18px rgba(0,0,0,.35);transform:rotate(-1.2deg);transition:transform .2s}
+  .tools button::before{content:"✚";font-style:normal;margin-right:.6em;color:#8a2f1d;font-size:.8em}
+  .tools button:hover{transform:rotate(.6deg) translateY(-2px)}
+  .tools button:focus-visible,.back:focus-visible{outline:2px dashed #f1e8d0;outline-offset:4px}
+  .tools small{font-family:"Gill Sans","Trebuchet MS",sans-serif;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;opacity:.75}
+  .back{position:absolute;left:clamp(16px,4vw,48px);top:16px;color:#f1e8d0;font-family:"Gill Sans","Trebuchet MS",sans-serif;font-size:11px;letter-spacing:.3em;text-decoration:none;border-bottom:1px solid rgba(241,232,208,.5);padding-bottom:3px}
+
+  .plates{max-width:1240px;margin:0 auto;padding:26px clamp(16px,4vw,48px) 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:clamp(20px,3vw,38px)}
+  .plate{position:relative;margin:0;background:var(--paper);padding:14px 14px 12px;transform:rotate(var(--tilt));
+    background-image:radial-gradient(ellipse at var(--fx) var(--fy),rgba(140,96,40,.2),transparent 42%),radial-gradient(ellipse at 100% 100%,rgba(120,84,40,.22),transparent 45%),linear-gradient(rgba(255,252,240,.5),transparent 30%);
+    box-shadow:0 1px 0 #cbb98f,0 2px 0 #e6d9b8,0 3px 0 #cbb98f,0 16px 26px rgba(0,0,0,.4);animation:lay .9s cubic-bezier(.2,.9,.25,1) backwards}
+  .plate::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply;background:#000;filter:url(#fibre)}
+  @keyframes lay{from{opacity:0;transform:translateY(-46px) rotate(calc(var(--tilt) * 4)) scale(1.06)}}
+  .plate svg{display:block;width:100%;height:auto}
+  .plate .pl{mix-blend-mode:multiply}
+  .label{position:relative;z-index:1;margin:-64px 0 0 auto;width:66%;background:#f8f1dc;border:1px solid var(--sepia);outline:1px solid var(--sepia);outline-offset:-4px;padding:9px 11px 8px;font-size:11px;line-height:1.35;box-shadow:1px 2px 3px rgba(60,40,10,.25)}
+  .label b{display:block;font-weight:400;font-style:italic;font-size:16.5px;line-height:1.1;margin:2px 0 3px}
+  .label .h{font-family:"Gill Sans","Trebuchet MS",sans-serif;font-size:8px;letter-spacing:.26em;text-transform:uppercase;color:var(--sepia);display:block;text-align:center;border-bottom:1px solid var(--sepia);padding-bottom:3px;margin-bottom:4px}
+  .label .hand{font-family:"Snell Roundhand","Segoe Script","Lucida Handwriting","URW Chancery L","Apple Chancery",cursive;font-size:13px;color:#2c3f66;line-height:1.25;display:block}
+  .no{position:absolute;left:14px;bottom:12px;z-index:1;font-family:"Courier New",monospace;font-size:11px;color:#8a2f1d;letter-spacing:.1em;transform:rotate(-4deg);border:1.5px solid #8a2f1d;padding:2px 6px;opacity:.75}
+  @media (max-width:700px){header{grid-template-columns:1fr}.tools{justify-items:start;text-align:left}}
+  @media (prefers-reduced-motion:reduce){.plate{animation:none}.tools button{transition:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="fibre" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".02 .45" numOctaves="3" seed="11"/><feColorMatrix values="0 0 0 0 .48  0 0 0 0 .36  0 0 0 0 .2  0 0 0 .5 -.1"/><feComposite in2="SourceGraphic" operator="in"/></filter></svg>
+<a class="back" href="index.html">← 100</a>
+<header>
+  <div>
+    <p class="k">Cabinet IX · Drawers 1 – 24</p>
+    <h1>Herbarium Vellomarense<span>Pressed flora of the Vellomar Marshes</span></h1>
+    <p class="lede">Every sheet here was grown a moment ago from a handful of numbers, pressed flat, taped down and named in a Latin nobody has ever spoken. No two are alike; none of them exist.</p>
+  </div>
+  <div class="tools"><button type="button" id="collect">Collect new specimen</button><small><span id="count">0</span> sheets in the cabinet</small></div>
+</header>
+<main class="plates" id="plates" aria-live="polite"></main>
+
+<script>
+(() => {
+  const plates = document.getElementById('plates'), countEl = document.getElementById('count');
+  // small seeded generator so each sheet is reproducible from its accession number
+  const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const f = n => n.toFixed(1), D = Math.PI / 180;
+  const GEN = ['Vellaria', 'Morbifolia', 'Tessandra', 'Quillonia', 'Umbrosia', 'Ferrucaria', 'Lanthea', 'Pelliphyllum', 'Astrocaulis', 'Nimbaria', 'Dulcamira', 'Sorbella', 'Cindrosa', 'Halimède', 'Oxalune', 'Brumelia'];
+  const EP1 = ['nocti', 'palu', 'argenti', 'tenui', 'rubri', 'longi', 'parvi', 'luni', 'cauli', 'multi', 'fusci', 'aureo', 'mollis', 'crispi'];
+  const EP2 = ['flora', 'folia', 'caulis', 'spina', 'cephala', 'carpa', 'phylla', 'stachya', 'radix', 'petala', 'sperma'];
+  const EP3 = ['vellomarensis', 'incognita', 'dubia', 'pluvialis', 'somnolenta', 'obliviosa', 'vespertina', 'tarda', 'mendax', 'hesitans'];
+  const FAM = ['Umbrosaceae', 'Lanthaceae', 'Quilloniaceae', 'Nimbariaceae', 'Ferrucaceae', 'Sorbellaceae'];
+  const LOC = ['Edge of Hollow Mere, among sedge', 'Drowned orchard, Low Vellomar', 'North dyke, in standing water', 'Peat cutting behind the eel house', 'Fen causeway, east verge', 'Salt meadow at Cray Sluice', 'Under alder, Witherfold Carr', 'Tidal flat below the lantern post'];
+  const COL = ['E. Marrow', 'T. Aldous-Finch', 'Sr. Ottoline', 'H. Pennywhistle', 'R. Quaile', 'Dr. I. Voss'];
+  const MON = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.'];
+  const GREEN = ['#5d6b34', '#6f7436', '#4f6140', '#7a7a3e', '#586a4c', '#817546'], BROWN = ['#6b4f2c', '#7a5a34', '#5e4a30'];
+  const PETAL = ['#9c5a6e', '#b98a3a', '#7b6aa0', '#b5694a', '#c9b98a', '#8a4a3a', '#6f86a3', '#b78fa6'];
+
+  function grow(seed){
+    const r = rng(seed), pick = a => a[r() * a.length | 0], R = (a, b) => a + r() * (b - a);
+    const green = pick(GREEN), stemC = pick(BROWN), petal = pick(PETAL);
+    let s = '';
+    const leaf = (x, y, ang, len, wid, fill = green, op = .88) => `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(ang)})"><path d="M0 0C${f(len * .3)} ${f(-wid)} ${f(len * .72)} ${f(-wid * .8)} ${f(len)} 0C${f(len * .72)} ${f(wid * .8)} ${f(len * .3)} ${f(wid)} 0 0Z" fill="${fill}" opacity="${op}"/><path d="M0 0L${f(len * .94)} 0" stroke="${stemC}" stroke-width=".6" opacity=".7" fill="none"/></g>`;
+    // a stem is a quadratic curve; returns point + tangent angle at t
+    const curve = (x0, y0, x1, y1, x2, y2) => t => { const u = 1 - t;
+      return {x: u * u * x0 + 2 * u * t * x1 + t * t * x2, y: u * u * y0 + 2 * u * t * y1 + t * t * y2,
+        a: Math.atan2(2 * u * (y1 - y0) + 2 * t * (y2 - y1), 2 * u * (x1 - x0) + 2 * t * (x2 - x1)) / D}; };
+    const stroke = (x0, y0, x1, y1, x2, y2, w, c = stemC) => `<path d="M${f(x0)} ${f(y0)}Q${f(x1)} ${f(y1)} ${f(x2)} ${f(y2)}" fill="none" stroke="${c}" stroke-width="${f(w)}" stroke-linecap="round"/>`;
+    const bx = 150 + R(-14, 14), by = 318;
+    // roots
+    for (let i = 0, n = 4 + (r() * 4 | 0); i < n; i++){ const dx = R(-34, 34), l = R(16, 44);
+      s += `<path d="M${f(bx)} ${by}q${f(dx * .2)} ${f(l * .5)} ${f(dx * .6)} ${f(l * .6)}t${f(dx * .4)} ${f(l * .4)}" fill="none" stroke="${stemC}" stroke-width="${f(R(.5, 1.3))}" opacity=".8" stroke-linecap="round"/>`; }
+    const flower = (x, y, a, kind, sc) => { let o = '';
+      if (kind === 0){ const n = 7 + (r() * 8 | 0); for (let i = 0; i < n; i++) o += leaf(x, y, i * 360 / n + R(-6, 6), 15 * sc, 4.4 * sc, petal, .8); o += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(4 * sc)}" fill="#6b4a1e" opacity=".85"/>`; }
+      else if (kind === 1){ const n = 6 + (r() * 6 | 0); for (let i = 0; i < n; i++){ const an = (a - 62 + i * 124 / (n - 1)) * D, l = R(18, 28) * sc, ex = x + Math.cos(an) * l, ey = y + Math.sin(an) * l;
+          o += `<path d="M${f(x)} ${f(y)}L${f(ex)} ${f(ey)}" stroke="${green}" stroke-width=".7" fill="none"/><circle cx="${f(ex)}" cy="${f(ey)}" r="${f(R(2.4, 4) * sc)}" fill="${petal}" opacity=".82"/>`; } }
+      else if (kind === 2){ for (let i = 0; i < 3; i++){ const an = (a + R(-70, 70)) * D, ex = x + Math.cos(an) * 12 * sc, ey = y + Math.sin(an) * 12 * sc + 6;
+          o += `<path d="M${f(x)} ${f(y)}Q${f(ex)} ${f(y - 4)} ${f(ex)} ${f(ey)}" stroke="${green}" stroke-width=".7" fill="none"/><path d="M${f(ex - 5 * sc)} ${f(ey)}q${f(5 * sc)} ${f(-7 * sc)} ${f(10 * sc)} 0l${f(-1.5 * sc)} ${f(13 * sc)}q${f(-3.5 * sc)} ${f(-3 * sc)} ${f(-7 * sc)} 0z" fill="${petal}" opacity=".82"/>`; } }
+      else { for (let i = 0; i < 5; i++) o += leaf(x, y, a - 60 + i * 30, 13 * sc, 3.2 * sc, petal, .78); }
+      return o; };
+
+    const type = r() * 4 | 0;
+    if (type === 0){            // forb: leafy stem, terminal flower
+      const hgt = R(170, 240), lean = R(-46, 46), c = curve(bx, by, bx + lean * .1 + R(-24, 24), by - hgt * .5, bx + lean, by - hgt);
+      const n = 4 + (r() * 6 | 0), opp = r() < .5, L = R(30, 58), Wd = R(5, 15), fk = r() * 4 | 0;
+      for (let i = 0; i < n; i++){ const t = .14 + i / n * .68, p = c(t), k = 1 - t * .55, side = i % 2 ? 1 : -1, sp = R(38, 66);
+        s += leaf(p.x, p.y, p.a + side * sp, L * k, Wd * k); if (opp) s += leaf(p.x, p.y, p.a - side * sp, L * k * R(.8, 1), Wd * k); }
+      const p0 = c(0), pm = c(.5), p1 = c(1);
+      s += stroke(p0.x, p0.y, 2 * pm.x - (p0.x + p1.x) / 2, 2 * pm.y - (p0.y + p1.y) / 2, p1.x, p1.y, R(1.4, 2.4));
+      s += flower(p1.x, p1.y, p1.a, fk, R(.9, 1.3));
+      if (r() < .55){ const q = c(R(.5, .7)), side = r() < .5 ? -1 : 1, an = (q.a + side * 40) * D, l = R(34, 60), ex = q.x + Math.cos(an) * l, ey = q.y + Math.sin(an) * l;
+        s += stroke(q.x, q.y, q.x + Math.cos(an) * l * .5, q.y + Math.sin(an) * l * .5 - 6, ex, ey, 1); s += flower(ex, ey, q.a + side * 40, fk, .75); }
+    } else if (type === 1){     // fern: fronds of paired pinnae
+      const fronds = 1 + (r() * 3 | 0);
+      for (let k = 0; k < fronds; k++){ const hgt = R(150, 235), lean = (k - (fronds - 1) / 2) * R(50, 80) + R(-14, 14), c = curve(bx, by, bx + lean * .2, by - hgt * .6, bx + lean, by - hgt);
+        const n = 12 + (r() * 9 | 0), L = R(22, 40), Wd = R(2.6, 5.5);
+        for (let i = 0; i < n; i++){ const t = .16 + i / n * .82, p = c(t), kk = Math.sin(Math.min(1, (1 - t) * 1.5 + .12) * Math.PI / 2);
+          s += leaf(p.x, p.y, p.a - 72, L * kk, Wd * kk + .8, green, .85) + leaf(p.x, p.y, p.a + 72, L * kk, Wd * kk + .8, green, .85); }
+        const p0 = c(0), pm = c(.5), p1 = c(1); s += stroke(p0.x, p0.y, 2 * pm.x - (p0.x + p1.x) / 2, 2 * pm.y - (p0.y + p1.y) / 2, p1.x, p1.y, 1.3); }
+    } else if (type === 2){     // grass: blades and nodding seed heads
+      for (let i = 0, n = 5 + (r() * 5 | 0); i < n; i++){ const lean = R(-90, 90), hgt = R(110, 220);
+        s += stroke(bx + R(-4, 4), by, bx + lean * .15, by - hgt * .75, bx + lean, by - hgt + Math.abs(lean) * .5, R(1.2, 2.8), green); }
+      for (let k = 0, n = 2 + (r() * 2 | 0); k < n; k++){ const lean = R(-60, 60), hgt = R(200, 258), c = curve(bx, by, bx + lean * .1, by - hgt * .7, bx + lean, by - hgt + Math.abs(lean) * .3);
+        const p0 = c(0), pm = c(.5), p1 = c(1); s += stroke(p0.x, p0.y, 2 * pm.x - (p0.x + p1.x) / 2, 2 * pm.y - (p0.y + p1.y) / 2, p1.x, p1.y, .9);
+        for (let i = 0; i < 12; i++){ const p = c(.7 + i / 12 * .3); s += leaf(p.x, p.y, p.a + (i % 2 ? 34 : -34), R(8, 13), 2.2, petal, .8); } }
+    } else {                    // twig: forking branches, small leaves, berries
+      const berry = r() < .6;
+      const branch = (x, y, ang, len, depth) => { const an = ang * D, ex = x + Math.cos(an) * len, ey = y + Math.sin(an) * len, bend = R(-10, 10);
+        s += stroke(x, y, (x + ex) / 2 + bend, (y + ey) / 2, ex, ey, depth * .75 + .5);
+        if (depth > 0){ const sp = R(18, 34); branch(ex, ey, ang - sp, len * R(.62, .8), depth - 1); branch(ex, ey, ang + sp * R(.7, 1.2), len * R(.62, .8), depth - 1);
+          if (r() < .4) branch(ex, ey, ang + R(-8, 8), len * .55, depth - 1); }
+        else { s += leaf(ex, ey, ang - 30, R(14, 22), R(4, 7)) + leaf(ex, ey, ang + 34, R(14, 22), R(4, 7));
+          if (berry) s += `<circle cx="${f(ex + R(-4, 4))}" cy="${f(ey + R(2, 7))}" r="${f(R(2.4, 3.8))}" fill="${petal}" opacity=".85"/>`; }
+        if (depth < 3) s += leaf((x + ex) / 2, (y + ey) / 2, ang + (r() < .5 ? -55 : 55), R(12, 20), R(3.5, 6)); };
+      branch(bx, by, -90 + R(-8, 8), R(72, 92), 3);
+    }
+    // linen tape strips
+    let tape = ''; for (const [ty, tx] of [[by - 6, bx], [R(150, 215), bx + R(-12, 12)]]) tape += `<rect x="${f(tx - 19)}" y="${f(ty)}" width="38" height="8" fill="#fbf6e6" opacity=".82" stroke="#c9b88e" stroke-width=".5" transform="rotate(${f(R(-12, 12))} ${f(tx)} ${f(ty)})"/>`;
+    const name = pick(GEN) + ' ' + (r() < .68 ? pick(EP1) + pick(EP2) : pick(EP3));
+    return {svg: `<svg viewBox="0 0 300 400" role="img" aria-label="Pressed specimen of ${name}"><g class="pl">${s}</g>${tape}</svg>`, name,
+      fam: pick(FAM), loc: pick(LOC), col: pick(COL), date: (1 + (r() * 28 | 0)) + ' ' + pick(MON) + ' 18' + (61 + (r() * 38 | 0)), tilt: R(-1.6, 1.6), fx: R(5, 60), fy: R(5, 70)};
+  }
+
+  let acc = 4100 + (Math.random() * 5000 | 0), total = 0;
+  function add(front, delay){
+    const seed = ++acc, sp = grow(seed * 7919), fig = document.createElement('figure');
+    fig.className = 'plate'; fig.style.cssText = `--tilt:${sp.tilt.toFixed(2)}deg;--fx:${sp.fx | 0}%;--fy:${sp.fy | 0}%;animation-delay:${delay || 0}ms`;
+    fig.innerHTML = sp.svg + `<figcaption class="label"><span class="h">Herb. Vellomarense</span><b>${sp.name}</b>${sp.fam}<span class="hand">${sp.loc}.<br>leg. ${sp.col}, ${sp.date}</span></figcaption><span class="no">No. ${seed}</span>`;
+    if (front) plates.prepend(fig); else plates.appendChild(fig);
+    while (plates.children.length > 24) plates.lastElementChild.remove();
+    countEl.textContent = ++total > 24 ? 24 : total;
+  }
+  for (let i = 0; i < 8; i++) add(false, i * 90);
+  document.getElementById('collect').addEventListener('click', () => { add(true, 0); plates.firstElementChild.scrollIntoView({block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); });
+})();
+</script>
+</body>
+</html>

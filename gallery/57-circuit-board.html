@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MERIDIAN-9 Mainboard, Rev. C</title>
+<meta name="description" content="A generated printed circuit board in green and gold: routed traces, pads and chips with light pulses running the copper. Hover or tap a chip for the datasheet of an invented part.">
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#06241a}
+  #pcb{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:manipulation}
+  .silk{position:fixed;left:clamp(34px,4vw,56px);bottom:clamp(30px,4vw,50px);pointer-events:none;color:#e9f1e6;
+    font-family:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace;text-transform:uppercase;text-shadow:0 0 1px rgba(0,0,0,.5)}
+  .silk h1{margin:0;font-size:clamp(17px,2.5vw,30px);font-weight:700;letter-spacing:.14em;line-height:1.05}
+  .silk p{margin:7px 0 0;font-size:clamp(8.5px,.9vw,11px);letter-spacing:.2em;line-height:1.7;opacity:.82}
+  .silk i{font-style:normal;display:inline-block;border:1px solid currentColor;padding:0 5px;margin-right:6px}
+  .ctl{position:fixed;right:clamp(34px,4vw,56px);bottom:clamp(30px,4vw,50px);display:flex;gap:8px;align-items:center}
+  .ctl button,.ctl a{font:700 10px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;text-transform:uppercase;color:#f3d57a;text-decoration:none;
+    background:rgba(4,30,21,.82);border:1px solid #b8923a;padding:9px 11px;cursor:pointer;border-radius:2px}
+  .ctl button:hover,.ctl a:hover{background:#b8923a;color:#06241a}
+  #sheet{position:fixed;width:min(310px,calc(100vw - 24px));background:#f6f4ec;color:#15171a;font:11.5px/1.45 "Helvetica Neue",Arial,sans-serif;
+    box-shadow:0 18px 44px rgba(0,0,0,.55),0 0 0 1px #000;opacity:0;transform:translateY(6px);transition:opacity .18s,transform .18s;pointer-events:none;z-index:4}
+  #sheet.on{opacity:1;transform:none}
+  #sheet header{background:#15171a;color:#f6f4ec;padding:9px 12px 8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  #sheet header b{font:700 15px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em}
+  #sheet header span{font-size:9px;letter-spacing:.16em;text-transform:uppercase;opacity:.7;white-space:nowrap}
+  #sheet .body{padding:10px 12px 12px}
+  #sheet h2{margin:0 0 4px;font-size:14px;line-height:1.2}
+  #sheet p{margin:0 0 9px}
+  #sheet .row{display:grid;grid-template-columns:1fr 92px;gap:10px;align-items:start}
+  #sheet table{border-collapse:collapse;width:100%;font-size:10.5px}
+  #sheet td{border-top:1px solid #c9c6ba;padding:3px 0;vertical-align:top}
+  #sheet td:last-child{text-align:right;font-family:ui-monospace,Menlo,Consolas,monospace;white-space:nowrap}
+  #sheet h3{margin:0 0 3px;font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:#7a7668}
+  #sheet .foot{margin:9px 0 0;font-size:9.5px;color:#7a7668;border-top:2px solid #15171a;padding-top:6px}
+  #sheet svg{display:block;width:100%}
+  @media (max-width:620px){#sheet{left:12px!important;top:auto!important;bottom:12px}.ctl{bottom:auto;top:16px;right:16px}.silk{left:22px;bottom:22px}}
+</style>
+</head>
+<body>
+<canvas id="pcb" aria-label="Printed circuit board with animated signal pulses"></canvas>
+<div class="silk"><h1>Meridian-9</h1><p><i>Rev C</i>stage control mainboard<br>hand-routed in Lower Anselm · 2-layer · do not lick</p></div>
+<div class="ctl"><button id="reroute" type="button">Re-route board</button><a href="index.html">← 100</a></div>
+<aside id="sheet" aria-live="polite"></aside>
+<script>
+(() => {
+  const cv = document.getElementById('pcb'), ctx = cv.getContext('2d'), sheet = document.getElementById('sheet');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2, rnd = (a, b) => a + Math.random() * (b - a), ri = (a, b) => Math.floor(rnd(a, b + 1)), pick = a => a[(Math.random() * a.length) | 0];
+  const DIRS = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]];
+  const PARTS = [
+    { pn: 'VT-4096', name: 'Octal Dream Latch', d: 'Holds eight bits of last night’s dream until the rising edge of morning. Outputs go high-impedance when asked what it meant.', s: [['Supply', '3.0–5.5 V'], ['Hold time', '≥ 1 night'], ['Quiescent', '12 µA']] },
+    { pn: 'KM-555N', name: 'Hesitation Timer', d: 'Monostable. Generates one precisely timed pause before difficult answers. Retriggerable by eye contact.', s: [['Pause', '0.4–9 s'], ['Jitter', '± 1 breath'], ['Supply', '4.5–16 V']] },
+    { pn: 'LX-0721', name: 'Quad Nostalgia Op-Amp', d: 'Rail-to-rail output. Input offset drifts slowly toward a summer you only half remember.', s: [['Gain-bandwidth', '3 MHz'], ['Offset drift', '1 yr/°C'], ['Noise', 'warm']] },
+    { pn: 'QR-8088', name: 'Stage Cue Sequencer', d: 'Sixty-four non-volatile cues with dedicated blackout pin. Has never once missed a blackout, and will tell you so.', s: [['Cues', '64'], ['Latency', '< 2 ms'], ['Standby', '80 µA']] },
+    { pn: 'HB-2240', name: 'Applause Detector', d: 'Envelope follower with adaptive encore threshold. Rejects polite coughing to −60 dB.', s: [['Range', '34–118 dB'], ['Encore thr.', 'adaptive'], ['Supply', '2.7–5.5 V']] },
+    { pn: 'TZ-13', name: 'Low-Dropout Courage Regulator', d: 'Stable with as little as 1 µF of encouragement on the output. Thermal shutdown during speeches.', s: [['Output', '3.3 V fixed'], ['Dropout', '90 mV'], ['Load', '500 mA']] },
+    { pn: 'NV-27C', name: 'Forgetful EEPROM', d: '256 kbit serial memory. Remembers everything except where it put it. Read twice to be sure.', s: [['Endurance', '100k writes'], ['Retention', '≈ 40 yr'], ['Bus', 'I²C-ish']] },
+    { pn: 'PS-9', name: 'Phase-Locked Heartbeat', d: 'PLL that captures and tracks 60–100 BPM. Lock indicator flickers near open doors and old friends.', s: [['Capture', '0.9–1.7 Hz'], ['Lock time', '3 beats'], ['Supply', '1.8–3.6 V']] },
+    { pn: 'MX-4051', name: 'Multiplexer of Small Decisions', d: 'Eight channels in, one out. Break-before-make switching prevents wanting two things at once.', s: [['On-resistance', '4 Ω'], ['Channels', '8:1'], ['Regret', '< 0.1 %']] },
+    { pn: 'DG-303', name: 'Dual Fog Driver', d: 'Half-bridge for low-lying atmosphere. Soft-start avoids startling the first three rows.', s: [['Output', '2 × 1.5 A'], ['Soft-start', '2.2 s'], ['Density', 'moody']] }
+  ];
+  const PINS = ['VCC', 'GND', 'CLK', 'CUE', 'HUSH', 'ENC', 'SIGH', 'Q0', 'Q1', 'NC', 'RST', 'DIM', 'FADE', 'ECHO', 'A0', 'A1', 'WAIT', 'GO'];
+  let W, H, dpr, g, cols, rows, occ, diag, chips, parts2, traces, pulses, board, hot = null, pinned = false;
+
+  const idx = (x, y) => y * cols + x;
+  function build() {
+    g = W < 640 ? 13 : 16; cols = Math.ceil(W / g); rows = Math.ceil(H / g);
+    occ = new Int16Array(cols * rows); diag = new Set(); chips = []; parts2 = []; traces = [];
+    const free = (x0, y0, x1, y1) => { if (x0 < 3 || y0 < 3 || x1 > cols - 4 || y1 > rows - 4) return false;
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (occ[idx(x, y)]) return false; return true; };
+    const mark = (x0, y0, x1, y1) => { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) occ[idx(x, y)] = -1; };
+    // keep the silkscreen title block clear
+    mark(0, rows - Math.ceil(120 / g), Math.min(cols - 1, Math.ceil(Math.min(W * .72, 400) / g)), rows - 1);
+    const want = Math.max(4, Math.min(11, Math.round(W * H / 80000))), deck = PARTS.slice().sort(() => Math.random() - .5);
+    for (let t = 0; t < 500 && chips.length < want; t++) {
+      const quad = Math.random() < .35, n = quad ? ri(5, 8) : ri(4, 9), w = n, h = quad ? n : (Math.random() < .5 ? 3 : 4);
+      const bx = ri(4, cols - w - 5), by = ri(4, rows - h - 5);
+      if (bx < 4 || by < 4 || !free(bx - 3, by - 3, bx + w + 2, by + h + 2)) continue;
+      mark(bx - 1, by - 1, bx + w, by + h);
+      const pins = [];
+      for (let i = 0; i < w; i++) { pins.push({ x: bx + i, y: by - 1, d: 6 }); pins.push({ x: bx + i, y: by + h, d: 2 }); }
+      if (quad) for (let i = 0; i < h; i++) { pins.push({ x: bx - 1, y: by + i, d: 4 }); pins.push({ x: bx + w, y: by + i, d: 0 }); }
+      chips.push({ bx, by, w, h, quad, pins, part: deck[chips.length % deck.length], ref: 'U' + (chips.length + 1), glow: 0,
+        px: bx * g - g * .12, py: by * g - g * .12, pw: w * g + g * .24, ph: h * g + g * .24, traces: [] });
+    }
+    for (let t = 0, n = Math.round(W * H / 42000); t < 300 && parts2.length < n; t++) {       // passives
+      const x = ri(4, cols - 6), y = ri(4, rows - 5), v = Math.random() < .4;
+      if (!free(x - 1, y - 1, x + (v ? 1 : 2), y + (v ? 2 : 1))) continue;
+      mark(x, y, x + (v ? 0 : 1), y + (v ? 1 : 0));
+      parts2.push({ x, y, v, kind: pick(['R', 'R', 'C', 'D']), pins: v ? [{ x, y, d: 6 }, { x, y: y + 1, d: 2 }] : [{ x, y, d: 4 }, { x: x + 1, y, d: 0 }] });
+    }
+    let id = 0;
+    const route = (pin, owner) => {
+      id++; let x = pin.x, y = pin.y, d = pin.d, straight = ri(2, 5); const len = ri(5, 52), cells = [[x, y]];
+      const ok = dd => { const [dx, dy] = DIRS[dd], nx = x + dx, ny = y + dy;
+        if (nx < 2 || ny < 2 || nx > cols - 3 || ny > rows - 3 || occ[idx(nx, ny)]) return false;
+        return !(dx && dy && diag.has(`${Math.min(x, nx)},${Math.min(y, ny)},${dx * dy > 0 ? 1 : 0}`)); };
+      for (let s = 0; s < len; s++) {
+        const turn = Math.random() < .5 ? 1 : 7;
+        const order = straight > 0 || Math.random() < .8 ? [d, (d + turn) % 8, (d + 8 - turn) % 8] : [(d + turn) % 8, d, (d + 8 - turn) % 8];
+        const nd = order.find(ok); if (nd === undefined) break;
+        const [dx, dy] = DIRS[nd], nx = x + dx, ny = y + dy;
+        if (dx && dy) diag.add(`${Math.min(x, nx)},${Math.min(y, ny)},${dx * dy > 0 ? 0 : 1}`);
+        if (nd !== d) straight = ri(1, 4); else straight--;
+        x = nx; y = ny; d = nd; occ[idx(x, y)] = id; cells.push([x, y]);
+      }
+      if (cells.length < 3) return;
+      const pts = cells.map(c => [(c[0] + .5) * g, (c[1] + .5) * g]), cum = [0];
+      for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+      const tr = { pts, cum, total: cum[cum.length - 1], flash: 0, owner }; traces.push(tr); if (owner) owner.traces.push(tr);
+    };
+    chips.forEach(c => c.pins.forEach(p => { if (Math.random() < .86) route(p, c); }));
+    parts2.forEach(p => p.pins.forEach(pin => route(pin, null)));
+    pulses = []; const n = reduce ? 0 : Math.min(90, Math.round(traces.length * .55));
+    for (let i = 0; i < n; i++) pulses.push(spawn());
+    paint();
+  }
+  const spawn = tr => { tr = tr || pick(traces); return { tr, s: tr ? -rnd(0, 300) : 0, v: rnd(1.6, 4.2), back: Math.random() < .5 }; };
+
+  function paint() {
+    board = document.createElement('canvas'); board.width = W * dpr; board.height = H * dpr;
+    const b = board.getContext('2d'); b.scale(dpr, dpr);
+    const base = b.createRadialGradient(W * .4, H * .35, 0, W * .5, H * .5, Math.max(W, H) * .8);
+    base.addColorStop(0, '#0f5238'); base.addColorStop(1, '#062a1d'); b.fillStyle = base; b.fillRect(0, 0, W, H);
+    b.strokeStyle = 'rgba(80,220,150,.05)'; b.lineWidth = 1; b.beginPath();                    // hatched ground pour
+    for (let i = -H; i < W + H; i += 7) { b.moveTo(i, 0); b.lineTo(i + H, H); b.moveTo(i, H); b.lineTo(i + H, 0); } b.stroke();
+    const m = g * 1.1; b.strokeStyle = 'rgba(233,241,230,.5)'; b.lineWidth = 1; b.strokeRect(m, m, W - m * 2, H - m * 2);
+    const line = (w, c) => { b.lineWidth = w; b.strokeStyle = c; b.lineJoin = 'round'; b.lineCap = 'round';
+      for (const t of traces) { b.beginPath(); t.pts.forEach((p, i) => i ? b.lineTo(p[0], p[1]) : b.moveTo(p[0], p[1])); b.stroke(); } };
+    line(g * .42, '#052016'); line(g * .22, '#2c9c68'); line(g * .07, 'rgba(160,255,200,.35)');
+    const gold = (x, y, r) => { const gr = b.createRadialGradient(x - r * .3, y - r * .3, 0, x, y, r); gr.addColorStop(0, '#fff0b0'); gr.addColorStop(.5, '#e0b548'); gr.addColorStop(1, '#8f6a1e'); return gr; };
+    for (const t of traces) { const [x, y] = t.pts[t.pts.length - 1], r = g * .3;                 // vias
+      b.fillStyle = gold(x, y, r); b.beginPath(); b.arc(x, y, r, 0, TAU); b.fill(); b.fillStyle = '#041a12'; b.beginPath(); b.arc(x, y, r * .42, 0, TAU); b.fill(); }
+    const pad = (p) => { const x = (p.x + .5) * g, y = (p.y + .5) * g, vert = p.d === 2 || p.d === 6, w = vert ? g * .5 : g * .95, h = vert ? g * .95 : g * .5;
+      b.fillStyle = gold(x, y, g * .6); b.fillRect(x - w / 2, y - h / 2, w, h); };
+    b.font = `${Math.max(8, g * .58)}px ui-monospace,Menlo,Consolas,monospace`; b.textBaseline = 'middle';
+    for (const c of chips) {
+      c.pins.forEach(pad);
+      b.fillStyle = 'rgba(0,0,0,.35)'; b.fillRect(c.px + 3, c.py + 4, c.pw, c.ph);
+      const gr = b.createLinearGradient(c.px, c.py, c.px + c.pw, c.py + c.ph); gr.addColorStop(0, '#2a2d32'); gr.addColorStop(.5, '#17191c'); gr.addColorStop(1, '#0b0c0e');
+      b.fillStyle = gr; b.beginPath(); b.roundRect(c.px, c.py, c.pw, c.ph, 2.5); b.fill();
+      b.strokeStyle = 'rgba(255,255,255,.14)'; b.lineWidth = 1; b.beginPath(); b.moveTo(c.px + 2, c.py + 1); b.lineTo(c.px + c.pw - 2, c.py + 1); b.stroke();
+      b.fillStyle = '#3a3e44'; b.beginPath(); b.arc(c.px + g * .55, c.py + c.ph - g * .55, g * .2, 0, TAU); b.fill();
+      b.fillStyle = '#9aa0a8'; b.textAlign = 'center'; b.fillText(c.part.pn, c.px + c.pw / 2, c.py + c.ph / 2 - (c.h > 3 ? g * .4 : 0), c.pw - 6);
+      if (c.h > 3) { b.fillStyle = '#5d636b'; b.fillText('ANSELM ' + (2400 + chips.indexOf(c) * 7), c.px + c.pw / 2, c.py + c.ph / 2 + g * .5, c.pw - 6); }
+      b.fillStyle = 'rgba(233,241,230,.85)'; b.textAlign = 'left'; b.fillText(c.ref, c.px, c.py - g * 1.45);
+    }
+    parts2.forEach((p, i) => {
+      p.pins.forEach(pad); const x = (p.x + (p.v ? .5 : 1)) * g, y = (p.y + (p.v ? 1 : .5)) * g, w = p.v ? g * .62 : g * 1.05, h = p.v ? g * 1.05 : g * .62;
+      b.fillStyle = p.kind === 'R' ? '#16181b' : p.kind === 'C' ? '#b08a5a' : '#c93a2a'; b.fillRect(x - w / 2, y - h / 2, w, h);
+      b.strokeStyle = 'rgba(233,241,230,.6)'; b.strokeRect(x - w / 2 - 3, y - h / 2 - 3, w + 6, h + 6);
+      b.fillStyle = 'rgba(233,241,230,.8)'; b.textAlign = 'left'; b.fillText(p.kind + (i + 1), x + w / 2 + 6, y - h / 2 - 6);
+    });
+    [[m * 1.9, m * 1.9], [W - m * 1.9, m * 1.9], [W - m * 1.9, H - m * 1.9]].forEach(([x, y]) => {             // mounting holes
+      b.fillStyle = gold(x, y, g * .8); b.beginPath(); b.arc(x, y, g * .8, 0, TAU); b.fill(); b.fillStyle = '#020a07'; b.beginPath(); b.arc(x, y, g * .42, 0, TAU); b.fill(); });
+  }
+
+  function at(tr, s) {
+    s = Math.max(0, Math.min(tr.total, s)); let i = 1; while (i < tr.cum.length - 1 && tr.cum[i] < s) i++;
+    const f = (s - tr.cum[i - 1]) / ((tr.cum[i] - tr.cum[i - 1]) || 1), a = tr.pts[i - 1], b = tr.pts[i];
+    return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
+  }
+
+  function frame() {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.drawImage(board, 0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round';
+    if (hot && pulses.length < 170 && hot.traces.length && Math.random() < .5) pulses.push(Object.assign(spawn(pick(hot.traces)), { s: 0, back: false, extra: true, v: rnd(3, 5.5) }));
+    for (let i = pulses.length - 1; i >= 0; i--) {
+      const p = pulses[i], tr = p.tr; p.s += p.v;
+      if (p.s > tr.total + 46) { if (!p.back) tr.flash = 1; else if (tr.owner) tr.owner.glow = 1; if (p.extra) pulses.splice(i, 1); else pulses[i] = spawn(); continue; }
+      if (p.s < 0) continue;
+      const pos = s => at(tr, p.back ? tr.total - s : s);
+      for (let k = 0; k < 7; k++) { const a = pos(p.s - k * 6), b = pos(p.s - k * 6 - 6); if (p.s - k * 6 < 0) break;
+        ctx.strokeStyle = `rgba(255,226,140,${.75 * (1 - k / 7)})`; ctx.lineWidth = g * .2; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); }
+      if (p.s <= tr.total) { const [x, y] = pos(p.s), gr = ctx.createRadialGradient(x, y, 0, x, y, g * .9);
+        gr.addColorStop(0, 'rgba(255,250,220,.95)'); gr.addColorStop(.3, 'rgba(255,214,110,.5)'); gr.addColorStop(1, 'rgba(255,200,80,0)');
+        ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, g * .9, 0, TAU); ctx.fill(); }
+    }
+    for (const t of traces) if (t.flash > .02) { const [x, y] = t.pts[t.pts.length - 1];
+      ctx.strokeStyle = `rgba(255,236,170,${t.flash})`; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(x, y, g * (.4 + (1 - t.flash) * 1.1), 0, TAU); ctx.stroke(); t.flash *= .9; }
+    for (const c of chips) if (c.glow > .02) { ctx.fillStyle = `rgba(120,255,190,${c.glow * .9})`; ctx.beginPath(); ctx.arc(c.px + g * .55, c.py + c.ph - g * .55, g * .2 + c.glow * 2, 0, TAU); ctx.fill(); c.glow *= .93; }
+    ctx.globalCompositeOperation = 'source-over';
+    if (hot) { ctx.strokeStyle = '#ffe08a'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]); ctx.lineDashOffset = -performance.now() / 60;
+      ctx.strokeRect(hot.px - g * 1.3, hot.py - g * 1.3, hot.pw + g * 2.6, hot.ph + g * 2.6); ctx.setLineDash([]); }
+    if (!reduce) requestAnimationFrame(frame);
+  }
+
+  // ---- datasheets -------------------------------------------------------------
+  function show(c) {
+    if (c === hot) return; hot = c;
+    if (!c) { sheet.classList.remove('on'); if (reduce) frame(); return; }
+    const n = c.pins.length, pk = (c.quad ? 'QFP-' : 'DIP-') + n, side = c.quad ? n / 4 : n / 2, P = c.part;
+    let pins = ''; const span = 60 / side;
+    for (let i = 0; i < side; i++) { const o = 20 + span * (i + .5);
+      pins += `<path d="M${o} 12v8M${o} 80v8${c.quad ? `M12 ${o}h8M80 ${o}h8` : ''}" stroke="#15171a" stroke-width="2.4"/>`; }
+    const labels = [0, 1, 2].map(i => `<text x="50" y="${42 + i * 10}" font-size="6.5" text-anchor="middle" font-family="monospace" fill="#f6f4ec">${i + 1} ${PINS[(chips.indexOf(c) * 3 + i * 5) % PINS.length]}</text>`).join('');
+    sheet.innerHTML = `<header><b>${P.pn}</b><span>${c.ref} · ${pk}</span></header><div class="body"><h2>${P.name}</h2><p>${P.d}</p>
+      <div class="row"><div><h3>Electrical characteristics</h3><table>${P.s.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}<tr><td>Routed nets</td><td>${c.traces.length} / ${n}</td></tr></table></div>
+      <div><h3>Pinout (top)</h3><svg viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="60" rx="2" fill="#15171a"/><circle cx="27" cy="27" r="2.5" fill="#f6f4ec"/>${pins}${labels}</svg></div></div>
+      <p class="foot">Anselm Semiconductor Works reserves the right to feelings. Not for use in life-support, aircraft, or arguments.</p></div>`;
+    sheet.classList.add('on');
+    if (innerWidth > 620) { const sw = sheet.offsetWidth, sh = sheet.offsetHeight; let x = c.px + c.pw + g * 2; if (x + sw > W - 12) x = c.px - sw - g * 2; if (x < 12) x = 12;
+      sheet.style.left = x + 'px'; sheet.style.top = Math.max(12, Math.min(H - sh - 12, c.py + c.ph / 2 - sh / 2)) + 'px'; }
+    if (reduce) frame();
+  }
+  const hit = e => chips.find(c => e.clientX > c.px - g && e.clientX < c.px + c.pw + g && e.clientY > c.py - g && e.clientY < c.py + c.ph + g) || null;
+  cv.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse' || pinned) return; const c = hit(e); cv.style.cursor = c ? 'help' : 'default'; show(c); });
+  cv.addEventListener('pointerdown', e => { const c = hit(e); pinned = !!c && e.pointerType !== 'mouse'; show(c);
+    if (!c && traces.length && !reduce) for (let i = 0; i < 6; i++) pulses.push(Object.assign(spawn(), { s: 0, extra: true })); });
+  cv.addEventListener('pointerleave', () => { if (!pinned) show(null); });
+
+  function setup() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); hot = null; pinned = false; sheet.classList.remove('on'); build();
+    if (reduce) frame();
+  }
+  document.getElementById('reroute').addEventListener('click', setup);
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(setup, 160); });
+  setup(); if (!reduce) requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

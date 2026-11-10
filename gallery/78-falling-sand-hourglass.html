@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sand-glass No. 78 — a working hourglass timer</title>
+<meta name="description" content="A museum-brass hourglass whose sand is a real falling-sand cellular simulation. Set a duration, start it, and flip the glass to run it again.">
+<style>
+  :root{--baize:#12312b;--brass1:#f6e2a0;--brass2:#c9a04a;--brass3:#7a5a1f;--brass4:#3d2b0c;--card:#efe8d6;--ink:#2b2416}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{color:var(--card);font-family:"Baskerville","Libre Baskerville","Baskerville Old Face","Hoefler Text",Garamond,"Times New Roman",serif;
+    background:radial-gradient(ellipse 70% 60% at 50% 34%,#2c6658 0,#17423a 45%,#0a1d1a 100%) fixed var(--baize);
+    display:flex;flex-direction:column;align-items:center;padding:20px 14px 30px;min-height:100vh}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.35;
+    background-image:repeating-linear-gradient(45deg,rgba(0,0,0,.25) 0 1px,transparent 1px 3px),repeating-linear-gradient(-45deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px)}
+  a.back{position:fixed;top:12px;left:14px;z-index:5;color:var(--brass1);text-decoration:none;font-size:13px;letter-spacing:.16em;font-variant:small-caps;opacity:.8}
+  a.back:hover{opacity:1}
+  .case{position:relative;display:grid;grid-template-columns:minmax(0,300px) minmax(260px,330px);gap:clamp(20px,5vw,64px);align-items:center;margin:auto;max-width:760px;width:100%}
+  /* instrument */
+  .stand{display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 30px 24px rgba(0,0,0,.55))}
+  .hg{width:100%;max-width:min(300px,38vh);position:relative;transition:transform .95s cubic-bezier(.65,0,.3,1);cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .hg.turn{transform:rotate(180deg)}
+  .cap{height:26px;border-radius:5px;position:relative;z-index:2;
+    background:linear-gradient(180deg,var(--brass1) 0,var(--brass2) 22%,var(--brass3) 58%,var(--brass2) 80%,var(--brass4) 100%);
+    box-shadow:inset 0 0 0 1px rgba(61,43,12,.7),inset 0 2px 0 rgba(255,255,255,.5)}
+  .cap::before{content:"";position:absolute;left:5%;right:5%;height:9px;border-radius:3px;
+    background:repeating-linear-gradient(90deg,var(--brass4) 0 1.5px,var(--brass2) 1.5px 4px);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 1px 2px rgba(0,0,0,.5)}
+  .cap.top::before{bottom:-9px}.cap.bot::before{top:-9px}
+  .mid{position:relative;padding:9px 13%;}
+  .post{position:absolute;top:0;bottom:0;width:7%;border-radius:4px;
+    background:linear-gradient(90deg,var(--brass4),var(--brass2) 28%,var(--brass1) 45%,var(--brass2) 62%,var(--brass4));
+    -webkit-mask:linear-gradient(#000,#000);box-shadow:0 0 0 .5px rgba(0,0,0,.5)}
+  .post::before,.post::after{content:"";position:absolute;left:-28%;right:-28%;height:16px;border-radius:50%/40%;top:calc(50% - 8px);
+    background:linear-gradient(90deg,var(--brass4),var(--brass1) 45%,var(--brass3))}
+  .post::after{top:22%;height:8px}
+  .post.l{left:2%}.post.r{right:2%}
+  .glass{aspect-ratio:61/97;position:relative}
+  .glass canvas{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated}
+  .plinth{width:118%;max-width:360px;height:14px;margin-top:0;border-radius:2px;background:linear-gradient(#3a2415,#1a0f08);box-shadow:inset 0 1px 0 rgba(255,255,255,.15)}
+  /* plaque */
+  .plaque{background:linear-gradient(135deg,#e9cf85,#b98f3c 38%,#e3c678 60%,#8f6a26);color:var(--brass4);border-radius:4px;padding:22px 22px 20px;position:relative;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),inset 0 0 0 5px rgba(61,43,12,.18),0 18px 28px -12px rgba(0,0,0,.7)}
+  .plaque::before,.plaque::after{content:"";position:absolute;top:9px;width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c4,#7a5a1f 60%,#3d2b0c);box-shadow:0 1px 1px rgba(0,0,0,.4)}
+  .plaque::before{left:9px}.plaque::after{right:9px}
+  .plaque h1{font-size:13px;letter-spacing:.34em;text-transform:uppercase;font-weight:400;margin:0 0 2px;text-align:center;text-shadow:0 1px 0 rgba(255,255,255,.4)}
+  .time{font-size:clamp(58px,10vw,78px);line-height:1;text-align:center;font-variant-numeric:tabular-nums lining-nums;letter-spacing:.02em;margin:6px 0 2px;
+    color:#2e2008;text-shadow:0 1px 0 rgba(255,244,200,.7),0 -1px 0 rgba(0,0,0,.25)}
+  .state{text-align:center;font-style:italic;font-size:14px;margin:0 0 14px;min-height:1.3em}
+  .sets{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:8px}
+  button{font:inherit;cursor:pointer;color:inherit;-webkit-tap-highlight-color:transparent}
+  .sets button,.fine button{border:1px solid rgba(61,43,12,.6);background:linear-gradient(#f3dea0,#c79f4b);border-radius:3px;padding:8px 0;font-size:13px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 2px 0 rgba(61,43,12,.55);transition:transform .08s,box-shadow .08s}
+  .sets button:active,.fine button:active,.acts button:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 0 rgba(61,43,12,.55)}
+  .sets button[aria-pressed=true]{background:linear-gradient(#5a3f12,#3d2b0c);color:#f6e2a0;box-shadow:inset 0 2px 3px rgba(0,0,0,.6)}
+  .fine{display:grid;grid-template-columns:44px 1fr 44px;gap:8px;align-items:center;margin-bottom:14px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;text-align:center}
+  .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .acts button{padding:12px 0;border-radius:3px;border:1px solid #2e2008;background:linear-gradient(#4f3810,#2e2008);color:#f6e2a0;font-size:14px;letter-spacing:.2em;text-transform:uppercase;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 2px 0 rgba(0,0,0,.5);transition:transform .08s,box-shadow .08s}
+  .label{grid-column:1/-1;justify-self:center;background:var(--card);color:var(--ink);padding:12px 18px;max-width:440px;font-size:13px;line-height:1.55;box-shadow:0 8px 14px -8px rgba(0,0,0,.7);margin-top:6px}
+  .label b{font-weight:400;font-variant:small-caps;letter-spacing:.12em;font-size:14px;display:block}
+  .label small{display:block;color:#7a6c50;margin-top:4px;font-style:italic;font-size:12px}
+  @media (max-width:640px){.case{grid-template-columns:1fr;justify-items:center;padding-top:26px}.plaque{width:100%;max-width:340px}.hg{max-width:min(230px,44vh)}}
+  @media (prefers-reduced-motion:reduce){.hg{transition:none}}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← 100</a>
+<main class="case">
+  <div class="stand">
+    <div class="hg" id="hg" role="button" tabindex="0" aria-label="Hourglass. Activate to flip it over.">
+      <div class="cap top"></div>
+      <div class="mid"><span class="post l"></span><span class="post r"></span><div class="glass" id="glass"><canvas id="cv"></canvas></div></div>
+      <div class="cap bot"></div>
+    </div>
+    <div class="plinth"></div>
+  </div>
+  <section class="plaque" aria-label="Timer controls">
+    <h1>Sand remaining</h1>
+    <div class="time" id="time" aria-live="off">3:00</div>
+    <p class="state" id="state">at rest — choose a measure</p>
+    <div class="sets" id="sets" role="group" aria-label="Duration presets"></div>
+    <div class="fine"><button id="less" aria-label="Ten seconds less">−</button><span id="durLbl"></span><button id="more" aria-label="Ten seconds more">+</button></div>
+    <div class="acts"><button id="go">Release</button><button id="flip">Flip</button></div>
+  </section>
+  <p class="label"><b>Sand-glass, brass and blown glass</b>Workshop of Anselm Qvist, Harbour Street, c. 1790. Used aboard the packet <i>Marigold</i> to time the watch and, by the cook, eggs. Every grain is simulated; none are in a hurry.
+    <small>Acc. no. 78.1904 — visitors may turn the glass. Tap it, or use the plate.</small></p>
+</main>
+<script>
+(function(){
+  const COLS=61,ROWS=97,MID=48,CX=30,GATE=MID*COLS+CX,$=id=>document.getElementById(id);
+  const cv=$('cv'),ctx=cv.getContext('2d'),hg=$('hg'),reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mask=new Uint8Array(COLS*ROWS);let g=new Uint8Array(COLS*ROWS);
+  function hw(y){const v=Math.abs(y-MID)/MID;if(v<=.5){const t=v/.5;return .6+27.4*t*t*(3-2*t)}const u=(v-.5)/.5;return 28*Math.sqrt(Math.max(0,1-u*u*u*u))}
+  for(let y=1;y<ROWS-1;y++)for(let x=0;x<COLS;x++)if(Math.abs(x-CX)<=hw(y)-.01)mask[y*COLS+x]=1;
+  let N=0,duration=180,tokens=0,running=false,flipping=false,done=false,tick=0,cell=4,last=0,ac=null,top=0;
+  function fill(){g.fill(0);N=0;for(let y=17;y<MID;y++)for(let x=0;x<COLS;x++)if(mask[y*COLS+x]){g[y*COLS+x]=1+((x*5+y*3+(Math.random()*3|0))%3);N++}tokens=0;done=false}
+  function can(k){return mask[k]&&!g[k]&&(k!==GATE||tokens>=1)}
+  function mv(a,b){g[b]=g[a];g[a]=0;if(b===GATE)tokens-=1}
+  function step(){
+    tick++;
+    for(let y=ROWS-2;y>=0;y--){const dir=(tick+y)&1,row=y*COLS;
+      for(let i=0;i<COLS;i++){const x=dir?i:COLS-1-i,k=row+x;if(!g[k])continue;const b=k+COLS;
+        if(can(b))mv(k,b);else{const d=Math.random()<.5?-1:1;if(can(b+d)&&!g[k+d])mv(k,b+d);else if(can(b-d)&&!g[k-d])mv(k,b-d)}}}}
+  function flipGrid(){const n=new Uint8Array(g.length);for(let i=0;i<g.length;i++)n[g.length-1-i]=g[i];g=n;tokens=0;done=false}
+
+  const SH=['','#ecd094','#dcb46c','#c79a50'];
+  function outline(){ctx.beginPath();const o=1.2;
+    for(let y=1;y<=ROWS-1;y+=.5){const h=hw(Math.min(ROWS-1.001,y))+o;ctx.lineTo((CX+.5-h)*cell,(y+.5)*cell)}
+    for(let y=ROWS-1;y>=1;y-=.5){const h=hw(Math.min(ROWS-1.001,y))+o;ctx.lineTo((CX+.5+h)*cell,(y+.5)*cell)}
+    ctx.closePath()}
+  function render(){
+    const W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);
+    outline();let gr=ctx.createLinearGradient(0,0,W,0);gr.addColorStop(0,'rgba(210,240,235,.16)');gr.addColorStop(.3,'rgba(210,240,235,.05)');gr.addColorStop(.75,'rgba(210,240,235,.04)');gr.addColorStop(1,'rgba(210,240,235,.2)');
+    ctx.fillStyle=gr;ctx.fill();
+    top=0;
+    for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){const s=g[y*COLS+x];if(s){if(y<MID)top++;ctx.fillStyle=SH[s];ctx.fillRect(x*cell,y*cell,cell,cell)}}
+    ctx.save();outline();ctx.clip();
+    gr=ctx.createLinearGradient(0,0,W,0);gr.addColorStop(.1,'rgba(255,255,255,0)');gr.addColorStop(.2,'rgba(255,255,255,.26)');gr.addColorStop(.27,'rgba(255,255,255,.04)');gr.addColorStop(.8,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(0,0,0,.28)');
+    ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);ctx.restore();
+    outline();ctx.strokeStyle='rgba(225,250,245,.55)';ctx.lineWidth=Math.max(1.2,cell*.45);ctx.lineJoin='round';ctx.stroke();
+  }
+  function fmt(s){s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+  function chime(){if(!ac)return;[880,1108.7,1318.5].forEach((f,i)=>{const t=ac.currentTime+i*.22,o=ac.createOscillator(),v=ac.createGain();o.type='sine';o.frequency.value=f;
+    v.gain.setValueAtTime(0,t);v.gain.linearRampToValueAtTime(.16,t+.01);v.gain.exponentialRampToValueAtTime(.0001,t+1.6);o.connect(v).connect(ac.destination);o.start(t);o.stop(t+1.7)})}
+  function ui(){
+    const rate=N/duration,left=top/rate;
+    $('time').textContent=fmt(left);
+    $('state').textContent=done?'the glass has run out — flip it':running?'running':top===N?'at rest — release the sand':top===0?'empty above — flip it':'held';
+    $('go').textContent=running?'Hold':'Release';$('durLbl').textContent='full glass '+fmt(duration);
+    [...$('sets').children].forEach(b=>b.setAttribute('aria-pressed',+b.dataset.s===duration));
+  }
+  function frame(ms){
+    const dt=Math.min(.1,(ms-last)/1000||0);last=ms;
+    if(!flipping){const rate=N/duration;
+      if(running)tokens=Math.min(3,tokens+rate*dt);
+      const steps=Math.max(2,Math.ceil(rate/35));for(let i=0;i<steps;i++)step();
+      if(!running&&tokens>0)tokens=0;}
+    render();
+    if(running&&top===0&&!g[GATE]){running=false;done=true;chime()}
+    if((tick&7)<2||!running)ui();
+    requestAnimationFrame(frame)}
+  function audio(){if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}else if(ac.state==='suspended')ac.resume()}
+  function flip(){
+    if(flipping)return;audio();
+    const fin=()=>{flipGrid();hg.style.transition='none';hg.classList.remove('turn');void hg.offsetWidth;hg.style.transition='';flipping=false;running=true;ui()};
+    if(reduce){fin();return}
+    flipping=true;hg.classList.add('turn');
+    let ended=false;const end=e=>{if(ended||(e&&e.propertyName!=='transform'))return;ended=true;hg.removeEventListener('transitionend',end);fin()};
+    hg.addEventListener('transitionend',end);setTimeout(end,1200);
+  }
+  function setDur(s){duration=Math.max(20,Math.min(3600,s));running=false;fill();ui()}
+  [[30,'30 s'],[60,'1 m'],[180,'3 m'],[300,'5 m'],[600,'10 m']].forEach(p=>{const b=document.createElement('button');b.textContent=p[1];b.dataset.s=p[0];b.onclick=()=>setDur(p[0]);$('sets').appendChild(b)});
+  $('less').onclick=()=>setDur(duration-10);$('more').onclick=()=>setDur(duration+10);
+  $('go').onclick=()=>{audio();if(done||(top===0&&!running)){flip();return}running=!running;ui()};
+  $('flip').onclick=flip;hg.addEventListener('click',flip);
+  hg.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}});
+  function resize(){const b=$('glass').getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);cell=Math.max(2,Math.round(b.width*dpr/COLS));cv.width=COLS*cell;cv.height=ROWS*cell}
+  new ResizeObserver(resize).observe($('glass'));resize();fill();render();ui();requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

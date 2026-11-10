@@ -98,8 +98,10 @@
 
   function scatter() {
     const W = innerWidth, H = innerHeight, n = items.length, pw = items[0].el.offsetWidth, ph = items[0].el.offsetHeight;
-    const cols = Math.max(2, Math.min(n, Math.round(Math.sqrt(n * W / H)))), rows = Math.ceil(n / cols);
-    const top = Math.min(90, H * .12), cw = (W - 40) / cols, ch = (H - top - 30) / rows;
+    const top = Math.min(90, H * .12);
+    let cols = Math.max(2, Math.min(n, Math.round(Math.sqrt(n * W / H)))), rows = Math.ceil(n / cols);
+    while (cols < n && (cols + 1) * pw * .8 < W - 40 && rows * ph * .86 > H - top - 30) { cols++; rows = Math.ceil(n / cols); }
+    const cw = (W - 40) / cols, ch = (H - top - 30) / rows;
     items.forEach((it, i) => {
       const c = i % cols, r = (i / cols) | 0, off = (r === rows - 1 ? (cols - (n - r * cols)) * cw / 2 : 0);
       it.x = 20 + off + c * cw + (cw - pw) / 2 + (Math.random() - .5) * cw * .3;

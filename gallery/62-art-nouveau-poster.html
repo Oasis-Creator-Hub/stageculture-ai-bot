@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Verveine de Lune — Élixir Botanique (Art Nouveau Poster)</title>
 <meta name="description" content="An Art Nouveau lithograph poster for a fictional botanical liqueur: whiplash stems, a floral SVG frame, olive, gold and rose, with ornamental lettering.">
-<style>
+<style>html{overflow-x:clip}
 :root{--paper:#ece2c4;--olive:#5d6431;--deep:#2f3519;--gold:#b8923a;--goldlt:#e2c675;--rose:#c9837a;--rosedk:#9c5550;--ink:#3a2e1c;--wall:#39401f}
 :root.nuit{--paper:#1f2a2b;--olive:#8fa06a;--deep:#0f1716;--gold:#d2ad55;--goldlt:#f3dc94;--rose:#d99a94;--rosedk:#a8625f;--ink:#eadfbe;--wall:#131b1b}
 *{box-sizing:border-box}
@@ -14,7 +14,7 @@ body{background:var(--wall);color:var(--paper);font-family:"Palatino Linotype","
   background-image:radial-gradient(ellipse 22px 34px at 50% 0,rgba(184,146,58,.16) 0 60%,transparent 62%),radial-gradient(ellipse 22px 34px at 0 50%,rgba(184,146,58,.1) 0 60%,transparent 62%),radial-gradient(ellipse 22px 34px at 100% 50%,rgba(184,146,58,.1) 0 60%,transparent 62%);
   background-size:88px 110px}
 .wrap{max-width:1180px;margin:0 auto;padding:clamp(14px,4vw,56px);display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:clamp(24px,5vw,72px);align-items:center;min-height:100vh}
-@media(max-width:860px){.wrap{grid-template-columns:1fr}}
+@media(max-width:860px){.wrap{grid-template-columns:minmax(0,1fr)}}
 .poster{display:block;width:100%;height:auto;box-shadow:0 2px 0 #1a1d0d,0 30px 70px rgba(0,0,0,.6);border-radius:2px}
 .poster *{transition:fill .8s,stroke .8s}
 .stem{fill:none;stroke:var(--olive);stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:grow 3.2s cubic-bezier(.5,0,.2,1) forwards}

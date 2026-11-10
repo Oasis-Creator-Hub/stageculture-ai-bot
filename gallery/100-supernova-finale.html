@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>100 — Supernova Finale</title>
+<meta name="description" content="The last of one hundred pages: a numeral that gathers itself out of starlight, charges, and bursts into a slow nebula, followed by closing credits for the whole collection. Click to re-ignite.">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#03020a}
+body{color:#f4ecff;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;cursor:pointer;-webkit-tap-highlight-color:transparent}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+.back{position:fixed;left:16px;top:14px;z-index:5;color:#ffd9a0;text-decoration:none;font-size:12px;letter-spacing:.26em;opacity:.75}
+.back:hover{opacity:1}
+.status{position:fixed;left:0;right:0;bottom:22px;z-index:4;text-align:center;font-size:10.5px;letter-spacing:.5em;text-indent:.5em;text-transform:uppercase;color:#b9a8e0;pointer-events:none;transition:opacity .8s}
+.meter{width:min(240px,50vw);height:2px;margin:10px auto 0;background:rgba(255,255,255,.14);overflow:hidden}.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,#6fd6ff,#fff,#ffcf7a)}
+.credits{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0;transition:opacity 2.5s;overflow:hidden;
+  -webkit-mask-image:linear-gradient(transparent 4%,#000 24%,#000 76%,transparent 96%);mask-image:linear-gradient(transparent 4%,#000 24%,#000 76%,transparent 96%)}
+.credits.on{opacity:1}
+.roll{position:absolute;left:50%;top:0;width:min(88vw,560px);margin-left:calc(min(88vw,560px) / -2);text-align:center;will-change:transform;text-shadow:0 0 18px #03020a,0 0 6px #03020a}
+.roll section{margin:0 0 clamp(54px,10vh,96px)}
+.roll small{display:block;font-size:10.5px;letter-spacing:.46em;text-indent:.46em;text-transform:uppercase;color:#ffcf8a;margin-bottom:12px}
+.roll h1{margin:0;font-family:"Didot","Bodoni MT","Playfair Display",Georgia,serif;font-weight:400;font-size:clamp(40px,8vw,84px);line-height:1;letter-spacing:.02em}
+.roll h2{margin:0;font-family:"Didot","Bodoni MT","Playfair Display",Georgia,serif;font-weight:400;font-style:italic;font-size:clamp(22px,3.6vw,34px);line-height:1.25}
+.roll p{margin:8px 0 0;font-size:clamp(14px,1.8vw,17px);line-height:1.7;color:#d9cdf2}
+.roll dl{margin:0;display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;font-size:clamp(13px,1.7vw,16px)}
+.roll dt{text-align:right;color:#a99bd0;letter-spacing:.14em;text-transform:uppercase;font-size:.78em;padding-top:.25em}.roll dd{margin:0;text-align:left}
+.roll .fin h1{font-size:clamp(64px,14vw,150px);background:linear-gradient(#fff,#ffcf8a 60%,#ff7ab0);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}
+.roll .fin{margin-bottom:0}
+.rm .credits{overflow:auto;pointer-events:auto;-webkit-mask-image:none;mask-image:none}.rm .roll{position:relative;padding:18vh 0}
+</style>
+</head>
+<body>
+<canvas id="cv" aria-label="A numeral 100 made of particles that bursts into a nebula"></canvas>
+<a class="back" href="index.html">← index</a>
+<div class="credits" id="credits"><div class="roll" id="roll">
+  <section><small>You have reached the end of</small><h1>The Hundred</h1><p>one hundred pages, each made by hand,<br>each pretending to come from a different studio</p></section>
+  <section><small>In order of appearance</small><h2>Pendulums, puppets, posters, ponds</h2><p>a sweet shop · a split-flap board · a ripple tank<br>a velvet curtain · a jar of moss · a loom of light<br>and ninety others who would not hold still</p></section>
+  <section><small>Materials</small><dl><dt>Structure</dt><dd>one file apiece</dd><dt>Paint</dt><dd>canvas, SVG, gradients</dd><dt>Type</dt><dd>whatever your machine had</dd><dt>Motion</dt><dd>requestAnimationFrame</dd><dt>Sound</dt><dd>only when asked</dd><dt>Network requests</dt><dd>none whatsoever</dd></dl></section>
+  <section><small>With thanks to</small><h2>Trigonometry, mostly</h2><p>also easing curves, the number 0.985,<br>and everyone who ever left a tab open<br>just to watch something move</p></section>
+  <section><small>No frameworks were harmed</small><p>Any resemblance to real destinations, theatres,<br>confectioners or railway timetables is a happy accident.</p></section>
+  <section class="fin"><h1>100</h1><small style="margin-top:14px">Fin · click anywhere to re-ignite</small></section>
+</div></div>
+<div class="status" id="status"><span id="st">Gathering</span><div class="meter"><i id="mt"></i></div></div>
+<script>
+(function(){
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),credits=document.getElementById('credits'),roll=document.getElementById('roll'),st=document.getElementById('st'),mt=document.getElementById('mt'),status=document.getElementById('status');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;if(reduce)document.body.classList.add('rm');
+const COL=['#fff4d6','#ffc46b','#ff5fa2','#b86bff','#3fd0ff','#2f6bff'],SPR=COL.map(c=>{const s=document.createElement('canvas');s.width=s.height=64;const g=s.getContext('2d'),r=g.createRadialGradient(32,32,0,32,32,32);
+  r.addColorStop(0,c);r.addColorStop(.25,c);r.addColorStop(1,'rgba(0,0,0,0)');g.globalAlpha=.9;g.fillStyle=r;g.fillRect(0,0,64,64);return s});
+let W=0,H=0,dpr=1,P=[],stars=[],phase='gather',t=0,last=0,ring=0,flash=0,rollY=0,rollEnd=0,actx=null,gesture=false;
+function homes(){const o=document.createElement('canvas'),s=Math.max(2,Math.round(Math.min(W,H)/170));o.width=W;o.height=H;const g=o.getContext('2d'),fs=Math.min(W*.4,H*.56);
+  g.font='900 '+fs+'px "Helvetica Neue","Arial Black",Arial,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.fillText('100',W/2,H/2);
+  const d=g.getImageData(0,0,W,H).data,pts=[];for(let y=0;y<H;y+=s)for(let x=0;x<W;x+=s)if(d[(y*W+x)*4+3]>128)pts.push([x,y]);return pts.length?pts:[[W/2,H/2]]}
+function init(){const pts=homes(),n=Math.min(2800,Math.max(900,Math.round(W*H/520)));P=[];
+  for(let i=0;i<n;i++){const h=pts[Math.random()*pts.length|0],a=Math.random()*6.283,r=Math.max(W,H)*(.55+Math.random()*.5),e=Math.pow(Math.random(),1.7);
+    P.push({x:W/2+Math.cos(a)*r,y:H/2+Math.sin(a)*r,hx:h[0]+(Math.random()-.5)*2,hy:h[1]+(Math.random()-.5)*2,vx:0,vy:0,e,c:Math.min(5,Math.floor(e*6.2)),s:2+Math.random()*3,d:.3+Math.random()*.7,tw:Math.random()*6})}
+  stars=[];for(let i=0;i<160;i++)stars.push([Math.random()*W,Math.random()*H,Math.random()*1.3+.3,Math.random()*6]);
+  phase='gather';t=0;ring=0;flash=0;credits.classList.remove('on');status.style.opacity=1;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#03020a';ctx.fillRect(0,0,W,H)}
+function fit(){dpr=Math.min(window.devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);init();if(reduce)still()}
+function boom(){if(!gesture)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const T=actx.currentTime,n=actx.sampleRate*2.4|0,b=actx.createBuffer(1,n,actx.sampleRate),d=b.getChannelData(0);
+  for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.2);const s=actx.createBufferSource(),f=actx.createBiquadFilter(),g=actx.createGain();s.buffer=b;f.type='lowpass';f.frequency.setValueAtTime(2400,T);f.frequency.exponentialRampToValueAtTime(90,T+2.2);
+  g.gain.value=.3;s.connect(f).connect(g).connect(actx.destination);s.start(T);const o=actx.createOscillator(),og=actx.createGain();o.frequency.setValueAtTime(110,T);o.frequency.exponentialRampToValueAtTime(28,T+1.6);
+  og.gain.setValueAtTime(.35,T);og.gain.exponentialRampToValueAtTime(.001,T+1.8);o.connect(og).connect(actx.destination);o.start(T);o.stop(T+1.9)}catch(e){}}
+function burst(){const m=Math.min(W,H);for(const p of P){const dx=p.x-W/2,dy=p.y-H/2,a=Math.atan2(dy,dx)+(Math.random()-.5)*.9,sp=m*(.004+p.e*.03)*(.6+Math.random()*.8);
+    p.vx=Math.cos(a)*sp-Math.sin(a)*sp*.25;p.vy=Math.sin(a)*sp+Math.cos(a)*sp*.25}
+  phase='nova';t=0;ring=1;flash=1;boom();status.style.opacity=0}
+function step(k){const m=Math.min(W,H);
+  if(phase==='gather'){const ch=Math.min(1,t/3.4),j=ch*ch*m*.012;for(const p of P){const pull=.03+p.d*.07;p.x+=(p.hx-p.x)*pull*k+(Math.random()-.5)*j;p.y+=(p.hy-p.y)*pull*k+(Math.random()-.5)*j}
+    mt.style.width=ch*100+'%';st.textContent=ch<.45?'Gathering':ch<.9?'Charging':'Critical';if(t>3.7)burst()}
+  else{const drag=Math.pow(.978,k),tt=t*.12;for(const p of P){const a=Math.sin(p.x*.0042+tt)*2.2+Math.cos(p.y*.0048-tt*1.3)*2.2,f=m*.00003*k;
+      p.vx=p.vx*drag+Math.cos(a)*f;p.vy=p.vy*drag+Math.sin(a)*f;p.x+=p.vx*k;p.y+=p.vy*k}
+    if(t>4.5&&!credits.classList.contains('on')){credits.classList.add('on');rollY=H*.62;measure()}
+    if(credits.classList.contains('on')&&!reduce){rollY=Math.max(rollEnd,rollY-k*Math.max(.5,H/1100));roll.style.transform='translateY('+rollY+'px)'}}}
+function measure(){const f=roll.lastElementChild;rollEnd=H/2-(f.offsetTop+f.offsetHeight/2)}
+function draw(){ctx.setTransform(dpr,0,0,dpr,0,0);ctx.globalCompositeOperation='source-over';
+  ctx.fillStyle=phase==='gather'?'rgba(3,2,10,.32)':'rgba(3,2,10,'+(t<2?.16:.07)+')';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#cfd6ff';for(const s of stars){ctx.globalAlpha=.25+.25*Math.sin(t*1.3+s[3]);ctx.fillRect(s[0],s[1],s[2],s[2])}
+  ctx.globalCompositeOperation='lighter';
+  if(phase==='gather'){const ch=Math.min(1,t/3.4);for(const p of P){ctx.globalAlpha=.25+.6*ch;const z=p.s*(.9+ch*1.1);ctx.drawImage(SPR[ch>.8?0:4-(p.c%2)],p.x-z,p.y-z,z*2,z*2)}
+    if(ch>.3){ctx.globalAlpha=(ch-.3)*.5;const R=Math.min(W,H)*(.5-ch*.12);ctx.drawImage(SPR[0],W/2-R,H/2-R,R*2,R*2)}}
+  else{const age=Math.min(1,t/5);for(const p of P){const hot=t<1.2&&p.c>0,z=p.s*(1.6+age*(2+p.e*7))*(1+.15*Math.sin(t*2+p.tw));ctx.globalAlpha=(hot?.5:.34-age*.2)*(.6+.4*p.d);
+      ctx.drawImage(SPR[hot?0:p.c],p.x-z,p.y-z,z*2,z*2)}
+    if(ring>0){const R=(1-ring)*Math.max(W,H)*.75+10;ctx.globalAlpha=ring*.8;ctx.strokeStyle='#bfe6ff';ctx.lineWidth=2+ring*10;ctx.beginPath();ctx.arc(W/2,H/2,R,0,7);ctx.stroke()}
+    if(flash>0){ctx.globalAlpha=flash;ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H)}
+    const core=Math.min(W,H)*(.05+.03*Math.sin(t*1.7));ctx.globalAlpha=.55;ctx.drawImage(SPR[0],W/2-core,H/2-core,core*2,core*2)}
+  ctx.globalAlpha=1}
+function still(){phase='gather';for(const p of P){p.x=p.hx;p.y=p.hy}burst();for(let i=0;i<260;i++){t+=1/60;step(1)}ring=0;flash=0;
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#03020a';ctx.fillRect(0,0,W,H);t=9;for(let i=0;i<4;i++)draw();credits.classList.add('on');status.style.opacity=0}
+function loop(now){const dt=Math.min(.05,(now-last)/1000||0);last=now;
+  if(!reduce&&!document.hidden){t+=dt;step(dt*60);ring=Math.max(0,ring-dt*.55);flash=Math.max(0,flash-dt*1.6);draw()}
+  requestAnimationFrame(loop)}
+function ignite(e){if(e.target.closest&&e.target.closest('a'))return;gesture=true;if(reduce){init();still();return}if(phase==='nova'&&t>1.5)init()}
+addEventListener('click',ignite);addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter')ignite(e)});
+let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(fit,150)});
+fit();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

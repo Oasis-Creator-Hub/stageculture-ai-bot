@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Small Weather — a moss terrarium</title>
+<meta name="description" content="A sealed glass terrarium in which ferns, sprigs and cushions of moss grow slowly from L-system rules. Mist the glass to hurry them along, and read the care notes while you wait.">
+<style>
+:root{--sage:#dde7d8;--deep:#243a2c;--moss:#5d8a4e;--kraft:#cdb891;--line:#9fb39a}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--sage);color:var(--deep);font-family:"Optima","Candara","Gill Sans","Segoe UI",sans-serif;min-height:100svh;
+  background-image:radial-gradient(ellipse at 50% 30%,#f1f6ec,transparent 60%),linear-gradient(#dde7d8 0 78%,#c3d1bd 78% 100%)}
+.back{position:absolute;left:18px;top:16px;color:var(--moss);text-decoration:none;font-size:13px;letter-spacing:.18em}
+.wrap{max-width:1080px;margin:0 auto;padding:clamp(44px,6vw,70px) 16px 40px;display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(14px,3vw,40px);align-items:center}
+.title{grid-column:1/-1;text-align:center}
+.title h1{margin:0;font-family:"Cormorant Garamond","Hoefler Text","Baskerville",Georgia,serif;font-weight:400;font-size:clamp(40px,7vw,78px);line-height:1;letter-spacing:.01em}
+.title p{margin:8px 0 0;font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:#5e7561}
+.vessel{width:min(84vw,400px,calc((100svh - 300px) * .78));min-width:250px;justify-self:center}
+.cork{width:46%;height:30px;margin:0 auto -3px;border-radius:8px 8px 3px 3px;position:relative;z-index:2;background:#b98a58;background-image:radial-gradient(#8f6537 1px,transparent 1.5px),linear-gradient(90deg,rgba(0,0,0,.2),transparent 30%,rgba(255,255,255,.15) 60%,rgba(0,0,0,.22));background-size:7px 6px,100%}
+.jar{position:relative;aspect-ratio:1/1.24;border-radius:46% 46% 13% 13%/24% 24% 7% 7%;overflow:hidden;border:3px solid rgba(255,255,255,.85);background:linear-gradient(#eef5ef,#d5e3d6);
+  box-shadow:inset 0 0 0 1px rgba(120,150,130,.5),inset 14px 0 30px rgba(255,255,255,.5),inset -18px 0 34px rgba(60,90,70,.16),0 26px 30px -14px rgba(36,58,44,.4)}
+.jar canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.jar::before{content:"";position:absolute;z-index:2;left:8%;top:14%;width:9%;height:58%;border-radius:99px;background:linear-gradient(rgba(255,255,255,.75),rgba(255,255,255,.05));transform:rotate(4deg);pointer-events:none}
+.jar::after{content:"";position:absolute;z-index:2;right:9%;top:22%;width:3%;height:30%;border-radius:99px;background:rgba(255,255,255,.4);pointer-events:none}
+.plinth{height:16px;margin:0 6%;border-radius:0 0 10px 10px;background:linear-gradient(#8a6a48,#5f4529)}
+.ctrl{display:flex;gap:10px;justify-content:center;margin-top:18px}
+button{font:inherit;font-size:14px;letter-spacing:.1em;cursor:pointer;border-radius:99px;padding:11px 22px;border:1.5px solid var(--deep);background:transparent;color:var(--deep);transition:background .2s,color .2s;touch-action:manipulation}
+button.go{background:var(--deep);color:#eef5ef}
+button:hover{background:var(--moss);border-color:var(--moss);color:#fff}
+.side{display:flex;flex-direction:column;gap:16px}
+.tag{position:relative;background:var(--kraft);padding:14px 16px 14px 34px;font-size:14px;line-height:1.45;max-width:270px;box-shadow:2px 3px 0 rgba(36,58,44,.18);clip-path:polygon(16px 0,100% 0,100% 100%,16px 100%,0 50%)}
+.tag::before{content:"";position:absolute;left:13px;top:50%;width:9px;height:9px;margin-top:-5px;border-radius:50%;background:var(--sage);box-shadow:inset 0 1px 2px rgba(0,0,0,.4)}
+.tag b{display:block;font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;margin-bottom:3px}
+.side.r{align-items:flex-end}.side.r .tag:nth-child(odd){transform:rotate(1.4deg)}.side.l .tag:nth-child(even){transform:rotate(-1.6deg)}
+.log{border-top:1px solid var(--line);padding-top:12px;max-width:270px;font-size:13px}
+.log div{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dotted var(--line)}
+.log span:last-child{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+.bar{height:5px;background:#c3d1bd;border-radius:9px;margin-top:10px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--moss);border-radius:9px}
+#say{font-family:"Hoefler Text",Georgia,serif;font-style:italic;margin:12px 0 0;min-height:2.8em}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}.side,.side.r{align-items:center;flex-direction:row;flex-wrap:wrap;justify-content:center}.side.l{order:3}.side.r{order:4}.tag,.log{max-width:320px;width:100%}}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← 100</a>
+<div class="wrap">
+  <div class="title"><h1>Small Weather</h1><p>A sealed garden · nothing in, nothing out</p></div>
+  <div class="side l">
+    <div class="tag"><b>Light</b>Bright but never direct. A north window, or the far end of a kitchen table.</div>
+    <div class="tag"><b>Water</b>Mist when the glass runs clear. If it is fogged by breakfast, it has enough.</div>
+    <div class="tag"><b>Air</b>Lift the cork on Sundays for the length of one cup of tea.</div>
+  </div>
+  <div class="vessel">
+    <div class="cork"></div>
+    <div class="jar"><canvas id="cv" aria-label="A glass terrarium with slowly growing ferns and moss"></canvas></div>
+    <div class="plinth"></div>
+    <div class="ctrl"><button class="go" id="mist" type="button">Mist</button><button id="again" type="button">Replant</button></div>
+  </div>
+  <div class="side r">
+    <div class="log" aria-live="off">
+      <div><span>Day</span><span id="day">1</span></div><div><span>Humidity</span><span id="hum">58%</span></div><div><span>Canopy</span><span id="can">0%</span></div>
+      <div class="bar"><i id="bar"></i></div><p id="say"></p>
+    </div>
+    <div class="tag"><b>Patience</b>Moss measures time in seasons. Do not prod it. It knows you are there.</div>
+  </div>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id),cv=$('cv'),ctx=cv.getContext('2d'),reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const bg=document.createElement('canvas'),bx=bg.getContext('2d'),pl=document.createElement('canvas'),px=pl.getContext('2d'),puff=document.createElement('canvas');
+let W=0,H=0,dpr=1,seed=7,plants=[],moss=[],mossN=0,grow=0,hum=58,mist=[],drops=[],last=0;
+function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647}
+(function(){puff.width=puff.height=64;const g=puff.getContext('2d'),r=g.createRadialGradient(32,32,0,32,32,32);r.addColorStop(0,'rgba(255,255,255,.55)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,64,64)})();
+const SPEC=[{ax:'X',r:{X:'F+[[X]-X]-F[-FX]+X',F:'FF'},a:23,n:5,h:.46,hue:104},{ax:'X',r:{X:'F[+X]F[-X]+X',F:'FF'},a:21,n:6,h:.36,hue:86},
+{ax:'F',r:{F:'FF-[-F+F+F]+[+F-F-F]'},a:22,n:4,h:.3,hue:118},{ax:'X',r:{X:'F[+X][-X]FX',F:'FF'},a:27,n:6,h:.4,hue:96},{ax:'X',r:{X:'F-[[X]+X]+F[+FX]-X',F:'FF'},a:19,n:5,h:.27,hue:74}];
+const soil=x=>.75-.035*Math.sin(Math.PI*x)-.012*Math.sin(x*17); /* fractions of W,H */
+function build(sp,x0){let s=sp.ax;for(let i=0;i<sp.n;i++){let o='';for(const c of s)o+=sp.r[c]||c;s=o}
+  const segs=[],st=[];let x=0,y=0,a=-90+(rnd()-.5)*8,d=0,dep=0,minY=0;const da=sp.a;
+  for(const c of s){if(c==='F'){const r=(a+(rnd()-.5)*7)*Math.PI/180,nx=x+Math.cos(r),ny=y+Math.sin(r);segs.push([x,y,nx,ny,++d,dep,0]);x=nx;y=ny;if(y<minY)minY=y}
+    else if(c==='+')a+=da*(.8+rnd()*.4);else if(c==='-')a-=da*(.8+rnd()*.4);else if(c==='['){st.push([x,y,a,d,dep]);dep++}
+    else if(c===']'){if(segs.length)segs[segs.length-1][6]=1;[x,y,a,d,dep]=st.pop()}}
+  const k=sp.h/(-minY||1);let max=0;for(const g of segs){g[0]*=k;g[1]*=k;g[2]*=k;g[3]*=k;if(g[4]>max)max=g[4]}
+  segs.sort((p,q)=>p[4]-q[4]);return{x0,segs,max,i:0,hue:sp.hue+(rnd()-.5)*14}}
+function plant(){seed=(Date.now()%100000)+11;plants=[];const xs=[.5,.27,.73,.39,.62];SPEC.forEach((sp,i)=>plants.push(build(sp,xs[i]+(rnd()-.5)*.05)));
+  moss=[];for(let c=0;c<16;c++){const cx=.08+.84*(c+rnd()*.6)/16,rad=.04+rnd()*.06;for(let j=0;j<170;j++){const an=rnd()*Math.PI,rr=Math.sqrt(rnd())*rad;
+      moss.push([cx+Math.cos(an)*rr,-Math.sin(an)*rr*.55+.012,rr/rad,82+rnd()*34,26+rnd()*26,1+rnd()*1.6])}}
+  moss.sort((a,b)=>a[2]-b[2]+(rnd()-.5)*.3);grow=reduce?.9:0;hum=58;redraw()}
+function backdrop(){bx.setTransform(dpr,0,0,dpr,0,0);bx.clearRect(0,0,W,H);const g=bx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#f2f7f0');g.addColorStop(.75,'#dbe8da');bx.fillStyle=g;bx.fillRect(0,0,W,H);
+  const layer=(off,col)=>{bx.fillStyle=col;bx.beginPath();bx.moveTo(0,H);for(let x=0;x<=1.001;x+=.02)bx.lineTo(x*W,(soil(x)+off)*H);bx.lineTo(W,H);bx.fill()};
+  layer(0,'#3d2e22');layer(.1,'#221b17');layer(.145,'#8d8a80');
+  let s=99;const r=()=>{s=(s*16807)%2147483647;return s/2147483647};
+  for(let i=0;i<70;i++){const x=r(),y=soil(x)+.15+r()*.1;bx.fillStyle=['#a9a79c','#77756c','#c2bfb2','#5f5d56'][i%4];bx.beginPath();bx.ellipse(x*W,y*H,W*(.018+r()*.02),W*(.012+r()*.012),r()*3,0,7);bx.fill()}
+  for(let i=0;i<260;i++){const x=r(),y=soil(x)+r()*.1;bx.fillStyle=i%3?'rgba(20,14,10,.5)':'rgba(120,96,70,.5)';bx.fillRect(x*W,y*H,1.5,1.5)}}
+function drawTo(){const thr=grow;px.lineCap='round';
+  for(const p of plants){const bxp=p.x0*W,byp=(soil(p.x0)+.01)*H,lim=thr*p.max,sc=H;
+    while(p.i<p.segs.length&&p.segs[p.i][4]<=lim){const g=p.segs[p.i++],t=g[4]/p.max;px.strokeStyle='hsl('+(p.hue+t*18)+',42%,'+(20+t*22+g[5]*1.5)+'%)';px.lineWidth=Math.max(.7,(3.2-g[5]*.5)*(1-t*.6)*W/400);
+      px.beginPath();px.moveTo(bxp+g[0]*sc,byp+g[1]*sc);px.lineTo(bxp+g[2]*sc,byp+g[3]*sc);px.stroke();
+      if(g[6]){px.fillStyle='hsl('+(p.hue+10)+',52%,'+(44+g[5]*3)+'%)';px.beginPath();px.ellipse(bxp+g[2]*sc,byp+g[3]*sc,2.6*W/400,1.5*W/400,g[4],0,7);px.fill()}}}
+  const mt=Math.min(moss.length,Math.floor(Math.min(1,thr*1.5)*moss.length));
+  while(mossN<mt){const m=moss[mossN++];px.fillStyle='hsl('+m[3]+',46%,'+m[4]+'%)';px.beginPath();px.arc(m[0]*W,(soil(m[0])+m[1])*H,m[5]*W/400,0,7);px.fill()}}
+function redraw(){px.setTransform(dpr,0,0,dpr,0,0);px.clearRect(0,0,W,H);for(const p of plants)p.i=0;mossN=0;drawTo()}
+function fit(){const r=cv.getBoundingClientRect();dpr=Math.min(window.devicePixelRatio||1,2);W=r.width;H=r.height;for(const c of[cv,bg,pl]){c.width=Math.round(W*dpr);c.height=Math.round(H*dpr)}backdrop();redraw();paint()}
+function paint(){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);ctx.drawImage(bg,0,0);ctx.drawImage(pl,0,0);ctx.setTransform(dpr,0,0,dpr,0,0);
+  const fog=Math.max(0,(hum-60)/40);if(fog>0){ctx.fillStyle='rgba(255,255,255,'+fog*.22+')';ctx.fillRect(0,0,W,H)}
+  for(const m of mist){ctx.globalAlpha=Math.min(1,m.l)*.7;ctx.drawImage(puff,m.x-m.r,m.y-m.r,m.r*2,m.r*2)}ctx.globalAlpha=1;
+  for(const d of drops){ctx.fillStyle='rgba(255,255,255,'+.55*Math.min(1,d.l)+')';ctx.beginPath();ctx.ellipse(d.x,d.y,d.r*.8,d.r,0,0,7);ctx.fill();ctx.fillStyle='rgba(90,130,110,'+.25*Math.min(1,d.l)+')';ctx.beginPath();ctx.arc(d.x+d.r*.2,d.y+d.r*.3,d.r*.45,0,7);ctx.fill()}}
+const SAY=[[0,'Bare soil. Something is deciding whether to bother.'],[.08,'First green threads. Do not congratulate them yet.'],[.3,'The moss has found the damp side and is telling its friends.'],[.6,'Fronds unroll. The glass has its own small weather now.'],[.95,'Full canopy. From here, the only task is leaving it alone.']];
+function hud(){$('day').textContent=1+Math.floor(grow*89);$('hum').textContent=Math.round(hum)+'%';$('can').textContent=Math.round(grow*100)+'%';$('bar').style.width=grow*100+'%';
+  let s='';for(const k of SAY)if(grow>=k[0])s=k[1];if($('say').textContent!==s)$('say').textContent=s}
+function doMist(){hum=Math.min(100,hum+26);if(!reduce)for(let i=0;i<26&&mist.length<90;i++)mist.push({x:W*(.2+Math.random()*.6),y:H*(.08+Math.random()*.2),r:W*(.08+Math.random()*.12),vx:(Math.random()-.5)*14,vy:10+Math.random()*26,l:1.6+Math.random()*2});
+  for(let i=0;i<14&&drops.length<60;i++)drops.push({x:W*(.1+Math.random()*.8),y:H*(.12+Math.random()*.5),r:1.5+Math.random()*2.6,l:5+Math.random()*8,v:0});
+  if(reduce){grow=Math.min(1,grow+.02);drawTo();paint();hud()}}
+$('mist').onclick=doMist;$('again').onclick=()=>{plant();paint();hud()};
+function loop(t){const dt=Math.min(.05,(t-last)/1000||0);last=t;
+  if(!document.hidden&&!reduce){hum+=(42-hum)*dt*.035;if(grow<1){grow=Math.min(1,grow+dt/95*(.45+hum/55));drawTo()}
+    for(const m of mist){m.x+=m.vx*dt;m.y+=m.vy*dt;m.r+=dt*8;m.l-=dt}mist=mist.filter(m=>m.l>0);
+    for(const d of drops){d.l-=dt;if(d.r>3){d.v+=dt*10;d.y+=d.v*dt}}drops=drops.filter(d=>d.l>0&&d.y<H*.74);
+    paint();hud()}
+  requestAnimationFrame(loop)}
+plant();new ResizeObserver(fit).observe(cv);fit();hud();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
