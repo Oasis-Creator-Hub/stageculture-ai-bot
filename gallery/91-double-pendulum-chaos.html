@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sensitive Dependence — an essay in seven pendulums</title>
+<meta name="description" content="Seven near-identical double pendulums are released a ten-thousandth of a radian apart and slowly tear into seven different futures. An illustrated essay on chaos; drag to set them going again.">
+<style>
+:root{--paper:#ece2cd;--ink:#1c1a16;--plate:#0c111c;--rule:#b5a688;--red:#a93a24;--soft:#6d6452}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;line-height:1.55;
+  background-image:radial-gradient(rgba(90,70,30,.07) 1px,transparent 1.2px);background-size:5px 5px}
+.back{position:fixed;top:14px;right:16px;font:italic 14px/1 Georgia,serif;color:var(--red);text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:2px;z-index:5}
+.sheet{max-width:1180px;margin:0 auto;padding:clamp(20px,4vw,56px) clamp(16px,4vw,48px) 60px}
+header{border-bottom:3px double var(--ink);padding-bottom:18px;margin-bottom:clamp(18px,3vw,34px);display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 28px}
+.kicker{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--soft);width:100%}
+h1{font-weight:400;font-style:italic;font-size:clamp(40px,7.4vw,96px);line-height:.92;margin:0;letter-spacing:-.02em;flex:1 1 420px}
+h1 span{font-style:normal;color:var(--red)}
+.dek{flex:0 1 300px;font-size:15px;color:var(--soft);margin:0}
+.cols{display:grid;grid-template-columns:minmax(0,1.28fr) minmax(0,1fr);gap:clamp(22px,4vw,56px);align-items:start}
+figure{margin:0}
+.plate{position:relative;background:var(--plate);aspect-ratio:1/1;border:1px solid var(--ink);box-shadow:0 0 0 6px var(--paper),0 0 0 7px var(--rule),8px 12px 0 7px rgba(60,45,20,.13)}
+.plate canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+.plate canvas:active{cursor:grabbing}
+.hud{position:absolute;left:12px;top:10px;font:11px/1.5 ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#8f9bb5;letter-spacing:.06em;pointer-events:none}
+.hud b{color:#e9eefc;font-weight:400}
+.btn{position:absolute;right:10px;bottom:10px;font:11px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;background:none;color:#cdd5ea;border:1px solid #47506a;padding:8px 10px;cursor:pointer}
+.btn:hover{background:#1a2233}
+figcaption{margin-top:22px;font-size:clamp(17px,2vw,21px);font-style:italic;min-height:4.7em;border-left:3px solid var(--red);padding-left:14px}
+figcaption small{display:block;font-style:normal;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--soft);margin-bottom:4px}
+.chart{margin-top:10px;border-top:1px solid var(--rule);padding-top:10px}
+.chart canvas{width:100%;height:110px;display:block}
+.chart p{margin:4px 0 0;font-size:12.5px;color:var(--soft)}
+article p{margin:0 0 1em;font-size:clamp(16px,1.35vw,18.5px);hyphens:auto}
+article p:first-of-type::first-letter{float:left;font-size:4.3em;line-height:.8;padding:.06em .08em 0 0;color:var(--red);font-style:italic}
+blockquote{margin:1.3em 0;padding:14px 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);font-size:clamp(21px,2.3vw,28px);line-height:1.22;font-style:italic}
+.key{list-style:none;padding:0;margin:1.4em 0 0;display:flex;flex-wrap:wrap;gap:6px 14px;font:11px ui-monospace,Menlo,Consolas,monospace;color:var(--soft)}
+.key i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:5px}
+.note{font-size:13px;color:var(--soft);border-top:1px solid var(--rule);margin-top:1.4em;padding-top:.8em}
+@media(max-width:820px){.cols{grid-template-columns:1fr}figcaption{min-height:0}}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← 100</a>
+<div class="sheet">
+<header>
+  <div class="kicker">Plate XCI · On things that cannot be repeated</div>
+  <h1>Sensitive <span>Dependence</span></h1>
+  <p class="dek">Seven double pendulums, one starting position, and a disagreement about the fourth decimal place.</p>
+</header>
+<div class="cols">
+<figure>
+  <div class="plate">
+    <canvas id="cv" aria-label="Seven double pendulums swinging; drag to reposition and release"></canvas>
+    <div class="hud">t = <b id="ht">0.0</b> s<br>spread = <b id="hs">0</b></div>
+    <button class="btn" id="pp" type="button">Pause</button>
+  </div>
+  <figcaption><small>Fig. 1 — drag the lower bob, let go</small><span id="cap"></span></figcaption>
+  <div class="chart"><canvas id="ch"></canvas>
+    <p>Fig. 2 — Distance between the first and last pendulum, on a logarithmic scale. A straight climb here means the error is multiplying, not adding.</p></div>
+</figure>
+<article>
+  <p>A single pendulum is the most obedient object in physics. Hang a second one from its tip and obedience ends. Nothing has been added but a hinge, and no law has been broken, yet the motion that follows cannot be forecast for more than a few breaths.</p>
+  <p>The seven pendulums on the left are not copies in the loose sense. They are the same pendulum, lifted to the same height, except that each begins one ten-thousandth of a radian further round than its neighbour. That is less than the width of a hair seen from across a room. While they agree, their coloured trails add up to a single white line.</p>
+  <blockquote>The rule is perfectly known. Only the present is slightly out of focus, and that turns out to be enough.</blockquote>
+  <p>Watch the white fray. First a fringe of red and violet at the outside of the fastest turns, then whole ribbons, then seven instruments playing seven tunes. The second figure shows why it feels sudden: the gap was growing all along, by a steady factor each second, and it only became visible when it reached the size of things you can see.</p>
+  <p>This is what the word chaos means in a laboratory. It is not disorder. Each arm obeys Newton to the last digit. It means that small ignorance compounds like interest, and that any forecast has a horizon beyond which better instruments buy only a little more time.</p>
+  <ul class="key" id="key"></ul>
+  <p class="note">Integrated with fourth-order Runge–Kutta at 480 steps per second; equal arms, equal masses, no friction. Start from a low hang and the seven will stay together far longer. Chaos here needs height.</p>
+</article>
+</div>
+</div>
+<script>
+(function(){
+const N=7,EPS=1e-4,G=9.81,H=1/480,COL=['#ff4d3d','#ff8f2e','#ffd23f','#7fe36a','#3fd8c8','#4f9bff','#b77bff'];
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),ch=document.getElementById('ch'),cx=ch.getContext('2d');
+const cap=document.getElementById('cap'),ht=document.getElementById('ht'),hs=document.getElementById('hs'),pp=document.getElementById('pp');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.getElementById('key').innerHTML=COL.map((c,i)=>'<li><i style="background:'+c+'"></i>θ₀ + '+i+'ε</li>').join('');
+let P=[],T=0,hist=[],peak=0,run=!reduce,drag=false,W=0,Hh=0,dpr=1,acc=0,last=0;
+const CAPS=[[0,'Seven pendulums, released a ten-thousandth of a radian apart. To the eye there is exactly one, and its trail is white.'],
+[2e-3,'Nothing has gone wrong. The error is simply multiplying, quietly, in a decimal place you cannot see yet.'],
+[6e-2,'Now the white frays. Red and violet peel off the outside of the fast turns, the way a rope shows its strands.'],
+[0.9,'Seven futures from what was, for every practical purpose, one present. Drag the bob and try to get this run back. You will not.']];
+function reset(a,b){P=[];for(let i=0;i<N;i++)P.push({a:a+i*EPS,b:b,wa:0,wb:0,tr:[]});T=0;hist=[];peak=0;acc=0}
+function f(a,b,wa,wb){const d=a-b,den=3-Math.cos(2*d),s=Math.sin(d),c=Math.cos(d);
+  return[(-3*G*Math.sin(a)-G*Math.sin(a-2*b)-2*s*(wb*wb+wa*wa*c))/den,(2*s*(2*wa*wa+2*G*Math.cos(a)+wb*wb*c))/den]}
+function step(p){const h=H;
+  const k1=f(p.a,p.b,p.wa,p.wb);
+  const k2=f(p.a+h/2*p.wa,p.b+h/2*p.wb,p.wa+h/2*k1[0],p.wb+h/2*k1[1]);
+  const wa2=p.wa+h/2*k1[0],wb2=p.wb+h/2*k1[1];
+  const k3=f(p.a+h/2*wa2,p.b+h/2*wb2,p.wa+h/2*k2[0],p.wb+h/2*k2[1]);
+  const wa3=p.wa+h/2*k2[0],wb3=p.wb+h/2*k2[1];
+  const k4=f(p.a+h*wa3,p.b+h*wb3,p.wa+h*k3[0],p.wb+h*k3[1]);
+  const wa4=p.wa+h*k3[0],wb4=p.wb+h*k3[1];
+  p.a+=h/6*(p.wa+2*wa2+2*wa3+wa4);p.b+=h/6*(p.wb+2*wb2+2*wb3+wb4);
+  p.wa+=h/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]);p.wb+=h/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1])}
+function tip(p){return[Math.sin(p.a)+Math.sin(p.b),Math.cos(p.a)+Math.cos(p.b)]}
+function spread(){const a=tip(P[0]),b=tip(P[N-1]);return Math.hypot(a[0]-b[0],a[1]-b[1])}
+function advance(dt){acc+=dt;let n=0;while(acc>=H&&n<40){for(const p of P)step(p);acc-=H;T+=H;n++;
+    if(hist.length<T*10){hist.push(spread())}}
+  if(n>=40)acc=0;
+  for(const p of P){p.tr.push(tip(p));if(p.tr.length>300)p.tr.shift()}
+  peak=Math.max(peak,spread())}
+function fit(){dpr=Math.min(window.devicePixelRatio||1,2);
+  let r=cv.getBoundingClientRect();W=r.width;Hh=r.height;cv.width=Math.round(W*dpr);cv.height=Math.round(Hh*dpr);
+  r=ch.getBoundingClientRect();ch.width=Math.round(r.width*dpr);ch.height=Math.round(r.height*dpr);draw()}
+function draw(){const L=Math.min(W,Hh)*0.225,ox=W/2,oy=Hh*0.47;
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.globalCompositeOperation='source-over';ctx.fillStyle='#0c111c';ctx.fillRect(0,0,W,Hh);
+  ctx.strokeStyle='rgba(140,160,210,.11)';ctx.lineWidth=1;
+  for(const r of[L,2*L]){ctx.beginPath();ctx.arc(ox,oy,r,0,7);ctx.stroke()}
+  ctx.beginPath();ctx.moveTo(ox,oy-2*L-12);ctx.lineTo(ox,oy+2*L+12);ctx.moveTo(ox-2*L-12,oy);ctx.lineTo(ox+2*L+12,oy);ctx.stroke();
+  ctx.globalCompositeOperation='lighter';ctx.lineCap='round';ctx.lineJoin='round';
+  P.forEach((p,i)=>{const t=p.tr,n=t.length;ctx.strokeStyle=COL[i];
+    for(let s=0;s<n-1;s+=12){const e=Math.min(n-1,s+12);ctx.globalAlpha=Math.pow((e)/n,2.2)*0.5;ctx.lineWidth=1+2.2*e/n;
+      ctx.beginPath();ctx.moveTo(ox+t[s][0]*L,oy+t[s][1]*L);for(let j=s+1;j<=e;j++)ctx.lineTo(ox+t[j][0]*L,oy+t[j][1]*L);ctx.stroke()}});
+  ctx.globalAlpha=.34;
+  P.forEach((p,i)=>{const x1=ox+Math.sin(p.a)*L,y1=oy+Math.cos(p.a)*L,x2=x1+Math.sin(p.b)*L,y2=y1+Math.cos(p.b)*L;
+    ctx.strokeStyle=ctx.fillStyle=COL[i];ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    ctx.beginPath();ctx.arc(x1,y1,4,0,7);ctx.fill();ctx.beginPath();ctx.arc(x2,y2,6.5,0,7);ctx.fill()});
+  ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.fillStyle='#e9eefc';ctx.beginPath();ctx.arc(ox,oy,3,0,7);ctx.fill();
+  ht.textContent=T.toFixed(1);const s=spread();hs.textContent=s<1e-3?s.toExponential(1):s.toFixed(3);
+  let c=CAPS[0][1];for(const k of CAPS)if(peak>=k[0])c=k[1];if(cap.textContent!==c)cap.textContent=c;
+  chart()}
+function chart(){const w=ch.width/dpr,h=ch.height/dpr;cx.setTransform(dpr,0,0,dpr,0,0);cx.clearRect(0,0,w,h);
+  const lo=-5,hi=0.7,pl=34,Y=v=>h-14-(v-lo)/(hi-lo)*(h-22),span=Math.max(300,hist.length),X=i=>pl+i/span*(w-pl-4);
+  cx.font='10px ui-monospace,Menlo,Consolas,monospace';cx.textBaseline='middle';
+  for(let e=-4;e<=0;e+=2){cx.strokeStyle='rgba(80,60,20,.22)';cx.beginPath();cx.moveTo(pl,Y(e));cx.lineTo(w,Y(e));cx.stroke();cx.fillStyle='#6d6452';cx.fillText('10'+(e?String(e).replace('-','⁻').replace('4','⁴').replace('2','²'):'⁰'),2,Y(e))}
+  cx.fillText(Math.round(span/10)+' s',w-30,h-5);
+  cx.strokeStyle='#a93a24';cx.lineWidth=1.8;cx.lineJoin='round';cx.beginPath();
+  hist.forEach((v,i)=>{const y=Y(Math.max(lo,Math.log10(v+1e-9)));i?cx.lineTo(X(i),y):cx.moveTo(X(i),y)});cx.stroke()}
+function aim(e){const r=cv.getBoundingClientRect(),L=Math.min(W,Hh)*0.225;
+  let dx=(e.clientX-r.left-W/2)/L,dy=(e.clientY-r.top-Hh*0.47)/L,d=Math.hypot(dx,dy);
+  if(d<0.05){dx=0;dy=0.05;d=0.05}const rr=Math.min(d,1.999),phi=Math.atan2(dx,dy),a=phi+Math.acos(rr/2);
+  const px=dx/d*rr,py=dy/d*rr,b=Math.atan2(px-Math.sin(a),py-Math.cos(a));reset(a,b);draw()}
+cv.addEventListener('pointerdown',e=>{drag=true;cv.setPointerCapture(e.pointerId);aim(e)});
+cv.addEventListener('pointermove',e=>{if(drag)aim(e)});
+const end=()=>{if(drag){drag=false;run=true;pp.textContent='Pause'}};
+cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+pp.addEventListener('click',()=>{run=!run;pp.textContent=run?'Pause':'Play'});
+function loop(t){const dt=Math.min(.05,(t-last)/1000||0);last=t;if(run&&!drag&&!document.hidden){advance(dt);draw()}requestAnimationFrame(loop)}
+reset(2.25,2.7);
+if(reduce){for(let i=0;i<700;i++)advance(1/60);pp.textContent='Play'}
+new ResizeObserver(fit).observe(cv);fit();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

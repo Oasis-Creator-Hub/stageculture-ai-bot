@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tessel Bay — an isometric city that keeps its own hours</title>
+<meta name="description" content="A tiny isometric city drawn in SVG: sixteen blocks, little cars and buses on the avenues, and a day/night switch that lights the windows one by one.">
+<style>
+  :root { --sky1:#ffd9b8; --sky2:#bfe3ee; --text:#243046; --ground:#cfd8c4; --road:#7d8794; --dash:#f4f1e6; --walk:#e9e4d6; --park:#8cc084; --glass:#3f5f7a; --panel:rgba(255,255,255,.72); }
+  body.night { --sky1:#141a45; --sky2:#070a1f; --text:#e8ecff; --ground:#1b2338; --road:#232a40; --dash:#59628a; --walk:#2f3856; --park:#234a3c; --glass:#161d38; --panel:rgba(16,20,48,.72); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; }
+  body { overflow:hidden; color:var(--text); transition:color 1.2s;
+    font-family:ui-rounded,"SF Pro Rounded","Arial Rounded MT Bold","Nunito","Varela Round","Trebuchet MS",system-ui,sans-serif; background:#bfe3ee; }
+  .sky { position:fixed; inset:0; background:linear-gradient(180deg,#bfe3ee,#ffd9b8); }
+  .sky::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,#070a1f,#1a2152 70%,#3a2c66); opacity:0; transition:opacity 1.4s; }
+  .night .sky::after { opacity:1; }
+  .stars { position:fixed; inset:0; opacity:0; transition:opacity 1.6s;
+    background-image:radial-gradient(1.2px 1.2px at 12% 18%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 28% 8%,#fff 50%,transparent 51%),radial-gradient(1.4px 1.4px at 44% 22%,#cfe 50%,transparent 51%),radial-gradient(1px 1px at 61% 12%,#fff 50%,transparent 51%),radial-gradient(1.3px 1.3px at 77% 26%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 90% 9%,#ffd 50%,transparent 51%),radial-gradient(1px 1px at 6% 40%,#fff 50%,transparent 51%),radial-gradient(1.2px 1.2px at 95% 44%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 36% 34%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 70% 4%,#fff 50%,transparent 51%); }
+  .night .stars { opacity:1; }
+  .orb { position:fixed; right:12%; top:12%; width:clamp(46px,7vw,84px); aspect-ratio:1; border-radius:50%; background:#fff3c9; box-shadow:0 0 60px 20px rgba(255,236,170,.7); transition:transform 1.4s cubic-bezier(.6,0,.3,1), background 1.4s, box-shadow 1.4s; }
+  .night .orb { transform:translate(-58vw,4vh) scale(.8); background:#eef1ff; box-shadow:0 0 40px 6px rgba(190,200,255,.45), inset -12px -6px 0 0 #c9cfee; }
+  .cloud { position:fixed; height:22px; border-radius:20px; background:#fff; opacity:.85; animation:drift linear infinite; transition:opacity 1.2s; }
+  .cloud::before,.cloud::after { content:""; position:absolute; background:#fff; border-radius:50%; }
+  .cloud::before { width:44%; aspect-ratio:1; left:16%; bottom:30%; } .cloud::after { width:32%; aspect-ratio:1; right:18%; bottom:40%; }
+  .night .cloud { opacity:.08; }
+  @keyframes drift { from { transform:translateX(-30vw);} to { transform:translateX(130vw);} }
+  svg#city { position:fixed; inset:0; width:100%; height:100%; display:block; }
+  .f { fill:var(--c); transition:fill 1.2s; }
+  .night .f { fill:color-mix(in srgb, var(--c) 34%, #0a0f30); }
+  .win { fill:var(--glass); transition:fill .6s; }
+  .night .win.lit { fill:#ffd88a; } .night .win.lit.cool { fill:#bfe9ff; }
+  .glow { opacity:0; transition:opacity 1.2s; pointer-events:none; } .night .glow { opacity:1; }
+  .hl { opacity:0; transition:opacity .8s; } .night .hl { opacity:.9; }
+  .beacon { fill:#7a2a2a; } .night .beacon { fill:#ff4d4d; animation:blink 1.6s steps(2) infinite; }
+  @keyframes blink { 50% { fill:#5a1a1a; } }
+  .ground { fill:var(--ground); transition:fill 1.2s; } .road { fill:var(--road); transition:fill 1.2s; }
+  .dash { stroke:var(--dash); transition:stroke 1.2s; } .walk { fill:var(--walk); transition:fill 1.2s; } .park { fill:var(--park); transition:fill 1.2s; }
+  header { position:fixed; left:clamp(14px,3vw,36px); top:clamp(40px,6vh,56px); z-index:3; max-width:min(330px,70vw); pointer-events:none; }
+  h1 { font-size:clamp(30px,5vw,56px); line-height:.95; letter-spacing:-.03em; font-weight:800; }
+  header p { margin-top:8px; font-size:clamp(13px,1.4vw,15px); line-height:1.4; opacity:.8; }
+  .back { position:fixed; left:clamp(14px,3vw,36px); top:12px; z-index:4; font-size:12px; font-weight:700; letter-spacing:.08em; color:var(--text); text-decoration:none; background:var(--panel); padding:5px 11px; border-radius:20px; backdrop-filter:blur(6px); transition:color 1.2s, background 1.2s; }
+  .switch { position:fixed; right:clamp(14px,3vw,36px); top:12px; z-index:4; display:flex; align-items:center; gap:10px; font:inherit; font-size:13px; font-weight:700; color:var(--text); background:var(--panel);
+    border:0; border-radius:30px; padding:7px 9px 7px 14px; cursor:pointer; backdrop-filter:blur(6px); transition:color 1.2s, background 1.2s; }
+  .switch:focus-visible, .back:focus-visible { outline:2px solid #ff8a5b; outline-offset:2px; }
+  .knob { width:50px; height:28px; border-radius:20px; background:#ffb65c; position:relative; transition:background .6s; }
+  .knob::after { content:""; position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background:#fff8e0; transition:transform .5s cubic-bezier(.5,1.6,.5,1), box-shadow .5s; }
+  .night .knob { background:#3a4290; } .night .knob::after { transform:translateX(22px); box-shadow:inset -6px -3px 0 #c9cfee; }
+  .stat { position:fixed; left:0; right:0; bottom:14px; z-index:3; display:flex; gap:8px; justify-content:center; flex-wrap:wrap; padding:0 10px; pointer-events:none; }
+  .stat span { background:var(--panel); padding:6px 12px; border-radius:20px; font-size:12px; font-weight:700; letter-spacing:.04em; backdrop-filter:blur(6px); transition:background 1.2s; font-variant-numeric:tabular-nums; }
+  @media (prefers-reduced-motion: reduce) { .cloud { animation:none; transform:translateX(20vw); } .night .beacon { animation:none; } }
+</style>
+</head>
+<body>
+<div class="sky"></div><div class="stars"></div><div class="orb"></div>
+<div class="cloud" style="top:16%;width:120px;animation-duration:90s;animation-delay:-20s"></div>
+<div class="cloud" style="top:27%;width:80px;animation-duration:120s;animation-delay:-70s"></div>
+<div class="cloud" style="top:9%;width:150px;animation-duration:150s;animation-delay:-110s"></div>
+<svg id="city" viewBox="-440 -420 880 660" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Isometric city with moving vehicles">
+  <defs><radialGradient id="lamp"><stop offset="0" stop-color="#ffe9a8" stop-opacity=".95"/><stop offset=".35" stop-color="#ffd27a" stop-opacity=".35"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient></defs>
+  <g id="world"></g>
+</svg>
+<a class="back" href="index.html">← 100</a>
+<button class="switch" id="sw" aria-pressed="false"><span id="swl">Day shift</span><span class="knob"></span></button>
+<header><h1>Tessel Bay</h1><p id="blurb">Sixteen blocks, five avenues, one very punctual bus. Flip the switch and watch the city decide who is still up.</p></header>
+<div class="stat"><span id="clock">12:10</span><span id="lit">0 windows lit</span><span>14 vehicles · 0 honking</span></div>
+
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg', world = document.getElementById('world');
+  const el = (n, a, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+  const OY = -204, iso = (x, y, z = 0) => [((x - y) * 24).toFixed(1), ((x + y) * 12 - z + OY).toFixed(1)];
+  const pts = arr => arr.map(p => iso(...p).join(',')).join(' ');
+  let sd = 28; const R = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16), t = k < 0 ? 0 : 255, a = Math.abs(k);
+    return '#' + [n >> 16, n >> 8 & 255, n & 255].map(v => Math.round(v + (t - v) * a).toString(16).padStart(2, '0')).join(''); };
+  const windows = [];
+
+  function box(g, x0, y0, x1, y1, z0, z1, col, wins) {
+    const f = (p, k) => el('polygon', { class: 'f', points: pts(p), style: `--c:${shade(col, k)}` }, g);
+    f([[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]], -.12);
+    f([[x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [x1, y0, z1]], -.32);
+    f([[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]], .28);
+    if (!wins) return;
+    const floors = Math.floor((z1 - z0 - 8) / 13), cool = R() < .3;
+    const nx = Math.max(1, Math.round((x1 - x0) / .42)), ny = Math.max(1, Math.round((y1 - y0) / .42));
+    for (let k = 0; k < floors; k++) { const z = z0 + 9 + k * 13;
+      for (let i = 0; i < nx; i++) { const a = x0 + (i + .22) * (x1 - x0) / nx, b = a + (x1 - x0) / nx * .56;
+        windows.push(el('polygon', { class: 'win' + (cool ? ' cool' : ''), points: pts([[a, y1, z], [b, y1, z], [b, y1, z + 7], [a, y1, z + 7]]) }, g)); }
+      for (let i = 0; i < ny; i++) { const a = y0 + (i + .22) * (y1 - y0) / ny, b = a + (y1 - y0) / ny * .56;
+        windows.push(el('polygon', { class: 'win' + (cool ? ' cool' : ''), points: pts([[x1, a, z], [x1, b, z], [x1, b, z + 7], [x1, a, z + 7]]) }, g)); }
+    }
+  }
+  function tree(g, x, y) { const [sx, sy] = iso(x, y), h = 10 + R() * 8, c = ['#4f9d69', '#3f8a5a', '#6ab07a'][(R() * 3) | 0];
+    el('line', { x1: sx, y1: sy, x2: sx, y2: sy - h, stroke: '#6b4a2f', 'stroke-width': 2 }, g);
+    el('circle', { class: 'f', cx: sx, cy: sy - h - 3, r: 7.5, style: `--c:${c}` }, g); el('circle', { class: 'f', cx: +sx - 2, cy: sy - h - 7, r: 5, style: `--c:${shade(c, .2)}` }, g); }
+  function lamp(g, x, y) { const [sx, sy] = iso(x, y);
+    el('line', { x1: sx, y1: sy, x2: sx, y2: sy - 16, stroke: '#3c4558', 'stroke-width': 1.4 }, g); el('circle', { cx: sx, cy: sy - 17, r: 2, fill: '#f7e7b0' }, g);
+    el('ellipse', { class: 'glow', cx: sx, cy: sy - 4, rx: 30, ry: 17, fill: 'url(#lamp)' }, g); el('circle', { class: 'glow', cx: sx, cy: sy - 17, r: 8, fill: 'url(#lamp)' }, g); }
+
+  // ground, roads, lane dashes
+  el('polygon', { class: 'ground', points: pts([[-1.2, -1.2, -6], [18.2, -1.2, -6], [18.2, 18.2, -6], [-1.2, 18.2, -6]]) }, world);
+  el('polygon', { class: 'f', style: '--c:#9aa58c', points: pts([[-1.2, 18.2, -6], [18.2, 18.2, -6], [18.2, 18.2, -20], [-1.2, 18.2, -20]]) }, world);
+  el('polygon', { class: 'f', style: '--c:#7f8a74', points: pts([[18.2, -1.2, -6], [18.2, 18.2, -6], [18.2, 18.2, -20], [18.2, -1.2, -20]]) }, world);
+  el('polygon', { class: 'road', points: pts([[0, 0], [17, 0], [17, 17], [0, 17]]) }, world);
+  for (let i = 0; i < 5; i++) { const c = i * 4 + .5; let a = iso(0, c), b = iso(17, c);
+    el('line', { class: 'dash', x1: a[0], y1: a[1], x2: b[0], y2: b[1], 'stroke-width': 1, 'stroke-dasharray': '5 6' }, world);
+    a = iso(c, 0); b = iso(c, 17); el('line', { class: 'dash', x1: a[0], y1: a[1], x2: b[0], y2: b[1], 'stroke-width': 1, 'stroke-dasharray': '5 6' }, world); }
+
+  // depth layers: H[row] for avenues, V[row][col] for cross streets, B blocks
+  const H = [], V = [], COLS = ['#f2a65a', '#ef6f6c', '#56a3a6', '#f7d488', '#8e7dbe', '#e8e4d9', '#4f6d7a', '#d96c75', '#7fb685', '#f4f1e6'];
+  const parks = new Set(['1,2', '3,0', '2,3']);
+  for (let r = 0; r < 4; r++) {
+    H[r] = el('g', {}, world); V[r] = [];
+    for (let c = 0; c < 4; c++) {
+      V[r][c] = el('g', {}, world);
+      const g = el('g', {}, world), bx = c * 4 + 1, by = r * 4 + 1, isPark = parks.has(r + ',' + c);
+      box(g, bx, by, bx + 3, by + 3, 0, 2.5, isPark ? '#8cc084' : '#e9e4d6');
+      const centre = 1 - (Math.abs(r - 1.5) + Math.abs(c - 1.5)) / 3.4, base = 26 + centre * 120;
+      if (isPark) {
+        const p = iso(bx + 1.5, by + 1.5, 2.5); el('ellipse', { class: 'f', style: '--c:#6fb7d6', cx: p[0], cy: p[1], rx: 20, ry: 10 }, g);
+        const ts = []; for (let i = 0; i < 9; i++) { const tx = bx + .3 + R() * 2.4, ty = by + .3 + R() * 2.4; if (Math.hypot(tx - bx - 1.5, ty - by - 1.5) > .95) ts.push([tx, ty]); }
+        ts.sort((a, b) => a[0] + a[1] - b[0] - b[1]).forEach(t => tree(g, t[0], t[1]));
+      } else {
+        const kind = R(), lots = [];
+        if (kind < .3) lots.push([.35, .35, 2.65, 2.65, base * 1.25]);
+        else if (kind < .62) { lots.push([.25, .25, 2.75, 1.35, base * (.6 + R() * .5)]); lots.push([.25, 1.7, 2.75, 2.75, base * (.5 + R() * .7)]); }
+        else for (let j = 0; j < 2; j++) for (let i = 0; i < 2; i++) lots.push([.22 + i * 1.4, .22 + j * 1.4, 1.38 + i * 1.4, 1.38 + j * 1.4, base * (.35 + R() * .85)]);
+        lots.forEach(([a, b, c2, d, h]) => {
+          const col = COLS[(R() * COLS.length) | 0]; h = Math.max(20, h);
+          box(g, bx + a, by + b, bx + c2, by + d, 2.5, h, col, true);
+          const rx = bx + a, ry = by + b, w = c2 - a, dd = d - b, t = R();
+          if (h > 95 && w > 1.5) { box(g, rx + .5, ry + .5, rx + w - .5, ry + dd - .5, h, h + 26, col, true); const p = iso(rx + w / 2, ry + dd / 2, h + 26);
+            el('line', { x1: p[0], y1: p[1], x2: p[0], y2: p[1] - 30, stroke: '#3c4558', 'stroke-width': 1.5 }, g); el('circle', { class: 'beacon', cx: p[0], cy: p[1] - 31, r: 2.4 }, g); }
+          else if (t < .4) box(g, rx + w * .2, ry + dd * .2, rx + w * .5, ry + dd * .5, h, h + 5, '#b9bec9');
+          else if (t < .6) { const p = iso(rx + w * .5, ry + dd * .5, h); el('rect', { class: 'f', style: '--c:#a8663f', x: p[0] - 5, y: p[1] - 15, width: 10, height: 10, rx: 2 }, g); el('line', { x1: p[0], y1: p[1], x2: p[0], y2: p[1] - 6, stroke: '#3c4558', 'stroke-width': 2 }, g); }
+          else if (t < .75) { const p = iso(rx + w * .5, ry + dd * .5, h); el('ellipse', { class: 'f', style: '--c:#7fb685', cx: p[0], cy: p[1], rx: w * 14, ry: w * 7 }, g); }
+        });
+      }
+      lamp(g, bx + 2.95, by + 2.95);
+    }
+    V[r][4] = el('g', {}, world);
+  }
+  H[4] = el('g', {}, world);
+
+  // vehicles
+  const VC = ['#e63946', '#f4a261', '#2a9d8f', '#f1faee', '#ffb703', '#457b9d', '#f1faee', '#e76f51'], cars = [];
+  for (let i = 0; i < 14; i++) {
+    const axis = i % 2 ? 'x' : 'y', bus = i === 0 || i === 7, L = bus ? .5 : .3, Wd = .15, hgt = bus ? 9 : 6, dir = i % 4 < 2 ? 1 : -1;
+    const g = el('g', {}), col = bus ? '#ffb703' : VC[i % VC.length], inner = el('g', {}, g);
+    const [ax, ay] = axis === 'x' ? [L, Wd] : [Wd, L];
+    // draw relative to world origin (0,0) then shift so OY cancels
+    const sub = el('g', { transform: `translate(0,${-OY})` }, inner);
+    box(sub, -ax, -ay, ax, ay, 1.5, hgt, col);
+    el('polygon', { points: pts(axis === 'x' ? [[-ax * .7, ay, hgt * .55], [ax * .7, ay, hgt * .55], [ax * .7, ay, hgt * .9], [-ax * .7, ay, hgt * .9]] : [[ax, -ay * .7, hgt * .55], [ax, ay * .7, hgt * .55], [ax, ay * .7, hgt * .9], [ax, -ay * .7, hgt * .9]]), fill: '#22314a', opacity: .75 }, sub);
+    const hp = iso(axis === 'x' ? dir * (ax + .35) : 0, axis === 'y' ? dir * (ay + .35) : 0, 1);
+    el('ellipse', { class: 'hl', cx: hp[0], cy: hp[1], rx: 9, ry: 5, fill: 'url(#lamp)' }, sub);
+    cars.push({ g, axis, road: (i * 3 + (i >> 1)) % 5, dir, t: R() * 17, v: (bus ? .9 : 1.2 + R() * 1.1), layer: null });
+  }
+  function placeCar(c) {
+    const lane = c.road * 4 + .5 + (c.axis === 'x' ? c.dir : -c.dir) * .23, x = c.axis === 'x' ? c.t : lane, y = c.axis === 'x' ? lane : c.t;
+    let layer;
+    if (c.axis === 'x') layer = H[c.road];
+    else { const band = Math.max(0, Math.min(4, Math.floor(y / 4))); layer = (y - band * 4 < 1.25 || band === 4) ? H[band] : V[band][c.road]; }
+    if (layer !== c.layer) { layer.appendChild(c.g); c.layer = layer; }
+    const p = iso(x, y); c.g.setAttribute('transform', `translate(${p[0]},${p[1]})`);
+    c.g.setAttribute('opacity', Math.max(0, Math.min(1, (c.t + .6) / .7, (17.6 - c.t) / .7)).toFixed(2));
+  }
+  cars.forEach(placeCar);
+
+  // day / night
+  const sw = document.getElementById('sw'), litEl = document.getElementById('lit'), clockEl = document.getElementById('clock'), reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let night = false, lit = 0, timers = [];
+  const setLit = (w, on) => { if (w.classList.contains('lit') !== on) { w.classList.toggle('lit', on); lit += on ? 1 : -1; } };
+  function toggle() {
+    night = !night; document.body.classList.toggle('night', night); sw.setAttribute('aria-pressed', night);
+    document.getElementById('swl').textContent = night ? 'Night shift' : 'Day shift'; clockEl.textContent = night ? '22:40' : '12:10';
+    document.getElementById('blurb').textContent = night ? 'The bakery on Ninth is already awake. Somebody on the top floor is definitely still working.' : 'Sixteen blocks, five avenues, one very punctual bus. Flip the switch and watch the city decide who is still up.';
+    timers.forEach(clearTimeout); timers = [];
+    windows.forEach(w => { const on = night && Math.random() < .46; if (reduce || !night) setLit(w, on); else if (on) timers.push(setTimeout(() => { setLit(w, true); show(); }, 200 + Math.random() * 2600)); });
+    show();
+  }
+  const show = () => { litEl.textContent = lit + ' windows lit'; };
+  sw.addEventListener('click', toggle);
+  if (!reduce) setInterval(() => { if (!night) return; for (let i = 0; i < 3; i++) { const w = windows[(Math.random() * windows.length) | 0]; setLit(w, !w.classList.contains('lit')); } show(); }, 700);
+
+  let last = performance.now();
+  function frame(now) { const dt = Math.min(60, now - last) / 1000; last = now;
+    for (const c of cars) { c.t += c.dir * c.v * dt; if (c.t > 17.6) c.t = -.6; if (c.t < -.6) c.t = 17.6; placeCar(c); }
+    requestAnimationFrame(frame); }
+  if (!reduce) requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

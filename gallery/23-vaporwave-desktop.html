@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PLAZA_OS 97 — Leisure Operating System</title>
+<meta name="description" content="A vaporwave pastel desktop with draggable retro windows, a checkerboard floor to the horizon, an abstract statue and deeply unhelpful software.">
+<style>
+  :root { --pink:#ff9ecf; --aqua:#8ff0e6; --lav:#b9a7ff; --peach:#ffd3a8; --ink:#2a1b4d; --chrome:#d9d3ea; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; overflow:hidden; }
+  body { font-family:"MS Sans Serif","Microsoft Sans Serif",Tahoma,Geneva,Verdana,sans-serif; font-size:13px; color:var(--ink);
+    background:linear-gradient(180deg,#3a1d74 0%,#8a4fc0 22%,#ff8fc4 44%,#ffd0a6 56%,#ffd0a6 57%); user-select:none; -webkit-user-select:none; }
+  .scene { position:fixed; inset:0; overflow:hidden; }
+  .sun { position:absolute; left:50%; top:56%; width:min(46vw,380px); aspect-ratio:1; border-radius:50%; transform:translate(-50%,-78%);
+    background:linear-gradient(180deg,#fff3a8 0%,#ffb37a 45%,#ff5fa8 100%);
+    -webkit-mask:repeating-linear-gradient(180deg,#000 0 13px,transparent 13px 17px), linear-gradient(#000 0 52%,transparent 52%);
+    -webkit-mask-composite:source-over; mask:linear-gradient(180deg,#000 52%,transparent 52%), repeating-linear-gradient(180deg,#000 0 13px,transparent 13px 18px);
+    filter:drop-shadow(0 0 40px rgba(255,160,200,.7)); }
+  .floor { position:absolute; left:-60%; right:-60%; top:56%; height:120%; transform-origin:50% 0; transform:perspective(420px) rotateX(74deg);
+    background-color:#ffb6de;
+    background-image:linear-gradient(45deg,#6b3fd0 25%,transparent 25%,transparent 75%,#6b3fd0 75%),linear-gradient(45deg,#6b3fd0 25%,transparent 25%,transparent 75%,#6b3fd0 75%);
+    background-size:96px 96px; background-position:0 0,48px 48px; animation:glide 5s linear infinite; }
+  @keyframes glide { to { background-position:0 96px,48px 144px; } }
+  .haze { position:absolute; left:0; right:0; top:50%; height:22%; background:linear-gradient(180deg,transparent,rgba(255,208,166,.95) 28%,rgba(255,182,222,0)); pointer-events:none; }
+  .statue { position:absolute; right:6%; top:56%; height:min(58vh,440px); transform:translateY(-78%); filter:drop-shadow(-14px 20px 0 rgba(58,29,116,.35)); animation:bob 7s ease-in-out infinite; }
+  @keyframes bob { 50% { transform:translateY(-81%); } }
+  .palm { position:absolute; left:2%; top:56%; height:min(46vh,340px); transform:translateY(-92%); opacity:.9; }
+  .jp { position:absolute; left:50%; top:9%; transform:translateX(-50%); font-family:Georgia,"Times New Roman",serif; font-style:italic;
+    font-size:clamp(30px,7vw,84px); letter-spacing:.28em; color:#fff; white-space:nowrap; text-shadow:3px 3px 0 #ff5fa8,6px 6px 0 #6b3fd0; opacity:.92; pointer-events:none; }
+  .scan { position:fixed; inset:0; pointer-events:none; z-index:500; background:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px); mix-blend-mode:overlay; }
+
+  .icons { position:fixed; left:10px; top:44px; display:grid; gap:14px; z-index:2; }
+  .icon { width:76px; background:none; border:0; font:inherit; color:#fff; text-shadow:1px 1px 0 var(--ink); cursor:pointer; display:grid; justify-items:center; gap:4px; padding:4px; }
+  .icon:focus-visible, .icon:hover { background:rgba(107,63,208,.5); outline:1px dotted #fff; }
+  .icon svg { width:38px; height:38px; }
+
+  .win { position:absolute; min-width:210px; background:var(--chrome); border:2px solid; border-color:#fff #5b4a8a #5b4a8a #fff;
+    box-shadow:6px 6px 0 rgba(42,27,77,.45); display:none; max-width:calc(100vw - 12px); }
+  .win.open { display:block; }
+  .bar { display:flex; align-items:center; gap:6px; padding:3px 3px 3px 7px; color:#fff; font-weight:700; letter-spacing:.04em; cursor:grab; touch-action:none;
+    background:linear-gradient(90deg,#6b3fd0,#ff7fbf 70%,#8ff0e6); }
+  .win.drag .bar { cursor:grabbing; }
+  .win:not(.top) .bar { background:linear-gradient(90deg,#8d86a8,#c0b8d6); }
+  .bar span { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bar button { width:20px; height:18px; font:700 11px/1 monospace; background:var(--chrome); color:var(--ink); border:2px solid; border-color:#fff #5b4a8a #5b4a8a #fff; cursor:pointer; padding:0; }
+  .bar button:active { border-color:#5b4a8a #fff #fff #5b4a8a; }
+  .body { padding:12px; line-height:1.45; }
+  .well { background:#fff; border:2px solid; border-color:#5b4a8a #fff #fff #5b4a8a; padding:10px; }
+  .btn { font:inherit; padding:5px 16px; background:var(--chrome); border:2px solid; border-color:#fff #5b4a8a #5b4a8a #fff; cursor:pointer; color:var(--ink); }
+  .btn:active { border-color:#5b4a8a #fff #fff #5b4a8a; }
+  .row { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; flex-wrap:wrap; }
+  #w-about .body { display:grid; grid-template-columns:64px 1fr; gap:12px; width:min(400px,calc(100vw - 16px)); }
+  #w-about h2 { font-family:Georgia,serif; font-style:italic; font-size:24px; color:#6b3fd0; }
+  #w-note .well { width:min(330px,calc(100vw - 44px)); height:190px; overflow:auto; font-family:"Courier New",monospace; font-size:12.5px; white-space:pre-wrap; user-select:text; -webkit-user-select:text; }
+  #w-mall .body { width:min(300px,calc(100vw - 16px)); }
+  .shop { display:grid; grid-template-columns:1fr auto; gap:5px 12px; }
+  .shop i { font-style:normal; color:#c2378a; }
+  #w-player .body { width:min(290px,calc(100vw - 16px)); background:#2a1b4d; color:var(--aqua); font-family:"Courier New",monospace; }
+  .eq { display:flex; gap:3px; align-items:flex-end; height:46px; margin:8px 0; }
+  .eq i { flex:1; background:linear-gradient(180deg,var(--pink),var(--aqua)); height:20%; transition:height .18s; }
+  .marq { overflow:hidden; white-space:nowrap; border:1px solid #6b3fd0; padding:3px 0; }
+  .marq b { display:inline-block; padding-left:100%; animation:marq 14s linear infinite; font-weight:400; }
+  @keyframes marq { to { transform:translateX(-100%); } }
+  #w-player .btn { background:#b9a7ff; }
+  .bartrack { height:16px; background:#fff; border:2px solid; border-color:#5b4a8a #fff #fff #5b4a8a; margin:10px 0 4px; }
+  .bartrack i { display:block; height:100%; width:0; background:repeating-linear-gradient(90deg,#6b3fd0 0 9px,transparent 9px 12px); }
+
+  .task { position:fixed; left:0; right:0; top:0; height:30px; z-index:600; background:var(--chrome); border-bottom:2px solid #5b4a8a; box-shadow:0 1px 0 #fff inset;
+    display:flex; align-items:center; gap:6px; padding:0 6px; }
+  .task .start { font-weight:700; padding:2px 10px; }
+  .task .tabs { display:flex; gap:4px; flex:1; overflow:hidden; }
+  .task .tabs button { font:inherit; font-size:12px; padding:2px 8px; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; background:var(--chrome); border:2px solid; border-color:#fff #5b4a8a #5b4a8a #fff; cursor:pointer; color:var(--ink); }
+  .task .tabs button.on { border-color:#5b4a8a #fff #fff #5b4a8a; background:#efeaf8; }
+  .task .clock { padding:2px 8px; border:2px solid; border-color:#5b4a8a #fff #fff #5b4a8a; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .back { color:var(--ink); text-decoration:none; font-size:12px; padding:2px 6px; }
+  .back:hover { background:#6b3fd0; color:#fff; }
+  @media (max-width:560px){ .statue{ right:-8%; opacity:.9; } .palm{ display:none; } .icons{ grid-template-columns:repeat(4,1fr); left:4px; right:4px; } .icon{ width:auto; } .task .tabs button{ max-width:64px; } }
+  @media (prefers-reduced-motion: reduce){ .floor,.statue,.marq b{ animation:none; } .marq b{ padding-left:4px; } }
+</style>
+</head>
+<body>
+<div class="scene" aria-hidden="true">
+  <div class="jp">l e i s u r e</div>
+  <div class="sun"></div>
+  <div class="floor"></div>
+  <div class="haze"></div>
+  <svg class="palm" viewBox="0 0 200 320"><g fill="none" stroke="#2a1b4d" stroke-linecap="round"><path d="M100 320 Q88 200 104 96" stroke-width="9"/><g stroke-width="7"><path d="M104 96 Q60 50 12 78"/><path d="M104 96 Q70 22 26 20"/><path d="M104 96 Q108 26 150 8"/><path d="M104 96 Q150 50 192 70"/><path d="M104 96 Q150 96 180 136"/><path d="M104 96 Q60 100 34 140"/></g></g></svg>
+  <svg class="statue" viewBox="0 0 220 440">
+    <defs><linearGradient id="mb" x1="0" x2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#e6ddf7"/><stop offset="1" stop-color="#a995dd"/></linearGradient>
+    <linearGradient id="mb2" x1="0" x2="1"><stop offset="0" stop-color="#f6f0ff"/><stop offset="1" stop-color="#8e78cf"/></linearGradient></defs>
+    <rect x="30" y="392" width="160" height="48" fill="url(#mb2)"/><rect x="46" y="372" width="128" height="22" fill="url(#mb)"/>
+    <path d="M70 372 Q54 300 78 250 Q96 222 92 196 L128 196 Q126 224 146 250 Q168 300 150 372 Z" fill="url(#mb)"/>
+    <path d="M84 300 Q110 320 138 296 M80 336 Q110 356 142 332 M90 264 Q110 278 132 262" fill="none" stroke="#a995dd" stroke-width="3"/>
+    <rect x="94" y="170" width="32" height="30" fill="url(#mb2)"/>
+    <ellipse cx="110" cy="118" rx="52" ry="64" fill="url(#mb)"/>
+    <path d="M110 54 A52 64 0 0 1 162 118 A52 64 0 0 1 110 182 Z" fill="#a995dd" opacity=".45"/>
+    <path d="M58 104 Q72 40 122 46 Q168 54 162 112 Q150 76 118 78 Q82 78 58 104 Z" fill="url(#mb2)"/>
+    <g fill="none" stroke="#7d68c2" stroke-width="3"><circle cx="76" cy="72" r="9"/><circle cx="98" cy="58" r="9"/><circle cx="124" cy="56" r="9"/><circle cx="146" cy="70" r="9"/></g>
+    <rect x="66" y="112" width="88" height="20" fill="#ff5fa8"/><rect x="66" y="112" width="88" height="6" fill="#8ff0e6"/>
+    <path d="M108 132 L100 152 L112 152 M94 166 Q110 172 124 164" fill="none" stroke="#7d68c2" stroke-width="3" stroke-linecap="round"/>
+    <polygon points="186,150 214,200 158,200" fill="none" stroke="#8ff0e6" stroke-width="5"/><circle cx="26" cy="210" r="16" fill="none" stroke="#ff9ecf" stroke-width="5"/>
+  </svg>
+</div>
+
+<div class="task">
+  <a class="back" href="index.html">← 100</a>
+  <button class="btn start" id="start">▣ Plaza</button>
+  <div class="tabs" id="tabs"></div>
+  <div class="clock" id="clock">4:44 PM</div>
+</div>
+
+<nav class="icons" aria-label="Desktop icons">
+  <button class="icon" data-open="w-about"><svg viewBox="0 0 38 38"><rect x="4" y="6" width="30" height="22" fill="#8ff0e6" stroke="#2a1b4d" stroke-width="2"/><rect x="12" y="30" width="14" height="4" fill="#2a1b4d"/><circle cx="19" cy="17" r="6" fill="#ff9ecf"/></svg>My Plaza</button>
+  <button class="icon" data-open="w-note"><svg viewBox="0 0 38 38"><path d="M8 4h16l6 6v24H8z" fill="#fff" stroke="#2a1b4d" stroke-width="2"/><path d="M12 14h14M12 19h14M12 24h9" stroke="#b9a7ff" stroke-width="2"/></svg>readme.txt</button>
+  <button class="icon" data-open="w-mall"><svg viewBox="0 0 38 38"><path d="M6 14h26l-3 18H9z" fill="#ffd3a8" stroke="#2a1b4d" stroke-width="2"/><path d="M13 14q0-9 6-9t6 9" fill="none" stroke="#2a1b4d" stroke-width="2"/></svg>Mall.exe</button>
+  <button class="icon" data-open="w-player"><svg viewBox="0 0 38 38"><circle cx="19" cy="19" r="14" fill="#b9a7ff" stroke="#2a1b4d" stroke-width="2"/><circle cx="19" cy="19" r="4" fill="#fff" stroke="#2a1b4d" stroke-width="2"/></svg>Muzak</button>
+</nav>
+
+<div id="desk">
+  <section class="win open" id="w-about" data-title="About PLAZA_OS" style="left:16%;top:64px">
+    <div class="bar"><span>About PLAZA_OS 97</span><button aria-label="Close">×</button></div>
+    <div class="body">
+      <svg viewBox="0 0 64 64" width="64" height="64"><rect width="64" height="64" fill="#2a1b4d"/><circle cx="32" cy="30" r="18" fill="#ff9ecf"/><path d="M14 34h36M16 40h32M20 46h24" stroke="#2a1b4d" stroke-width="3"/><path d="M6 56h52" stroke="#8ff0e6" stroke-width="3"/></svg>
+      <div><h2>Plaza OS 97</h2><p>The operating system for people with nowhere to be. Now with 256 feelings and a fountain that never needs cleaning.</p>
+      <p style="margin-top:8px">Memory: mostly of summers<br>Disk: half full, half nostalgic</p>
+      <div class="row"><button class="btn" data-open="w-err">Register</button><button class="btn" data-close>OK, whatever</button></div></div>
+    </div>
+  </section>
+
+  <section class="win open" id="w-note" data-title="readme.txt" style="left:44%;top:150px">
+    <div class="bar"><span>readme.txt — Notepad-ish</span><button aria-label="Close">×</button></div>
+    <div class="body"><div class="well" tabindex="0">WELCOME, VALUED GUEST
+
+Thank you for choosing a desktop
+that asks nothing of you.
+
+TIPS
+- The escalator goes up. Only up.
+- Your files are safe in the atrium.
+- The statue is not judging you.
+  The statue is buffering.
+- If the sunset freezes, so can you.
+
+Please enjoy the complimentary
+ambience. It is non-refundable.
+
+      ~ Management (out to lunch,
+        since 1997)</div></div>
+  </section>
+
+  <section class="win" id="w-mall" data-title="Mall.exe" style="left:8%;top:300px">
+    <div class="bar"><span>Mall.exe — Directory</span><button aria-label="Close">×</button></div>
+    <div class="body"><div class="well shop">
+      <span>Crystal Pepper Juice Bar</span><i>closed</i><span>Dolphin &amp; Sons Fax Repair</span><i>closed</i>
+      <span>Marble Head Emporium</span><i>closed</i><span>Sunset Rental (VHS only)</span><i>rewinding</i>
+      <span>The Fern Department</span><i>thriving</i><span>Food Court, Level ∞</span><i>echoing</i></div>
+      <div class="row"><button class="btn" data-open="w-load">Go shopping</button></div></div>
+  </section>
+
+  <section class="win open" id="w-player" data-title="Muzak" style="left:58%;top:420px">
+    <div class="bar"><span>Muzak Deluxe</span><button aria-label="Close">×</button></div>
+    <div class="body">
+      <div class="marq"><b>♪ now idling: “Elevator to the Aquarium (slowed, then slowed again)” — Hotel Lobby Ensemble ♪</b></div>
+      <div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="row" style="justify-content:space-between;margin-top:6px"><span id="pstat">■ stopped</span><button class="btn" id="play">▶ play</button></div>
+    </div>
+  </section>
+
+  <section class="win" id="w-load" data-title="Loading" style="left:30%;top:240px">
+    <div class="bar"><span>Entering the mall…</span><button aria-label="Close">×</button></div>
+    <div class="body" style="width:min(280px,calc(100vw - 16px))"><p id="loadmsg">Polishing the floor tiles…</p><div class="bartrack"><i id="loadbar"></i></div><small>Estimated time remaining: one (1) era</small></div>
+  </section>
+
+  <section class="win" id="w-err" data-title="Error" style="left:36%;top:200px">
+    <div class="bar"><span>A Gentle Error</span><button aria-label="Close">×</button></div>
+    <div class="body" style="width:min(300px,calc(100vw - 16px))"><p><b>Registration is not available.</b></p><p style="margin-top:6px">The form was mailed in 1997 and we are still waiting to hear back. Would you like to feel wistful instead?</p>
+      <div class="row"><button class="btn" data-close>Yes</button><button class="btn" data-close>Also yes</button></div></div>
+  </section>
+</div>
+<div class="scan" aria-hidden="true"></div>
+
+<script>
+(() => {
+  const wins = [...document.querySelectorAll('.win')], tabs = document.getElementById('tabs');
+  let z = 10;
+  const clampPos = w => {
+    const maxX = innerWidth - Math.min(w.offsetWidth, 60), maxY = innerHeight - 28;
+    w.style.left = Math.max(-w.offsetWidth + 80, Math.min(maxX, w.offsetLeft)) + 'px';
+    w.style.top = Math.max(32, Math.min(maxY, w.offsetTop)) + 'px';
+  };
+  function focus(w) { wins.forEach(o => o.classList.remove('top')); w.classList.add('top'); w.style.zIndex = ++z; renderTabs(); }
+  function open(id) { const w = document.getElementById(id); w.classList.add('open');
+    if (w.offsetLeft + w.offsetWidth > innerWidth) w.style.left = Math.max(4, innerWidth - w.offsetWidth - 6) + 'px';
+    clampPos(w); focus(w); if (id === 'w-load') load(); }
+  function close(w) { w.classList.remove('open', 'top'); renderTabs(); }
+  function renderTabs() {
+    tabs.innerHTML = '';
+    wins.filter(w => w.classList.contains('open')).forEach(w => {
+      const b = document.createElement('button'); b.textContent = w.dataset.title; if (w.classList.contains('top')) b.className = 'on';
+      b.onclick = () => focus(w); tabs.appendChild(b);
+    });
+  }
+  wins.forEach(w => {
+    const bar = w.querySelector('.bar');
+    w.addEventListener('pointerdown', () => focus(w));
+    bar.querySelector('button').addEventListener('click', e => { e.stopPropagation(); close(w); });
+    let sx, sy, ox, oy, id = null;
+    bar.addEventListener('pointerdown', e => {
+      if (e.target.tagName === 'BUTTON') return;
+      id = e.pointerId; bar.setPointerCapture(id); sx = e.clientX; sy = e.clientY; ox = w.offsetLeft; oy = w.offsetTop; w.classList.add('drag');
+    });
+    bar.addEventListener('pointermove', e => {
+      if (e.pointerId !== id) return;
+      w.style.left = ox + e.clientX - sx + 'px'; w.style.top = oy + e.clientY - sy + 'px'; clampPos(w);
+    });
+    const end = e => { if (e.pointerId === id) { id = null; w.classList.remove('drag'); } };
+    bar.addEventListener('pointerup', end); bar.addEventListener('pointercancel', end);
+  });
+  document.addEventListener('click', e => {
+    const o = e.target.closest('[data-open]'); if (o) open(o.dataset.open);
+    const c = e.target.closest('[data-close]'); if (c) close(c.closest('.win'));
+  });
+  document.getElementById('start').addEventListener('click', () => open('w-about'));
+
+  // loader that never quite finishes
+  const msgs = ['Polishing the floor tiles…', 'Watering the plastic ferns…', 'Rewinding the sunset…', 'Aligning the dolphins…', 'Almost there (emotionally)…'];
+  let loadT = null;
+  function load() {
+    clearInterval(loadT); let p = 0; const bar = document.getElementById('loadbar'), m = document.getElementById('loadmsg');
+    loadT = setInterval(() => { p += (99 - p) * 0.07; bar.style.width = p + '%'; m.textContent = msgs[Math.min(msgs.length - 1, (p / 20) | 0)];
+      if (!document.getElementById('w-load').classList.contains('open')) clearInterval(loadT); }, 260);
+  }
+
+  // muzak: a slow detuned chord loop via WebAudio, started only on click
+  let ac = null, playing = false, timer = null, eqT = null, step = 0;
+  const eq = [...document.querySelectorAll('#eq i')], pstat = document.getElementById('pstat'), playBtn = document.getElementById('play');
+  const chords = [[220, 277.2, 329.6, 415.3], [185, 233.1, 277.2, 349.2], [246.9, 311.1, 370, 466.2], [207.7, 261.6, 311.1, 392]];
+  function chord() {
+    const t = ac.currentTime, c = chords[step++ % chords.length];
+    c.forEach((f, i) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = i % 2 ? 'triangle' : 'sine'; o.frequency.value = f * 0.75; o.detune.value = (i - 1.5) * 9;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.055, t + .5); g.gain.exponentialRampToValueAtTime(0.0008, t + 3.4);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t + 3.5);
+    });
+  }
+  playBtn.addEventListener('click', () => {
+    playing = !playing;
+    if (playing) {
+      try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); chord(); timer = setInterval(chord, 3000); } catch (e) { ac = null; }
+      eqT = setInterval(() => eq.forEach(b => b.style.height = 12 + Math.random() * 88 + '%'), 190);
+      pstat.textContent = '▶ idling smoothly'; playBtn.textContent = '■ stop';
+    } else {
+      clearInterval(timer); clearInterval(eqT); eq.forEach(b => b.style.height = '20%');
+      pstat.textContent = '■ stopped'; playBtn.textContent = '▶ play';
+    }
+  });
+
+  addEventListener('resize', () => wins.forEach(w => w.classList.contains('open') && clampPos(w)));
+  // scatter for small screens
+  if (innerWidth < 620) { const pos = { 'w-about': [6, 150], 'w-note': [14, 300], 'w-player': [30, 470], 'w-mall': [8, 220], 'w-load': [20, 260], 'w-err': [16, 230] };
+    wins.forEach(w => { const p = pos[w.id]; w.style.left = p[0] + 'px'; w.style.top = Math.min(p[1], innerHeight - 120) + 'px'; }); }
+  wins.filter(w => w.classList.contains('open')).forEach(w => { clampPos(w); w.style.zIndex = ++z; });
+  focus(document.getElementById('w-about'));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Horologium — Liturgy of the Guild of Clockmakers</title>
+<meta name="description" content="A dark gothic page: pointed arches, a turning rose window, flickering candles you can light and snuff, and the solemn invented liturgy of a clockmakers' guild.">
+<style>
+  :root{--night:#08070b;--stone:#15131a;--stone2:#211e28;--bone:#d9cdb4;--dim:#8c8271;--gold:#c29a4b;--blood:#7d1620;--glass:#27407f}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--night);color:var(--bone);font-family:"Hoefler Text","Baskerville","Garamond","Palatino Linotype",Georgia,serif;font-size:17px;line-height:1.7;overflow-x:hidden;
+    background-image:radial-gradient(ellipse 70% 50% at 50% 0,#1d1826 0,transparent 70%),repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0 2px,transparent 2px 46px),repeating-linear-gradient(90deg,rgba(255,255,255,.01) 0 2px,transparent 2px 92px)}
+  .bl{font-family:"UnifrakturCook","Old English Text MT","Luminari","Cloister Black","Goudy Text MT","Blackadder ITC","Papyrus",fantasy;font-weight:400;letter-spacing:.01em}
+  a.back{position:fixed;top:12px;left:14px;color:var(--dim);font-size:12px;letter-spacing:.3em;text-decoration:none;z-index:6;font-variant:small-caps}
+  a.back:hover{color:var(--gold)}
+  .nave{max-width:1060px;margin:0 auto;padding:0 clamp(14px,4vw,40px)}
+  /* facade */
+  .facade{position:relative;padding-top:clamp(44px,7vw,80px);text-align:center}
+  .arch{position:relative;margin:0 auto;width:min(560px,100%);padding:clamp(26px,5vw,48px) clamp(16px,4vw,44px) 40px;
+    background:linear-gradient(180deg,var(--stone2),var(--stone));
+    clip-path:polygon(50% 0,58% 3%,68% 9%,78% 17%,87% 27%,94% 38%,100% 50%,100% 100%,0 100%,0 50%,6% 38%,13% 27%,22% 17%,32% 9%,42% 3%);}
+  .rose{width:min(330px,74%);display:block;margin:clamp(44px,9vw,80px) auto 14px;filter:drop-shadow(0 0 26px rgba(120,150,255,.25))}
+  .spin{transform-origin:200px 200px;animation:turn 240s linear infinite}
+  .spin.rev{animation-duration:90s;animation-direction:reverse}
+  @keyframes turn{to{transform:rotate(360deg)}}
+  .pane{animation:glim 7s ease-in-out infinite}
+  @keyframes glim{50%{opacity:.62}}
+  h1{font-size:clamp(38px,8vw,76px);line-height:1;color:var(--bone);text-shadow:0 0 24px rgba(194,154,75,.25);margin-top:10px}
+  .sub{font-variant:small-caps;letter-spacing:.36em;font-size:12px;color:var(--gold);margin-top:16px}
+  .hour{font-style:italic;color:var(--dim);margin-top:14px;font-size:15px}
+  .hour b{color:var(--bone);font-weight:400}
+  /* arcade of lancets */
+  .lancets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,2.4vw,26px);margin:clamp(40px,7vw,80px) 0}
+  .lancet{position:relative;background:linear-gradient(180deg,#1b1822,#0f0e14);padding:clamp(60px,11vw,110px) clamp(14px,2.4vw,26px) 28px;
+    border-radius:50% 50% 0 0 / clamp(60px,12vw,130px) clamp(60px,12vw,130px) 0 0;border:1px solid #2c2835;border-bottom:3px solid #2c2835;text-align:center}
+  .lancet::before{content:"";position:absolute;inset:8px 8px 0;border:1px solid rgba(194,154,75,.22);border-bottom:0;border-radius:inherit;pointer-events:none}
+  .lancet .num{font-size:12px;letter-spacing:.4em;color:var(--gold);font-variant:small-caps}
+  .lancet h2{font-size:clamp(22px,3.4vw,34px);line-height:1.1;margin:8px 0 12px}
+  .lancet p{font-size:15px;color:#b6ab95;line-height:1.6}
+  .lancet svg{width:44px;height:44px;margin-bottom:6px;stroke:var(--gold);fill:none;stroke-width:1.2}
+  /* liturgy */
+  .liturgy{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:clamp(20px,5vw,70px);align-items:start;padding:clamp(20px,4vw,50px) 0 clamp(40px,7vw,80px);border-top:1px solid #2c2835}
+  .liturgy h2{font-size:clamp(30px,5vw,54px);line-height:1.05;position:sticky;top:30px}
+  .liturgy h2 small{display:block;font:italic 15px/1.5 "Hoefler Text",Baskerville,Georgia,serif;color:var(--dim);margin-top:16px;letter-spacing:0}
+  .verse{margin-bottom:22px}
+  .verse .r{color:var(--blood);filter:brightness(1.7);font-variant:small-caps;letter-spacing:.14em;font-size:13px;margin-right:8px}
+  .verse p:first-child::first-letter{font-family:"UnifrakturCook","Old English Text MT","Luminari","Goudy Text MT",fantasy;font-size:3.1em;float:left;line-height:.82;padding:.06em .1em 0 0;color:var(--gold)}
+  .resp{font-style:italic;color:#b6ab95;padding-left:1.6em}
+  .rule{text-align:center;color:var(--gold);letter-spacing:1em;margin:26px 0;opacity:.6}
+  /* candles */
+  .altar{position:relative;border-top:1px solid #2c2835;padding:clamp(34px,6vw,60px) 0 0;text-align:center}
+  .altar h2{font-size:clamp(26px,4.4vw,44px)}
+  .altar>p{color:var(--dim);font-style:italic;font-size:15px;margin-top:6px}
+  .rack{display:flex;justify-content:center;align-items:flex-end;gap:clamp(8px,2.6vw,26px);margin-top:36px;padding:0 4px 0;position:relative;flex-wrap:nowrap}
+  .rack::after{content:"";position:absolute;left:4%;right:4%;bottom:0;height:10px;background:linear-gradient(180deg,#5b4a25,#231c0d);border-radius:2px}
+  .candle{position:relative;width:clamp(18px,3.4vw,26px);background:linear-gradient(90deg,#b9ad92,#efe6cf 45%,#a59a80);border:0;border-radius:3px 3px 0 0;cursor:pointer;margin-bottom:10px;padding:0;flex:none}
+  .candle::before{content:"";position:absolute;left:50%;top:-7px;width:2px;height:8px;margin-left:-1px;background:#221a12}
+  .candle:focus-visible{outline:1px solid var(--gold);outline-offset:6px}
+  .flame{position:absolute;left:50%;top:-34px;width:14px;height:28px;margin-left:-7px;border-radius:50% 50% 50% 50%/62% 62% 38% 38%;
+    background:radial-gradient(ellipse at 50% 78%,#fff8d6 0 18%,#ffc54a 42%,#e2601a 72%,transparent 76%);transform-origin:50% 100%;
+    animation:flick var(--d,1.4s) ease-in-out infinite alternate;opacity:0;transition:opacity .5s;pointer-events:none}
+  .glow{position:absolute;left:50%;top:-22px;width:220px;height:220px;margin:-110px 0 0 -110px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,180,80,.22),rgba(255,160,60,.06) 40%,transparent 68%);opacity:0;transition:opacity .8s;pointer-events:none;animation:breathe var(--d,1.4s) ease-in-out infinite alternate}
+  .candle.lit .flame,.candle.lit .glow{opacity:1}
+  @keyframes flick{0%{transform:scale(1,1) skewX(-3deg)}35%{transform:scale(.92,1.1) skewX(4deg)}70%{transform:scale(1.05,.93) skewX(-5deg)}100%{transform:scale(.96,1.07) skewX(2deg)}}
+  @keyframes breathe{from{transform:scale(.94)}to{transform:scale(1.06)}}
+  .tally{margin:26px 0 0;font-variant:small-caps;letter-spacing:.24em;font-size:13px;color:var(--gold);min-height:1.7em}
+  footer{text-align:center;color:#5d5648;font-size:13px;font-style:italic;padding:50px 0 44px}
+  @media (max-width:760px){.lancets{grid-template-columns:1fr;max-width:380px;margin-left:auto;margin-right:auto}.liturgy{grid-template-columns:1fr}.liturgy h2{position:static}}
+  @media (prefers-reduced-motion:reduce){.spin,.pane,.flame,.glow{animation:none}}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← 100</a>
+<div class="nave">
+  <header class="facade">
+    <div class="arch">
+      <svg class="rose" viewBox="0 0 400 400" role="img" aria-label="Rose window whose tracery is a clock face">
+        <defs>
+          <radialGradient id="lit"><stop offset="0" stop-color="#fff3c4"/><stop offset=".3" stop-color="#e9b44c"/><stop offset="1" stop-color="#7d1620"/></radialGradient>
+          <radialGradient id="veil"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
+        </defs>
+        <circle cx="200" cy="200" r="196" fill="#0c0b10" stroke="#3a3544" stroke-width="6"/>
+        <g class="spin" id="outer"></g>
+        <g class="spin rev" id="inner"></g>
+        <circle cx="200" cy="200" r="34" fill="url(#lit)" class="pane"/>
+        <g id="tracery" fill="none" stroke="#0c0b10" stroke-linecap="round"></g>
+        <g id="hands" stroke="#0c0b10" stroke-linecap="round"><line id="hh" x1="200" y1="200" x2="200" y2="120" stroke-width="7"/><line id="mh" x1="200" y1="200" x2="200" y2="78" stroke-width="4"/></g>
+        <circle cx="200" cy="200" r="7" fill="#0c0b10"/>
+        <circle cx="200" cy="200" r="190" fill="url(#veil)" pointer-events="none"/>
+      </svg>
+      <h1 class="bl">The Horologium</h1>
+      <p class="sub">Liturgy of the Guild of Clockmakers</p>
+      <p class="hour">It is now the <b id="hourname">hour of oil</b> — <b id="clock">--:--</b> by the tower.</p>
+    </div>
+  </header>
+
+  <section class="lancets" aria-label="The three vows">
+    <article class="lancet"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="13"/><circle cx="22" cy="22" r="4"/><path d="M22 4v5M22 35v5M4 22h5M35 22h5M9 9l4 4M31 31l4 4M35 9l-4 4M13 31l-4 4"/></svg>
+      <p class="num">Vow the First</p><h2 class="bl">Of the Wheel</h2><p>I shall cut no tooth in anger, for a wheel remembers the hand that made it and turns accordingly.</p></article>
+    <article class="lancet"><svg viewBox="0 0 44 44"><path d="M22 4v14M14 18h16l-4 8h-8zM22 26v6"/><circle cx="22" cy="36" r="4"/></svg>
+      <p class="num">Vow the Second</p><h2 class="bl">Of the Weight</h2><p>I shall let fall what must fall, and wind again at dawn without complaint, as the stone does.</p></article>
+    <article class="lancet"><svg viewBox="0 0 44 44"><path d="M12 6h20M12 38h20M14 6c0 10 16 12 16 16s-16 6-16 16M30 6c0 10-16 12-16 16s16 6 16 16"/></svg>
+      <p class="num">Vow the Third</p><h2 class="bl">Of the Silence</h2><p>I shall keep the hour between the ticks, which belongs to no master and is entered in no ledger.</p></article>
+  </section>
+
+  <section class="liturgy">
+    <h2 class="bl">The Office of Winding<small>Said at the foot of the great movement, before the first bell, by those whose hands are clean of filings.</small></h2>
+    <div>
+      <div class="verse"><p><span class="r">Warden.</span>Before the wheel there was the waiting, and the waiting had no measure, and no one was late.</p><p class="resp"><span class="r">All.</span>Blessed be the escapement, that lets the hour go a little at a time.</p></div>
+      <div class="verse"><p><span class="r">Warden.</span>Then the First Maker hung a weight in the dark and said: fall, but slowly; and it fell slowly, and that was the first day.</p><p class="resp"><span class="r">All.</span>We fall slowly. We are wound again.</p></div>
+      <p class="rule">✠ ✠ ✠</p>
+      <div class="verse"><p><span class="r">Warden.</span>Who keeps the hour when the keeper sleeps?</p><p class="resp"><span class="r">All.</span>The pendulum keeps it, which asks nothing and goes nowhere, and is never lost.</p></div>
+      <div class="verse"><p><span class="r">Warden.</span>Forgive us the minutes we have filed too thin, the springs we have overwound, the bells we have struck before their time.</p><p class="resp"><span class="r">All.</span>As we forgive the clocks that have run slow against us.</p></div>
+      <div class="verse"><p><span class="r">Warden.</span>Go now to your benches. Oil what is dry. Let nothing in your keeping stop.</p><p class="resp"><span class="r">All.</span>Until the last tooth meets the last tooth. So it turns.</p></div>
+    </div>
+  </section>
+
+  <section class="altar">
+    <h2 class="bl">Twelve Lights for Twelve Hours</h2>
+    <p>Touch a candle to light it for an hour you wish to keep; touch again to let it go.</p>
+    <div class="rack" id="rack"></div>
+    <p class="tally" id="tally" aria-live="polite"></p>
+  </section>
+  <footer>Set down in the scriptorium of Saint Anselm‑under‑the‑Bell, a place that exists only here.</footer>
+</div>
+
+<script>
+(() => {
+  const NS='http://www.w3.org/2000/svg';
+  const mk=(p,t,a)=>{ const e=document.createElementNS(NS,t); for(const k in a) e.setAttribute(k,a[k]); p.appendChild(e); return e; };
+  const pol=(a,r)=>[200+Math.sin(a)*r,200-Math.cos(a)*r];
+  const outer=document.getElementById('outer'), inner=document.getElementById('inner'), tr=document.getElementById('tracery');
+  const GLASS=['#27407f','#7d1620','#1f6a5a','#c29a4b','#5a2a7a','#274a9a','#9a2530','#b8862e'];
+  // outer ring: 12 petal panes + roundels
+  for(let i=0;i<12;i++){
+    const a=i/12*Math.PI*2, w=Math.PI/12*.86;
+    const p1=pol(a-w,112), p2=pol(a-w,160), tip=pol(a,186), p3=pol(a+w,160), p4=pol(a+w,112);
+    mk(outer,'path',{d:`M${p1}L${p2}Q${pol(a-w*.6,186)} ${tip}Q${pol(a+w*.6,186)} ${p3}L${p4}Z`,fill:GLASS[i%8],class:'pane',style:`animation-delay:${-i*.9}s`,opacity:.92});
+    const c=pol(a,142); mk(outer,'circle',{cx:c[0],cy:c[1],r:13,fill:GLASS[(i+3)%8],class:'pane',style:`animation-delay:${-i*.5}s`});
+    mk(outer,'circle',{cx:c[0],cy:c[1],r:5,fill:'#fff3c4',opacity:.7});
+    const m=pol(a+Math.PI/12,176); mk(outer,'circle',{cx:m[0],cy:m[1],r:7,fill:GLASS[(i+5)%8],opacity:.85});
+  }
+  // inner ring: 6 trefoil-ish panes
+  for(let i=0;i<6;i++){
+    const a=i/6*Math.PI*2, w=Math.PI/6*.84, p1=pol(a-w,42), p2=pol(a-w,84), tip=pol(a,106), p3=pol(a+w,84), p4=pol(a+w,42);
+    mk(inner,'path',{d:`M${p1}L${p2}Q${pol(a-w*.5,104)} ${tip}Q${pol(a+w*.5,104)} ${p3}L${p4}Z`,fill:GLASS[(i*3+1)%8],class:'pane',style:`animation-delay:${-i*1.3}s`});
+    const c=pol(a,74); mk(inner,'circle',{cx:c[0],cy:c[1],r:9,fill:'#e9b44c',opacity:.75});
+  }
+  // stone tracery (static): rings, spokes, hour pips
+  [[190,5],[108,6],[38,5]].forEach(([r,w])=>mk(tr,'circle',{cx:200,cy:200,r,'stroke-width':w}));
+  for(let i=0;i<12;i++){ const a=i/12*Math.PI*2+Math.PI/12, p=pol(a,108), q=pol(a,190); mk(tr,'line',{x1:p[0],y1:p[1],x2:q[0],y2:q[1],'stroke-width':5}); }
+  for(let i=0;i<6;i++){ const a=i/6*Math.PI*2+Math.PI/6, p=pol(a,38), q=pol(a,108); mk(tr,'line',{x1:p[0],y1:p[1],x2:q[0],y2:q[1],'stroke-width':5}); }
+
+  const HOURS=['hour of ash','hour of oil','hour of the small wheel','hour of filings','hour of the unstruck bell','hour of brass','hour of the open case','hour of winding','hour of the long shadow','hour of the pendulum','hour of the last tooth','hour of silence'];
+  function tick(){
+    const d=new Date(), h=d.getHours(), m=d.getMinutes();
+    document.getElementById('hh').setAttribute('transform',`rotate(${(h%12+m/60)*30} 200 200)`);
+    document.getElementById('mh').setAttribute('transform',`rotate(${(m+d.getSeconds()/60)*6} 200 200)`);
+    document.getElementById('clock').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+    document.getElementById('hourname').textContent=HOURS[h%12];
+  }
+  tick(); setInterval(tick,5000);
+
+  // candles
+  const rack=document.getElementById('rack'), tally=document.getElementById('tally'), ROM=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+  const SAY=['The rack is dark. Nothing is kept.','One hour is kept.','Two hours are kept.','Three hours are kept.','Four hours are kept.','Five hours are kept.','Half the dial is lit.','Seven hours are kept.','Eight hours are kept.','Nine hours are kept.','Ten hours are kept.','One hour remains unkept.','All twelve burn. So it turns.'];
+  const count=()=>{ tally.textContent=SAY[rack.querySelectorAll('.lit').length]; };
+  ROM.forEach((r,i)=>{
+    const b=document.createElement('button'); b.type='button'; b.className='candle'+([2,5,6,9].includes(i)?' lit':'');
+    b.style.height=(70+((i*37)%5)*14+(i%2)*8)+'px'; b.style.setProperty('--d',(1.1+((i*53)%7)*.12)+'s');
+    b.setAttribute('aria-label','Candle of hour '+r); b.setAttribute('aria-pressed',b.classList.contains('lit'));
+    b.innerHTML='<span class="glow"></span><span class="flame"></span>';
+    b.addEventListener('click',()=>{ b.classList.toggle('lit'); b.setAttribute('aria-pressed',b.classList.contains('lit')); count(); });
+    rack.appendChild(b);
+  });
+  count();
+})();
+</script>
+</body>
+</html>

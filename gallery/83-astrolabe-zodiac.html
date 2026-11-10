@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Vesper Astrolabe — twelve houses of an invented sky</title>
+<meta name="description" content="A gold-on-navy engraved astrolabe. Drag the star wheel to bring each of twelve invented constellations under the index and read its lore.">
+<style>
+  :root { --navy: #0a1433; --deep: #060c22; --gold: #d8b565; --pale: #f3e2ab; --dim: #8b7a4c; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background:
+      radial-gradient(1px 1px at 12% 18%, #f3e2ab99 50%, transparent 51%), radial-gradient(1px 1px at 78% 9%, #f3e2ab88 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 91% 62%, #f3e2ab77 50%, transparent 51%), radial-gradient(1px 1px at 6% 81%, #f3e2ab77 50%, transparent 51%),
+      radial-gradient(1px 1px at 55% 95%, #f3e2ab66 50%, transparent 51%), radial-gradient(1.5px 1.5px at 63% 4%, #f3e2ab66 50%, transparent 51%),
+      radial-gradient(90% 80% at 30% 45%, #14245a 0%, var(--navy) 55%, var(--deep) 100%);
+    color: var(--pale); font-family: Didot, "Bodoni 72", "Bodoni MT", "Hoefler Text", Garamond, "Times New Roman", serif;
+    display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr); gap: clamp(16px, 4vw, 64px); align-items: center;
+    min-height: 100vh; padding: clamp(16px, 3vw, 44px) clamp(16px, 5vw, 80px); }
+  .instrument { width: min(100%, 86vh); justify-self: end; position: relative; }
+  svg { display: block; width: 100%; height: auto; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; filter: drop-shadow(0 30px 50px rgba(0,0,0,.55)); }
+  svg.grabbing { cursor: grabbing; }
+  svg:focus-visible { outline: 1px dashed var(--gold); outline-offset: 6px; }
+  .con line { stroke: var(--gold); stroke-width: .9; opacity: .55; transition: opacity .5s, stroke .5s; }
+  .con path { fill: var(--gold); transition: fill .5s; }
+  .con.lit line { stroke: #fff6d6; opacity: 1; stroke-width: 1.3; }
+  .con.lit path { fill: #fffbe6; filter: url(#glow); }
+  .band text { font: 600 10.5px/1 "Gill Sans", "Gill Sans MT", "Trebuchet MS", sans-serif; letter-spacing: .22em; fill: #1a1f3c; }
+  aside { max-width: 26rem; }
+  .eyebrow { font: 600 .66rem/1 "Gill Sans", "Gill Sans MT", "Trebuchet MS", sans-serif; letter-spacing: .36em; text-transform: uppercase; color: var(--dim); }
+  .house { display: flex; align-items: baseline; gap: .7em; margin-top: 2.2rem; color: var(--gold); font-size: .95rem; letter-spacing: .3em; }
+  .house::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--gold), transparent); }
+  h1 { font-weight: 400; font-size: clamp(2.2rem, 4.6vw, 3.9rem); line-height: 1; margin: .35em 0 .15em; letter-spacing: -.01em; }
+  .epithet { font-style: italic; font-size: 1.15rem; color: var(--gold); margin: 0 0 1.3rem; }
+  .lore { font-family: "Hoefler Text", Baskerville, Garamond, Georgia, serif; font-size: 1.05rem; line-height: 1.7; color: #d9cfae; margin: 0 0 1.5rem; }
+  .lore::first-letter { font-size: 3.1em; float: left; line-height: .82; padding: .06em .1em 0 0; color: var(--pale); font-family: Didot, "Bodoni 72", serif; }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: .45em 1.2em; margin: 0; padding-top: 1.1rem; border-top: 1px solid #d8b56533; font-size: .92rem; }
+  dt { font: 600 .62rem/1.9 "Gill Sans", "Gill Sans MT", "Trebuchet MS", sans-serif; letter-spacing: .28em; text-transform: uppercase; color: var(--dim); }
+  dd { margin: 0; font-style: italic; }
+  #card { transition: opacity .35s ease, transform .35s ease; }
+  #card.swap { opacity: 0; transform: translateY(8px); }
+  .hint { margin-top: 2rem; font: 600 .62rem/1.8 "Gill Sans", "Gill Sans MT", "Trebuchet MS", sans-serif; letter-spacing: .3em; text-transform: uppercase; color: var(--dim); }
+  .hint b { color: var(--gold); font-weight: 600; }
+  .back { position: fixed; top: 16px; right: 20px; z-index: 2; font: 600 .66rem/1 "Gill Sans", "Trebuchet MS", sans-serif; letter-spacing: .3em; color: var(--dim); text-decoration: none; border: 1px solid #d8b56544; padding: .7em .9em; border-radius: 99px; }
+  .back:hover, .back:focus-visible { color: var(--pale); border-color: var(--gold); }
+  @media (max-width: 860px) { body { grid-template-columns: 1fr; align-items: start; } .instrument { justify-self: center; width: min(100%, 560px); } aside { justify-self: center; } .house { margin-top: .6rem; } }
+  @media (prefers-reduced-motion: reduce) { #card { transition: none; } }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">&larr; 100</a>
+<div class="instrument">
+  <svg id="astro" viewBox="-420 -470 840 895" tabindex="0" role="img" aria-label="Astrolabe with a rotating star wheel of twelve invented constellations. Use arrow keys or drag to turn.">
+    <defs>
+      <linearGradient id="au" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6e7b0"/><stop offset=".35" stop-color="#d8b565"/><stop offset=".62" stop-color="#9a7430"/><stop offset=".8" stop-color="#e2c57a"/><stop offset="1" stop-color="#8a6526"/></linearGradient>
+      <radialGradient id="plate"><stop offset="0" stop-color="#17296a"/><stop offset=".7" stop-color="#0e1b4a"/><stop offset="1" stop-color="#091237"/></radialGradient>
+      <filter id="glow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      <path id="arc" d="M0 -304 A304 304 0 1 1 -.01 -304"/>
+    </defs>
+    <!-- throne and suspension ring -->
+    <g fill="none" stroke="url(#au)">
+      <circle cy="-432" r="24" stroke-width="7"/>
+      <path d="M-58 -372 C-54 -400 -30 -398 -22 -412 C-14 -424 14 -424 22 -412 C30 -398 54 -400 58 -372Z" fill="url(#au)" stroke="none"/>
+      <circle cy="-394" r="7" fill="#0a1433" stroke-width="1.5"/>
+    </g>
+    <!-- mater and limb -->
+    <circle r="390" fill="url(#au)"/><circle r="383" fill="#0b1640"/>
+    <circle r="340" fill="url(#plate)" stroke="url(#au)" stroke-width="2.5"/>
+    <g id="limb" stroke="#d8b565" fill="#d8b565"></g>
+    <!-- tympan engraving -->
+    <g fill="none" stroke="#d8b565" stroke-width=".8" opacity=".38">
+      <circle r="318"/><circle r="214"/><circle r="144"/>
+      <g id="almu"></g>
+      <path d="M-318 0H318M0 -318V318" stroke-dasharray="2 5"/>
+    </g>
+    <!-- rete: the turning star wheel -->
+    <g id="rete">
+      <path fill="url(#au)" fill-rule="evenodd" d="M0 -318A318 318 0 1 1 -.01 -318ZM0 -291A291 291 0 1 0 .01 -291Z"/>
+      <g id="divs" stroke="#1a1f3c" stroke-width="1.2"></g>
+      <g class="band" id="names"></g>
+      <g fill="none" stroke="url(#au)">
+        <circle cy="-74" r="212" stroke-width="9"/>
+        <circle cy="-74" r="212" stroke="#1a1f3c" stroke-width="1" stroke-dasharray="1 10.1"/>
+        <path stroke-width="5" d="M0 -291V-110M0 291V110M-291 0H-110M291 0H110"/>
+        <path stroke-width="4" d="M-78 -78Q0 -150 78 -78Q150 0 78 78Q0 150 -78 78Q-150 0 -78 -78Z"/>
+        <circle r="46" stroke-width="5"/>
+      </g>
+      <g id="cons"></g>
+      <circle r="17" fill="url(#au)"/><path d="M-11 0H11" stroke="#1a1f3c" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <!-- fixed index -->
+    <path d="M0 -286 L-9 -332 L0 -344 L9 -332Z" fill="#fff6d6" stroke="#8a6526" stroke-width="1" filter="url(#glow)"/>
+  </svg>
+</div>
+<aside>
+  <div class="eyebrow">The Vesper Astrolabe &middot; made for a sky that never was</div>
+  <div id="card">
+    <div class="house"><span id="num">I</span></div>
+    <h1 id="name">The Lamplighter</h1>
+    <p class="epithet" id="epi"></p>
+    <p class="lore" id="lore"></p>
+    <dl><dt>Lucida</dt><dd id="star"></dd><dt>Rises</dt><dd id="rise"></dd><dt>Governs</dt><dd id="gov"></dd></dl>
+  </div>
+  <p class="hint"><b>Drag</b> the wheel, or use <b>&larr; &rarr;</b> &nbsp;&middot;&nbsp; rete at <b id="deg">0&deg;</b></p>
+</aside>
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg', $ = id => document.getElementById(id);
+  const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
+  const ROM = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+  const SKY = [
+    ['The Lamplighter', 'who walks ahead of the dusk', 'Tindra', 'with the first frost', 'beginnings, errands, small courage', 'Each evening she climbs the eastern stair with a taper no wind has managed to put out. Sailors of the Vesper coast will not weigh anchor until her lowest star has cleared the water.'],
+    ['The Heron’s Oar', 'a single stroke across still water', 'Sculla', 'when the reeds turn', 'patience, crossings, things done once', 'They say a heron tired of wading and borrowed an oar from a drowned boat. It rowed one stroke, liked the silence afterwards, and has held the oar aloft ever since.'],
+    ['The Unstrung Harp', 'music kept for later', 'Aul', 'at midwinter', 'grief, rest, promises', 'Seven stars for seven pegs and not a string between them. The harper cut the strings to bind a friend’s wound, and the sky kept the instrument so that nobody could call it a waste.'],
+    ['The Salt Crown', 'worn by no one twice', 'Halmyra', 'with the spring tides', 'rule, thirst, hard bargains', 'A circlet of nine pale stars, offered in turn to every monarch of the old shore. Each found it heavier than it looked and set it back on the horizon before morning.'],
+    ['The Sleeping Ferryman', 'do not wake him for less than a soul', 'Corvane', 'when the swallows come', 'thresholds, debts, safe passage', 'He lies along the river of faint stars with his pole across his knees. Travellers leave a coin on the windowsill the night he rises, heads-up, and never look to see if it is gone.'],
+    ['The Moth', 'small faith, large lantern', 'Lumet', 'at haymaking', 'longing, foolishness, devotion', 'Forever one handspan from the Lamplighter’s flame and forever arriving. Lovers are told to be like the Moth; their grandmothers add, quietly, to bring a coat.'],
+    ['The Twin Kilns', 'one for bread, one for bells', 'Fornax Minor', 'at high summer', 'craft, heat, honest work', 'Two red stars low in the south, banked like coals. When they shimmer, potters say the sky is firing a new batch of days and it is unlucky to open any door too quickly.'],
+    ['The Tongueless Bell', 'rung once, heard always', 'Sorda', 'when the barley whitens', 'secrets, warnings, memory', 'It tolled the hour the first city fell, and the note was so terrible the gods removed the clapper. On clear nights, dogs still lift their heads at its rising.'],
+    ['The Weaver’s Knot', 'what holds, holds', 'Nexa', 'with the first rains', 'kinship, oaths, mended things', 'A tight tangle of small stars where three sky-roads meet. Untie it, the stories warn, and every sworn word in the world comes loose by a thumb’s width.'],
+    ['The Hound of Ash', 'faithful past the fire', 'Cineris', 'at leaf-fall', 'loyalty, hearths, long waiting', 'Grey and lean, nose toward the Kilns. It waits for a master who went into the flame for a child and came out as smoke; it has not once looked away.'],
+    ['The Open Door', 'someone is expected', 'Limen', 'on the longest night', 'welcome, risk, strangers', 'Four stars for the frame and a fifth for the light inside. Householders leave their own door ajar the night it stands highest, and set one bowl more than they need.'],
+    ['The Ladder', 'eleven rungs and a rumour of a twelfth', 'Scalar', 'at the turning of the year', 'ambition, endings, the next thing', 'It leans against nothing at all. The last rung is too faint for any eye, which is why, the astronomers say, no one has ever agreed where the year truly stops.']
+  ];
+  const pol = (r, deg) => [r * Math.sin(deg * Math.PI / 180), -r * Math.cos(deg * Math.PI / 180)];
+  let seed = 31; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+  // limb scale: 360 ticks, numerals every 30 degrees, double hours
+  let ticks = '';
+  for (let d = 0; d < 360; d++) {
+    const len = d % 10 === 0 ? 16 : d % 5 === 0 ? 11 : 6, [x1, y1] = pol(341, d), [x2, y2] = pol(341 + len, d);
+    ticks += `M${x1.toFixed(2)} ${y1.toFixed(2)}L${x2.toFixed(2)} ${y2.toFixed(2)}`;
+  }
+  el('path', { d: ticks, 'stroke-width': .9, fill: 'none' }, $('limb'));
+  for (let h = 0; h < 24; h++) {
+    const a = h * 15, [x, y] = pol(369, a), t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', transform: `rotate(${a} ${x} ${y})`, 'font-size': 14, 'font-family': 'Didot, "Bodoni 72", Georgia, serif', stroke: 'none' }, $('limb'));
+    t.textContent = ROM[(h + 11) % 12];
+  }
+  // almucantars: nested eccentric circles and azimuth arcs
+  for (let i = 0; i < 7; i++) el('circle', { cy: -40 - i * 17, r: 250 - i * 37 }, $('almu'));
+  for (let i = -3; i <= 3; i++) if (i) el('path', { d: `M0 -142Q${i * 120} 40 ${i * 96} 300` }, $('almu'));
+
+  // rete band, names and constellations
+  const cons = SKY.map((c, i) => {
+    const [x1, y1] = pol(291, i * 30), [x2, y2] = pol(318, i * 30);
+    el('path', { d: `M${x1} ${y1}L${x2} ${y2}` }, $('divs'));
+    const tx = el('text', { 'text-anchor': 'middle' }, $('names')), tp = el('textPath', { href: '#arc', startOffset: ((i + .5) / 12 * 100) + '%' }, tx);
+    tp.textContent = c[0].replace(/^The /, '').toUpperCase();
+    const g = el('g', { class: 'con' }, $('cons')), n = 5 + (rnd() * 3 | 0), pts = [];
+    let r = 150 + rnd() * 90, th = i * 30 + 15 + (rnd() - .5) * 12;
+    for (let k = 0; k < n; k++) {
+      pts.push(pol(r, th));
+      r = Math.max(128, Math.min(278, r + (rnd() - .5) * 110)); th = Math.max(i * 30 + 4, Math.min(i * 30 + 26, th + (rnd() - .5) * 15));
+    }
+    for (let k = 1; k < n; k++) el('line', { x1: pts[k - 1][0], y1: pts[k - 1][1], x2: pts[k][0], y2: pts[k][1] }, g);
+    if (n > 5) el('line', { x1: pts[1][0], y1: pts[1][1], x2: pts[n - 1][0], y2: pts[n - 1][1] }, g);
+    pts.forEach(([x, y], k) => {
+      const s = k === 0 ? 8.5 : 3.2 + rnd() * 3.4, q = s * .26;
+      el('path', { d: `M${x} ${y - s}L${x + q} ${y - q}L${x + s} ${y}L${x + q} ${y + q}L${x} ${y + s}L${x - q} ${y + q}L${x - s} ${y}L${x - q} ${y - q}Z` }, g);
+    });
+    return g;
+  });
+
+  // rotation, inertia and the lore card
+  const svg = $('astro'), rete = $('rete'), card = $('card');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let ang = -15, vel = 0, dragging = false, lastA = 0, lastT = 0, idleAt = 0, active = -1, swapT;
+  const fill = i => {
+    const c = SKY[i];
+    $('num').textContent = 'House ' + ROM[i]; $('name').textContent = c[0]; $('epi').textContent = c[1];
+    $('star').textContent = c[2]; $('rise').textContent = c[3]; $('gov').textContent = c[4]; $('lore').textContent = c[5];
+  };
+  function apply() {
+    rete.setAttribute('transform', `rotate(${ang.toFixed(2)})`);
+    $('deg').textContent = Math.round(((ang % 360) + 360) % 360) + '°';
+    const i = ((Math.round((-ang - 15) / 30) % 12) + 12) % 12;
+    if (i !== active) {
+      const first = active < 0; active = i;
+      cons.forEach((g, k) => g.classList.toggle('lit', k === i));
+      clearTimeout(swapT);
+      if (first) fill(i); else { card.classList.add('swap'); swapT = setTimeout(() => { fill(active); card.classList.remove('swap'); }, 260); }
+    }
+  }
+  const pointerAngle = e => { const b = svg.getBoundingClientRect(); return Math.atan2(e.clientY - (b.top + b.height * 470 / 895), e.clientX - (b.left + b.width / 2)) * 180 / Math.PI; };
+  svg.addEventListener('pointerdown', e => { dragging = true; vel = 0; lastA = pointerAngle(e); lastT = performance.now(); svg.setPointerCapture(e.pointerId); svg.classList.add('grabbing'); });
+  svg.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const a = pointerAngle(e), now = performance.now(); let d = a - lastA;
+    if (d > 180) d -= 360; if (d < -180) d += 360;
+    ang += d; vel = d / Math.max(1, now - lastT) * 16; lastA = a; lastT = now; apply();
+  });
+  const end = () => { if (!dragging) return; dragging = false; svg.classList.remove('grabbing'); idleAt = performance.now(); if (performance.now() - lastT > 80) vel = 0; };
+  svg.addEventListener('pointerup', end); svg.addEventListener('pointercancel', end);
+  svg.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); vel += e.key === 'ArrowLeft' ? -2.2 : 2.2; idleAt = performance.now(); if (reduce) { ang += e.key === 'ArrowLeft' ? -30 : 30; vel = 0; apply(); } }
+  });
+  function tick(now) {
+    if (!dragging) {
+      if (Math.abs(vel) > .01) { ang += vel; vel *= .955; apply(); }
+      else if (!reduce && now - idleAt > 5000) { ang += .035; apply(); }
+    }
+    requestAnimationFrame(tick);
+  }
+  apply(); requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

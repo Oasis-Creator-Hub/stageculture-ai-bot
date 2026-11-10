@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Marrow Glacier Journal — Austral Summer 1923–24</title>
+<meta name="description" content="An Antarctic expedition journal in ice blue: a scrolling timeline of dated entries with hand-drawn SVG field sketches and a temperature graph that follows you down the page.">
+<style>
+:root{--night:#0e2233;--ice:#e9f3f7;--floe:#c9e2ee;--ink:#1d3a55;--mute:#6a8598;--flare:#e2603a}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ice);color:var(--ink);font-family:"American Typewriter","Courier Prime","Courier New",Courier,monospace;line-height:1.65}
+.split{display:grid;grid-template-columns:minmax(300px,36%) 1fr;min-height:100vh}
+aside{background:var(--night);color:var(--floe);padding:clamp(22px,3.4vw,48px);position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:18px;overflow:hidden;
+  background-image:radial-gradient(ellipse at 20% -10%,rgba(120,220,200,.22),transparent 55%),radial-gradient(ellipse at 90% 0,rgba(110,150,255,.16),transparent 50%)}
+aside a{color:var(--mute);text-decoration:none;font-size:11px;letter-spacing:.24em}
+aside a:hover{color:#fff}
+.kick{font:11px Optima,Candara,"Segoe UI",sans-serif;letter-spacing:.34em;text-transform:uppercase;color:#8fb6c9}
+h1{font-family:Optima,Candara,"Segoe UI","Gill Sans",sans-serif;font-weight:400;font-size:clamp(32px,4vw,56px);line-height:1;margin:6px 0 0;color:#f3fafc;letter-spacing:.01em}
+h1 em{display:block;font-family:Georgia,serif;font-size:.42em;color:#9cc6d8;margin-top:12px;line-height:1.35}
+.read{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(201,226,238,.2);border:1px solid rgba(201,226,238,.2);margin-top:auto}
+.read div{background:var(--night);padding:9px 12px}
+.read span{display:block;font:9.5px Optima,Candara,sans-serif;letter-spacing:.26em;text-transform:uppercase;color:#7da0b3}
+.read b{font-weight:400;font-size:clamp(14px,1.4vw,17px);color:#f3fafc}
+#graph{width:100%;height:auto;display:block;overflow:visible}
+#graph text{font:9px Optima,Candara,sans-serif;fill:#7da0b3;letter-spacing:.1em}
+.gcap{font:9.5px Optima,Candara,sans-serif;letter-spacing:.26em;text-transform:uppercase;color:#7da0b3;margin-bottom:-6px}
+main{padding:clamp(24px,5vw,80px) clamp(16px,5vw,80px) 120px;max-width:860px;position:relative}
+.pre{font-family:Georgia,serif;font-style:italic;font-size:clamp(17px,1.8vw,21px);color:#3f607a;max-width:52ch;margin:0 0 clamp(36px,6vw,70px);border-left:3px solid var(--floe);padding-left:18px}
+.line{position:relative;padding-left:clamp(64px,10vw,116px)}
+.line:before{content:"";position:absolute;left:clamp(50px,8vw,92px);top:6px;bottom:0;width:0;border-left:2px dashed #a9cbdb}
+.entry{position:relative;margin:0 0 clamp(48px,8vw,96px);opacity:.38;transition:opacity .6s}
+.entry.on{opacity:1}
+.entry:before{content:"";position:absolute;left:calc(clamp(50px,8vw,92px) - clamp(64px,10vw,116px) - 6px);top:8px;width:14px;height:14px;border-radius:50%;background:var(--ice);border:2px solid var(--ink);transition:.4s}
+.entry.on:before{background:var(--flare);border-color:var(--flare);box-shadow:0 0 0 6px rgba(226,96,58,.18)}
+.date{position:absolute;left:calc(-1 * clamp(64px,10vw,116px));top:-4px;width:clamp(38px,6vw,70px);text-align:right;font-family:Optima,Candara,sans-serif;line-height:1}
+.date b{display:block;font-weight:400;font-size:clamp(24px,3.4vw,42px);color:var(--ink)}
+.date span{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+h2{font-family:Optima,Candara,"Segoe UI",sans-serif;font-weight:400;font-size:clamp(21px,2.5vw,30px);margin:0 0 4px;line-height:1.15}
+.meta{font-size:11px;letter-spacing:.12em;color:var(--mute);text-transform:uppercase;margin-bottom:10px}
+.meta i{font-style:normal;color:var(--flare)}
+.entry p{margin:0 0 .9em;font-size:clamp(14px,1.25vw,15.5px);max-width:58ch}
+figure{margin:16px 0 0;background:#f8fcfd;border:1px solid #d4e6ee;padding:10px 12px 8px;max-width:420px;transform:rotate(-.8deg);box-shadow:0 8px 18px -10px rgba(20,60,90,.4)}
+.entry:nth-child(even) figure{transform:rotate(1deg);margin-left:auto}
+figure svg{display:block;width:100%;height:auto}
+figcaption{font-family:"Bradley Hand","Segoe Print","Lucida Handwriting",Georgia,cursive;font-style:italic;font-size:14px;color:#44627a;margin-top:2px}
+.sk{fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;filter:url(#wob)}
+.sk path,.sk line,.sk circle,.sk ellipse,.sk rect{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 2.4s ease-in-out}
+.on .sk *{stroke-dashoffset:0}
+.w{fill:var(--floe);opacity:0;transition:opacity 1.4s 1s;filter:url(#wob)}.w.d{fill:#8fb8cf}.w.f{fill:var(--flare)}
+.on .w{opacity:.6}
+.end{font-family:Georgia,serif;font-style:italic;color:var(--mute);text-align:center;margin-top:40px}
+@media(max-width:880px){.split{grid-template-columns:1fr}aside{position:relative;height:auto}.read{margin-top:6px}}
+@media(prefers-reduced-motion:reduce){.sk *{transition:none;stroke-dashoffset:0}.w{transition:none;opacity:.6}.entry{transition:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="wob"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="3.2"/></filter></svg>
+<div class="split">
+<aside>
+  <a href="index.html">← 100</a>
+  <div><div class="kick">Field journal · Sledge party B</div>
+  <h1>The Marrow Glacier Survey<em>kept by E. Lindqvist-Hale, surveyor, in pencil, in mittens — austral summer 1923–24</em></h1></div>
+  <div class="read">
+    <div><span>Date</span><b id="rD">—</b></div><div><span>Position</span><b id="rP">—</b></div>
+    <div><span>Air temp</span><b id="rT">—</b></div><div><span>Wind</span><b id="rW">—</b></div>
+  </div>
+  <div class="gcap">Noon temperature, °C</div>
+  <svg id="graph" viewBox="0 0 340 170" role="img" aria-label="Line graph of noon temperature across the expedition, falling to minus 33 in mid-December"></svg>
+</aside>
+<main>
+  <p class="pre">Four of us, two sledges, sixty-one days of food. The object: to carry a line of levels from the sea ice to the head of the Marrow Glacier and bring the notebooks home dry.</p>
+  <div class="line" id="line"></div>
+  <p class="end">— here the pencil gives out; the remaining pages are tide tables —</p>
+</main>
+</div>
+<script>
+(function(){
+const E=[
+{d:'14',m:'Nov',day:0,t:-9,pos:'77°41′S 166°20′E',w:'Calm',h:'Cape Sorrow. The ship goes.',
+ p:['The <i>Petrel’s Wake</i> stood off at four bells and was hull-down within the hour. Nobody said anything clever. Brandt counted the cases twice and got two different numbers, which he says is traditional.','Emperors on the floe edge watched us pitch the first camp with the air of landlords.'],c:'three tenants, unimpressed',
+ s:'<path class="w" d="M0 112h240v38H0z"/><g class="sk"><path pathLength="1" d="M4 110q60-8 118 0t114-2"/><path pathLength="1" d="M60 106q-12-30-4-52 6-10 12 0 8 24-2 52z"/><path pathLength="1" d="M58 62q-6-12 6-14 8 2 4 12M68 52l8 3"/><path pathLength="1" d="M102 108q-10-24-3-42 5-8 10 0 6 20-2 42zM100 72q-4-10 5-11 7 2 3 9"/><path pathLength="1" d="M136 108q-7-18-2-30 4-6 8 0 4 14-2 30z"/><path pathLength="1" d="M186 70h36l-6 9h-24zM198 70V52M210 70V56M198 54l12 6"/><path pathLength="1" d="M176 84q10-4 20 0t20 0 18-2"/></g>'},
+{d:'19',m:'Nov',day:5,t:-14,pos:'78°02′S 165°48′E',w:'SE 12 kn',h:'On to the Barrier.',
+ p:['Eleven miles made good, hauling. The surface is like dragging a piano across sugar. Okonkwo has rigged a sail on the lead sledge from the floor-cloth; it adds perhaps a quarter of a knot and a great deal of dignity.'],c:'the piano, and its mover',
+ s:'<path class="w" d="M0 118h240v32H0z"/><g class="sk"><path pathLength="1" d="M92 116q-10 0-9-9M92 116h102q12 0 14-11"/><path pathLength="1" d="M100 112V86q0-6 6-6h72q6 0 6 6v26"/><path pathLength="1" d="M112 80l16 32M146 80l16 32M100 96h84"/><path pathLength="1" d="M142 80V40l34 34"/><path pathLength="1" d="M92 108L50 86"/><path pathLength="1" d="M50 86l-8 30M50 86l8 30M48 86l-6-22M44 70l-14 12M40 64q-8-2-6-9t9-5 5 9"/><path pathLength="1" d="M4 122q40-5 76 0M200 124q20-3 36 0"/></g>'},
+{d:'27',m:'Nov',day:13,t:-19,pos:'78°49′S 164°30′E',w:'S 20 kn',h:'Camp 6, among the sastrugi.',
+ p:['Wind-carved ridges as far as the glass will show, hard as kerb-stones, all pointing accusingly north. We lift the sledges over each one. Ferrier has begun naming them after his aunts.','Hoosh at eight. The primus sounds like the only friendly thing on the continent.'],c:'tent, with aunts',
+ s:'<path class="w d" d="M96 112l32-66 32 66z"/><g class="sk"><path pathLength="1" d="M94 112l34-68 34 68z"/><path pathLength="1" d="M128 44v-10M128 78q-8 16-6 34M128 78q8 16 6 34"/><path pathLength="1" d="M106 88L76 112M150 88l30 24"/><path pathLength="1" d="M6 126q16-12 30 0M30 138q18-12 34 0M70 128q14-10 28 0M150 130q16-12 32 0M190 120q14-10 28 0M196 140q16-10 30 0M104 142q16-10 30 0"/></g>'},
+{d:'3',m:'Dec',day:19,t:-21,pos:'79°20′S 163°55′E',w:'Variable',h:'Whiteout. Steering by the needle.',
+ p:['No horizon, no shadow, no up. One walks into a drift before seeing it. We marched four hours on the compass and by Brandt’s reckoning described a handsome letter S.','The needle is sluggish this near the Pole; it thinks about each answer.'],c:'it thinks about each answer',
+ s:'<circle class="w" cx="120" cy="78" r="52"/><g class="sk"><circle pathLength="1" cx="120" cy="78" r="54"/><circle pathLength="1" cx="120" cy="78" r="44"/><path pathLength="1" d="M120 40l9 38-9 38-9-38z"/><path pathLength="1" d="M120 40l9 38h-18z" style="fill:#1d3a55"/><path pathLength="1" d="M120 24v-10M112 12h16M82 78h-8M166 78h-8M120 118v6M92 50l-5-5M148 50l5-5M92 106l-5 5M148 106l5 5"/><path pathLength="1" d="M115 34v-8l10 8v-8"/></g>'},
+{d:'9',m:'Dec',day:25,t:-23,pos:'79°58′S 162°40′E',w:'S 15 kn',h:'The foot of the glacier.',
+ p:['Okonkwo went through a snow bridge to the armpits and hung there, quite calm, asking whether anyone had the camera. We hauled him out on the alpine rope. The crack is blue to a depth I did not care to estimate.','Roped up from here. The levels begin tomorrow.'],c:'blue to a depth not estimated',
+ s:'<path class="w d" d="M96 58l-8 24 12 22-8 24 10 22h30l-8-22 12-22-10-24 6-24z"/><g class="sk"><path pathLength="1" d="M6 58h90l-8 24 12 22-8 24 10 22"/><path pathLength="1" d="M234 58h-98l-6 24 10 24-12 22 8 22"/><path pathLength="1" d="M52 56q64 16 132-2"/><path pathLength="1" d="M52 56V34M52 34l-10 6M52 34l10 6M184 54V30l12 6-12 6"/><path pathLength="1" d="M112 62v30M108 96q4 8 8 0M112 100v14l-6 12M112 114l6 12M112 104l-8-6M112 104l8-6"/></g>'},
+{d:'16',m:'Dec',day:32,t:-31,pos:'80°22′S 161°58′E',w:'S 55 kn, gusting',h:'Laid up. Third day of blizzard.',
+ p:['Nothing to enter but the noise. The tent cloth cracks like a rifle range. Ferrier reads us the label of the cocoa tin, with expression. We are on half rations to keep the calendar honest.','Minus thirty-one in the lee of the sledge. I have stopped sharpening the pencil; the cold does it.'],c:'the whole world, 6 ft × 6 ft',
+ s:'<path class="w" d="M0 150V120q60-34 110-22 60 16 130-14v66z"/><g class="sk"><path pathLength="1" d="M104 98l22-42 26 46"/><path pathLength="1" d="M126 56v-8M4 122q54-34 104-24 62 18 128-12"/><path pathLength="1" d="M8 30h44M70 22h60M150 34h70M20 52h70M120 46h30M176 58h50M6 76h60M170 80h56M30 96h40M190 104h36M60 10h36M160 12h48"/></g>'},
+{d:'22',m:'Dec',day:38,t:-27,pos:'80°51′S 161°10′E',w:'Light airs',h:'Midsummer. The head of the Marrow.',
+ p:['Clear at last, and we stood on the nunatak at 2,140 metres with the whole glacier unrolled below like a dropped ribbon. A halo round the sun with two false suns beside it — Brandt says ice crystals, Okonkwo says applause.','The line of levels is closed. We built a cairn, left a tin with our names, and ate the last of the raisins as a ceremony.'],c:'sun, two understudies, one cairn',
+ s:'<circle class="w f" cx="170" cy="42" r="9"/><path class="w d" d="M20 138l50-70 22 26 26-48 34 52 20-18 48 58z"/><g class="sk"><circle pathLength="1" cx="170" cy="42" r="9"/><circle pathLength="1" cx="170" cy="42" r="32" stroke-dasharray=".02 .02"/><path pathLength="1" d="M136 42h5M199 42h5"/><path pathLength="1" d="M18 138l52-72 22 28 26-50 34 54 20-18 50 58"/><path pathLength="1" d="M118 44v-18l12 5-12 5M112 46h12M104 62l10 12 8-8M70 66l6 20"/></g>'},
+{d:'2',m:'Jan',day:49,t:-17,pos:'79°05′S 164°02′E',w:'N 8 kn',h:'The depot, where we left it.',
+ p:['Raised the black flag of One Ton Biscuit at noon, exactly where the notebook said, which astonished everybody including the notebook. Pemmican, paraffin, and a note from ourselves in November: “Hope you are well.”','We are well. We are also thinner and browner and one of us snores in Norwegian.'],c:'“Hope you are well.”',
+ s:'<path class="w" d="M84 122h76v-18H96z"/><g class="sk"><path pathLength="1" d="M82 122h80M88 122v-18h30v18M122 122v-18h34v18M100 104V88h36v16M118 88V30"/><path pathLength="1" d="M118 30l34 8-34 10" style="fill:#1d3a55"/><path pathLength="1" d="M6 134q40-8 76-10M4 142q44-8 82-14M164 126q36 4 70 12"/></g>'},
+{d:'11',m:'Jan',day:58,t:-6,pos:'77°41′S 166°20′E',w:'Calm',h:'Smoke on the horizon.',
+ p:['Ferrier saw it first and would not say so for a full minute in case it was a cloud. It was not a cloud. Minus six, and we sat on the sledge in our shirtsleeves like men at a regatta.','The notebooks are dry. I have checked four times.'],c:'not a cloud',
+ s:'<circle class="w" cx="86" cy="76" r="50"/><circle class="w" cx="154" cy="76" r="50"/><g class="sk"><circle pathLength="1" cx="86" cy="76" r="52"/><circle pathLength="1" cx="154" cy="76" r="52"/><path pathLength="1" d="M40 88h160"/><path pathLength="1" d="M104 88l4-8h28l6 8M116 80V66M128 80V68M122 80v-6h4v6"/><path pathLength="1" d="M124 72q6-10 16-8t16-8"/><path pathLength="1" d="M52 100q10-4 20 0M96 104q12-4 24 0M150 100q12-4 22 0"/></g>'}];
+const TEMP=[[0,-9],[3,-11],[5,-14],[9,-16],[13,-19],[17,-18],[19,-21],[25,-23],[29,-28],[32,-31],[34,-33],[36,-29],[38,-27],[43,-24],[49,-17],[53,-12],[58,-6]];
+const line=document.getElementById('line');
+line.innerHTML=E.map((e,i)=>`<article class="entry" data-i="${i}"><div class="date"><b>${e.d}</b><span>${e.m}</span></div><h2>${e.h}</h2>
+<div class="meta">${e.pos} · <i>${e.t}°C</i> · wind ${e.w}</div>${e.p.map(x=>'<p>'+x+'</p>').join('')}
+<figure><svg viewBox="0 0 240 150" role="img" aria-label="Field sketch: ${e.c}">${e.s}</svg><figcaption>fig. ${i+1} — ${e.c}</figcaption></figure></article>`).join('');
+// graph
+const g=document.getElementById('graph'),X=d=>34+d/58*296,Y=t=>14+(-t)/36*132;
+let s='';for(let t=0;t>=-30;t-=10)s+=`<line x1="34" x2="330" y1="${Y(t)}" y2="${Y(t)}" stroke="rgba(201,226,238,.18)"/><text x="28" y="${Y(t)+3}" text-anchor="end">${t}</text>`;
+[['NOV',0],['DEC',17],['JAN',48]].forEach(m=>s+=`<text x="${X(m[1])}" y="166">${m[0]}</text><line x1="${X(m[1])}" x2="${X(m[1])}" y1="14" y2="150" stroke="rgba(201,226,238,.12)"/>`);
+const pts=TEMP.map(p=>[X(p[0]),Y(p[1])]);let d='M'+pts[0];for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],mx=(a[0]+b[0])/2;d+=` C${mx} ${a[1]} ${mx} ${b[1]} ${b[0]} ${b[1]}`}
+s+=`<path d="${d} L330 150 L34 150Z" fill="rgba(143,200,224,.12)"/><path d="${d}" fill="none" stroke="#bfe3f2" stroke-width="1.8"/>`;
+E.forEach(e=>s+=`<circle cx="${X(e.day)}" cy="${Y(e.t)}" r="2.4" fill="#0e2233" stroke="#bfe3f2"/>`);
+s+=`<line id="gl" x1="0" x2="0" y1="14" y2="150" stroke="#e2603a" stroke-dasharray="2 3"/><circle id="gd" r="5.5" fill="#e2603a" stroke="#fff" stroke-width="1.5"/><text id="gt" style="fill:#fff;font-size:11px" text-anchor="middle"></text>`;
+g.innerHTML=s;
+const gl=g.querySelector('#gl'),gd=g.querySelector('#gd'),gt=g.querySelector('#gt'),R=id=>document.getElementById(id);
+let cur=-1,cx=X(0),cy=Y(-9),tx=cx,ty=cy;
+function setActive(i){if(i===cur)return;cur=i;const e=E[i];[...line.children].forEach((a,k)=>a.classList.toggle('on',k===i||a.classList.contains('seen')&&false));
+  line.children[i].classList.add('on');R('rD').textContent=e.d+' '+e.m;R('rP').textContent=e.pos;R('rT').textContent=e.t+' °C';R('rW').textContent=e.w;tx=X(e.day);ty=Y(e.t);gt.textContent=e.t+'°'}
+function pick(){const mid=innerHeight*.45;let best=0,bd=1e9;[...line.children].forEach((a,i)=>{const r=a.getBoundingClientRect(),c=Math.abs((r.top+Math.min(r.height,300)/2)-mid);if(c<bd){bd=c;best=i}});setActive(best)}
+function tick(){cx+=(tx-cx)*.12;cy+=(ty-cy)*.12;gl.setAttribute('x1',cx);gl.setAttribute('x2',cx);gd.setAttribute('cx',cx);gd.setAttribute('cy',cy);gt.setAttribute('x',Math.min(316,Math.max(46,cx)));gt.setAttribute('y',cy-11);requestAnimationFrame(tick)}
+addEventListener('scroll',pick,{passive:true});addEventListener('resize',pick);pick();tick();
+})();
+</script>
+</body>
+</html>

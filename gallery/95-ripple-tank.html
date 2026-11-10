@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ripple Tank · Bench 4 — wave interference</title>
+<meta name="description" content="A ripple-tank simulation of wave interference. Click to place point sources, drag them about, change the wavelength, and watch nodal lines appear where crest meets trough.">
+<style>
+:root{--bg:#f3f5f7;--panel:#fff;--line:#d4dae1;--ink:#16202b;--mute:#6b7785;--blue:#0b4fd6;--red:#d93a3a}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:24px 24px;background-position:-1px -1px}
+.mono{font-family:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace}
+.top{display:flex;align-items:baseline;gap:8px 18px;flex-wrap:wrap;padding:12px clamp(12px,3vw,28px);background:var(--panel);border-bottom:1px solid var(--line)}
+.top a{color:var(--mute);text-decoration:none;font-size:12px}.top a:hover{color:var(--blue)}
+.top h1{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em}
+.top span{color:var(--mute);font-size:12px}
+.top .id{margin-left:auto;font-size:11px;color:var(--mute);border:1px solid var(--line);padding:2px 7px;border-radius:3px}
+.bench{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:clamp(12px,2vw,22px);padding:clamp(12px,2.4vw,24px) clamp(12px,3vw,28px) 40px;max-width:1360px;margin:0 auto}
+.tank{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:26px 14px 14px 34px;position:relative;box-shadow:0 1px 0 #fff inset,0 8px 24px rgba(20,40,70,.06)}
+.tank canvas{display:block;width:100%;height:min(66vh,620px);min-height:300px;touch-action:none;cursor:crosshair;border:1px solid #9aa7b6;background:#dce9fb}
+.ruler{position:absolute;color:var(--mute);font-size:9.5px}
+.ruler.x{left:34px;right:14px;top:7px;height:16px;background:repeating-linear-gradient(90deg,#9aa7b6 0 1px,transparent 1px 20px) bottom/100% 5px no-repeat,repeating-linear-gradient(90deg,#9aa7b6 0 1px,transparent 1px 100px) bottom/100% 10px no-repeat}
+.ruler.y{left:10px;top:26px;bottom:14px;width:20px;background:repeating-linear-gradient(#9aa7b6 0 1px,transparent 1px 20px) right/5px 100% no-repeat,repeating-linear-gradient(#9aa7b6 0 1px,transparent 1px 100px) right/10px 100% no-repeat}
+.ruler.x::before{content:"0  mm";position:absolute;left:3px;top:-2px}
+.tip{position:absolute;left:44px;bottom:22px;background:rgba(255,255,255,.9);border:1px solid var(--line);padding:4px 8px;font-size:11px;color:var(--mute);pointer-events:none;border-radius:3px}
+aside{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px}
+.card h2{margin:0 0 10px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);font-weight:700}
+label{display:flex;justify-content:space-between;font-size:12.5px;margin-top:10px}label:first-of-type{margin-top:0}
+label output{color:var(--blue)}
+input[type=range]{width:100%;margin:6px 0 0;accent-color:var(--blue);height:22px}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--ink);border-radius:3px;overflow:hidden;margin-top:12px}
+.seg button{border:0;background:#fff;padding:8px 4px;font:inherit;font-size:12.5px;cursor:pointer;color:var(--ink)}
+.seg button[aria-pressed=true]{background:var(--ink);color:#fff}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.btns button{border:1px solid var(--line);background:#fafbfc;border-radius:3px;padding:8px 6px;font:inherit;font-size:12.5px;cursor:pointer;color:var(--ink);text-align:left}
+.btns button:hover{border-color:var(--blue);color:var(--blue)}
+.btns .wide{grid-column:1/-1;text-align:center;background:var(--blue);color:#fff;border-color:var(--blue)}.btns .wide:hover{color:#fff;filter:brightness(1.1)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+td{padding:4px 0;border-bottom:1px dashed var(--line)}td:last-child{text-align:right}
+tr:last-child td{border:0}
+.verdict{margin-top:8px;padding:6px 8px;border-radius:3px;font-size:12px;background:#eef2f6;color:var(--mute)}
+.verdict.c{background:#e3ecff;color:var(--blue)}.verdict.d{background:#fde8e8;color:var(--red)}
+.note{font-size:12.5px;color:var(--mute);margin:0}
+.scale{height:10px;border:1px solid #9aa7b6;margin-top:10px;background:linear-gradient(90deg,#fbfdff,#8fb6ef,#082a78)}
+.scale+div{display:flex;justify-content:space-between;font-size:10px;color:var(--mute);margin-top:3px}
+@media(max-width:860px){.bench{grid-template-columns:1fr}.tank canvas{height:58vh}}
+</style>
+</head>
+<body>
+<div class="top"><a href="index.html" class="mono">← 100</a><h1>Ripple Tank</h1><span>Superposition of circular waves from coherent point sources</span><span class="id mono">BENCH 4 · EXP 95</span></div>
+<div class="bench">
+  <div class="tank">
+    <div class="ruler x mono"></div><div class="ruler y"></div>
+    <canvas id="cv" aria-label="Ripple tank. Click to add a wave source, drag a source to move it, double-click a source to remove it."></canvas>
+    <div class="tip mono" id="tip">click: add source · drag: move · double-click: remove</div>
+  </div>
+  <aside>
+    <div class="card"><h2>Wave</h2>
+      <label>Wavelength λ <output class="mono" id="oL">24 mm</output></label><input id="lam" type="range" min="8" max="70" value="24" aria-label="Wavelength">
+      <label>Frequency f <output class="mono" id="oF">1.5 Hz</output></label><input id="frq" type="range" min="2" max="40" value="15" aria-label="Frequency">
+      <div class="seg"><button id="mA" type="button" aria-pressed="true">Displacement</button><button id="mB" type="button" aria-pressed="false">Intensity</button></div>
+      <div class="scale" id="scale"></div><div class="mono"><span id="s0">trough</span><span id="s1">crest</span></div>
+    </div>
+    <div class="card"><h2>Sources</h2>
+      <div class="btns"><button id="p2" type="button">Two sources</button><button id="p5" type="button">Line of five</button><button id="p1" type="button">Single</button><button id="pr" type="button">Remove last</button>
+      <button id="run" class="wide" type="button">Pause</button></div>
+    </div>
+    <div class="card"><h2>Probe (S1 &amp; S2)</h2>
+      <table class="mono"><tr><td>r₁</td><td id="r1">—</td></tr><tr><td>r₂</td><td id="r2">—</td></tr><tr><td>Δr = |r₁ − r₂|</td><td id="dr">—</td></tr><tr><td>Δr / λ</td><td id="dl">—</td></tr></table>
+      <div class="verdict" id="vd">Move the pointer over the tank.</div>
+    </div>
+    <div class="card"><p class="note">Where the path difference is a whole number of wavelengths, crests arrive together and the water heaves. At a half-number they cancel, and the surface lies still along a hyperbola. Switch to <b>Intensity</b> to see those quiet lines on their own.</p></div>
+  </aside>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id),cv=$('cv'),ctx=cv.getContext('2d'),MM=2; /* css px per mm */
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W=0,H=0,dpr=1,cell=3,gw=0,gh=0,S,C,img,off=document.createElement('canvas'),octx=off.getContext('2d');
+let src=[{x:.38,y:.5},{x:.62,y:.5}],lam=24,frq=1.5,mode=0,run=!reduce,phase=0,drag=-1,last=0,dirty=true,probe=null;
+function fit(){const r=cv.getBoundingClientRect();dpr=Math.min(window.devicePixelRatio||1,2);W=r.width;H=r.height;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+  cell=3;while((W/cell)*(H/cell)>52000)cell+=.5;gw=Math.ceil(W/cell);gh=Math.ceil(H/cell);off.width=gw;off.height=gh;img=octx.createImageData(gw,gh);
+  S=new Float32Array(gw*gh);C=new Float32Array(gw*gh);for(let i=3;i<img.data.length;i+=4)img.data[i]=255;dirty=true;render()}
+function field(){S.fill(0);C.fill(0);const k=2*Math.PI/(lam*MM),norm=1/Math.max(1,Math.sqrt(src.length)*1.15);
+  for(const s of src){const sx=s.x*W,sy=s.y*H;let i=0;for(let y=0;y<gh;y++){const dy=(y+.5)*cell-sy;for(let x=0;x<gw;x++,i++){const dx=(x+.5)*cell-sx,r=Math.sqrt(dx*dx+dy*dy),a=norm/Math.sqrt(1+r/70);
+        S[i]+=a*Math.sin(k*r);C[i]+=a*Math.cos(k*r)}}}dirty=false}
+function render(){if(!img)return;if(dirty)field();const d=img.data,n=gw*gh,cw=Math.cos(phase),sw=Math.sin(phase);
+  if(mode===0){for(let i=0,j=0;i<n;i++,j+=4){let v=S[i]*cw-C[i]*sw;v=v>1?1:v<-1?-1:v;const u=(v+1)/2,q=u*u*(3-2*u);d[j]=251-243*q;d[j+1]=253-211*q;d[j+2]=255-135*q}}
+  else{for(let i=0,j=0;i<n;i++,j+=4){let a=Math.sqrt(S[i]*S[i]+C[i]*C[i])*.92;a=a>1?1:a;const q=a*a*(3-2*a);d[j]=251-243*q;d[j+1]=253-211*q;d[j+2]=255-135*q}}
+  octx.putImageData(img,0,0);ctx.setTransform(dpr,0,0,dpr,0,0);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(off,0,0,gw*cell,gh*cell);
+  ctx.font='600 11px ui-monospace,Menlo,Consolas,monospace';ctx.textBaseline='middle';
+  src.forEach((s,i)=>{const x=s.x*W,y=s.y*H;ctx.fillStyle='#fff';ctx.strokeStyle='#d93a3a';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,7,0,7);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#d93a3a';ctx.beginPath();ctx.arc(x,y,2.4,0,7);ctx.fill();
+    const t='S'+(i+1),tw=ctx.measureText(t).width;ctx.fillStyle='rgba(255,255,255,.85)';ctx.fillRect(x+10,y-17,tw+6,14);ctx.fillStyle='#16202b';ctx.fillText(t,x+13,y-10)});
+  if(probe&&src.length>=2){ctx.setLineDash([4,4]);ctx.lineWidth=1;ctx.strokeStyle='rgba(22,32,43,.7)';ctx.beginPath();
+    ctx.moveTo(src[0].x*W,src[0].y*H);ctx.lineTo(probe.x,probe.y);ctx.lineTo(src[1].x*W,src[1].y*H);ctx.stroke();ctx.setLineDash([]);
+    ctx.strokeStyle='#16202b';ctx.beginPath();ctx.arc(probe.x,probe.y,4,0,7);ctx.stroke()}}
+function readout(){const set=(id,v)=>$(id).textContent=v,vd=$('vd');
+  if(!probe||src.length<2){['r1','r2','dr','dl'].forEach(i=>set(i,'—'));vd.className='verdict';vd.textContent=src.length<2?'Needs at least two sources.':'Move the pointer over the tank.';return}
+  const r1=Math.hypot(probe.x-src[0].x*W,probe.y-src[0].y*H)/MM,r2=Math.hypot(probe.x-src[1].x*W,probe.y-src[1].y*H)/MM,d=Math.abs(r1-r2),q=d/lam,fr=q-Math.floor(q);
+  set('r1',r1.toFixed(1)+' mm');set('r2',r2.toFixed(1)+' mm');set('dr',d.toFixed(1)+' mm');set('dl',q.toFixed(2)+' λ');
+  if(fr<.12||fr>.88){vd.className='verdict c';vd.textContent='Constructive: Δr ≈ '+Math.round(q)+' λ. Crests meet crests.'}
+  else if(Math.abs(fr-.5)<.12){vd.className='verdict d';vd.textContent='Destructive: Δr ≈ '+(Math.floor(q)+.5)+' λ. A nodal line.'}
+  else{vd.className='verdict';vd.textContent='In between: partial reinforcement.'}}
+function at(e){const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+function hit(p){let b=-1,bd=22;src.forEach((s,i)=>{const d=Math.hypot(s.x*W-p.x,s.y*H-p.y);if(d<bd){bd=d;b=i}});return b}
+let lastTap=0,lastIdx=-1;
+cv.addEventListener('pointerdown',e=>{const p=at(e);cv.setPointerCapture(e.pointerId);let i=hit(p);const now=performance.now();
+  if(i>=0&&i===lastIdx&&now-lastTap<350){src.splice(i,1);drag=-1;lastIdx=-1;dirty=true;render();readout();return}
+  if(i<0&&src.length<8){src.push({x:p.x/W,y:p.y/H});i=src.length-1;dirty=true}
+  drag=i;lastIdx=i;lastTap=now;$('tip').style.display='none';render()});
+cv.addEventListener('pointermove',e=>{const p=at(e);probe=p;if(drag>=0){src[drag].x=Math.min(1,Math.max(0,p.x/W));src[drag].y=Math.min(1,Math.max(0,p.y/H));dirty=true}
+  cv.style.cursor=drag>=0||hit(p)>=0?'move':'crosshair';readout();if(!run||drag>=0)render()});
+const up=()=>{drag=-1};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+cv.addEventListener('pointerleave',()=>{if(drag<0){probe=null;readout();if(!run)render()}});
+function preset(n){src=[];if(n===1)src.push({x:.5,y:.5});else if(n===2)src.push({x:.5-55/W,y:.5},{x:.5+55/W,y:.5});
+  else for(let i=0;i<5;i++)src.push({x:.5+(i-2)*lam*MM*.5/W,y:.82});dirty=true;render();readout()}
+$('p1').onclick=()=>preset(1);$('p2').onclick=()=>preset(2);$('p5').onclick=()=>preset(5);$('pr').onclick=()=>{src.pop();dirty=true;render();readout()};
+$('lam').oninput=e=>{lam=+e.target.value;$('oL').textContent=lam+' mm';dirty=true;render();readout()};
+$('frq').oninput=e=>{frq=e.target.value/10;$('oF').textContent=frq.toFixed(1)+' Hz'};
+function setMode(m){mode=m;$('mA').setAttribute('aria-pressed',m===0);$('mB').setAttribute('aria-pressed',m===1);$('s0').textContent=m?'still':'trough';$('s1').textContent=m?'max amplitude':'crest';render()}
+$('mA').onclick=()=>setMode(0);$('mB').onclick=()=>setMode(1);
+$('run').onclick=()=>{run=!run;$('run').textContent=run?'Pause':'Run'};$('run').textContent=run?'Pause':'Run';
+function loop(t){const dt=Math.min(.05,(t-last)/1000||0);last=t;if(run&&!document.hidden){phase=(phase+dt*frq*2*Math.PI)%(2*Math.PI);if(mode===0||dirty)render()}requestAnimationFrame(loop)}
+new ResizeObserver(fit).observe(cv);fit();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

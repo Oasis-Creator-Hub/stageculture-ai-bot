@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stilla — Furniture for Slow Rooms</title>
+<meta name="description" content="A calm Scandinavian furniture catalogue: muted palette, generous whitespace, hand-drawn SVG chairs and lamps, and a refined, filterable product grid.">
+<style>
+  :root{--bg:#f3f0ea;--card:#ebe6dd;--ink:#2e2c28;--mute:#8d877b;--line:#d9d3c7;--oak:#c9a77c;--sage:#9aa58f;--clay:#c48f76;--fog:#aab4b8;--char:#45423d}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:"Avenir Next","Avenir","Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:400;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 clamp(20px,5vw,64px)}
+  nav{display:flex;justify-content:space-between;align-items:baseline;padding:28px 0;font-size:13px;letter-spacing:.06em;gap:16px}
+  nav .logo{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-size:24px;letter-spacing:.01em}
+  nav ul{display:flex;gap:clamp(14px,3vw,36px);list-style:none;color:var(--mute)}
+  nav a{color:inherit;text-decoration:none;border-bottom:1px solid transparent;padding-bottom:2px;transition:border-color .3s,color .3s}
+  nav a:hover{color:var(--ink);border-color:var(--ink)}
+  .hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,5vw,80px);align-items:end;padding:clamp(30px,7vw,100px) 0 clamp(50px,8vw,120px)}
+  .eyebrow{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--mute)}
+  h1{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-weight:400;font-size:clamp(40px,6.6vw,92px);line-height:1.02;letter-spacing:-.02em;margin:22px 0 28px}
+  h1 em{font-style:italic;color:var(--clay)}
+  .hero p{max-width:38ch;color:#5d594f;font-size:16px}
+  .cta{display:inline-flex;gap:14px;align-items:center;margin-top:34px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);text-decoration:none}
+  .cta i{width:44px;height:1px;background:var(--ink);transition:width .4s}
+  .cta:hover i{width:74px}
+  .stage{background:var(--card);border-radius:2px;aspect-ratio:6/5;position:relative;overflow:hidden}
+  .stage svg{position:absolute;inset:0;width:100%;height:100%}
+  .stage figcaption{position:absolute;left:22px;bottom:18px;font-size:11px;letter-spacing:.14em;color:var(--mute);text-transform:uppercase}
+  .bar{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;border-top:1px solid var(--line);padding:30px 0 34px}
+  h2{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-weight:400;font-size:clamp(26px,3.4vw,40px);letter-spacing:-.01em}
+  .filters{display:flex;gap:6px;flex-wrap:wrap}
+  .filters button{font:inherit;font-size:12px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);background:transparent;color:var(--mute);padding:9px 16px;border-radius:40px;cursor:pointer;transition:all .3s}
+  .filters button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+  .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,3vw,44px) clamp(14px,2.4vw,32px);padding-bottom:clamp(60px,9vw,130px)}
+  .item{transition:opacity .45s,transform .45s}
+  .item.hide{display:none}
+  .pic{background:var(--card);aspect-ratio:4/5;position:relative;overflow:hidden;cursor:pointer;border:0;width:100%;display:block;padding:0}
+  .pic svg{width:100%;height:100%;display:block;transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+  .item:hover .pic svg{transform:scale(1.045)}
+  .pic .tag{position:absolute;top:14px;left:14px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;background:var(--bg);padding:5px 9px;color:var(--char)}
+  .meta{display:flex;justify-content:space-between;gap:10px;padding:14px 2px 0;align-items:baseline}
+  .meta h3{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-weight:400;font-size:20px}
+  .meta span{font-size:13px;color:var(--mute);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .sub{font-size:12.5px;color:var(--mute);padding:2px 2px 10px}
+  .sw{display:flex;gap:7px;padding:0 2px}
+  .sw button{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.12);cursor:pointer;padding:0;outline-offset:3px}
+  .sw button[aria-pressed=true]{outline:1px solid var(--ink)}
+  .wide{grid-column:span 2}.wide .pic{aspect-ratio:8/5}
+  .note{grid-column:span 1;align-self:center;padding:10px clamp(0px,2vw,26px)}
+  .note blockquote{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-size:clamp(20px,2.2vw,27px);line-height:1.35;font-style:italic}
+  .note cite{display:block;font-style:normal;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);margin-top:18px}
+  footer{border-top:1px solid var(--line);padding:30px 0 44px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--mute);letter-spacing:.04em}
+  footer a{color:inherit}
+  .wood{stroke:var(--w,#c9a77c);fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .fab{fill:var(--f,#9aa58f);transition:fill .5s}
+  @media (max-width:900px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.note{grid-column:span 2;padding:20px 0}}
+  @media (max-width:520px){.grid{grid-template-columns:1fr}.wide,.note{grid-column:span 1}.wide .pic{aspect-ratio:4/5}nav ul li:nth-child(n+3){display:none}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav><span class="logo">Stilla</span><ul><li><a href="#catalogue">Catalogue</a></li><li><a href="#catalogue">Workshop</a></li><li><a href="#catalogue">Journal</a></li><li><a href="index.html">← 100</a></li></ul></nav>
+
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Autumn collection · Nº 14</p>
+      <h1>Furniture for <em>slow</em> rooms.</h1>
+      <p>Ash, oak and wool, joined by nine people in a former boat shed on the Halvøra coast. Nothing here is in a hurry — least of all the chairs.</p>
+      <a class="cta" href="#catalogue"><i></i>See the collection</a>
+    </div>
+    <figure class="stage">
+      <svg viewBox="0 0 600 500" role="img" aria-label="Lounge chair beside a floor lamp and low table">
+        <rect width="600" height="500" fill="#ebe6dd"/>
+        <rect y="380" width="600" height="120" fill="#e2dccf"/>
+        <path d="M0 380h600" stroke="#d2cbbc"/>
+        <rect x="60" y="70" width="150" height="200" fill="#f3f0ea"/><path d="M135 70v200M60 170h150" stroke="#e2dccf" stroke-width="3"/>
+        <ellipse cx="330" cy="436" rx="150" ry="12" fill="#d5cebf"/>
+        <!-- lamp -->
+        <path d="M470 440V150q0-46-46-46h-26" class="wood" style="--w:#45423d" stroke-width="4"/>
+        <path d="M440 440h60" class="wood" style="--w:#45423d" stroke-width="6"/>
+        <path d="M368 104h60l16 46h-92z" fill="#f6f2e8" stroke="#d9d3c7"/>
+        <path d="M352 150h92l40 230H312z" fill="#fff6dc" opacity=".28"/>
+        <!-- chair -->
+        <path d="M236 250q-8 66 12 112h134q14-4 14-26q-60-10-104-10q-20-40-22-78q-18-10-34 2z" class="fab" style="--f:#9aa58f"/>
+        <path d="M250 362l-22 74M372 362l26 74M248 300l-30 136M392 340l-6 30" class="wood" stroke-width="7"/>
+        <path d="M222 318q60-12 120 0" class="wood" stroke-width="6"/>
+        <!-- side table -->
+        <ellipse cx="140" cy="372" rx="54" ry="8" fill="#c9a77c"/><path d="M110 376l-10 62M170 376l10 62M140 380v58" class="wood" stroke-width="5"/>
+        <path d="M128 366q-3-22 6-30q10 8 6 30z" fill="#c48f76"/><path d="M134 336q-12-26 2-40M136 336q14-16 20-12" stroke="#7d8a72" stroke-width="2" fill="none"/>
+      </svg>
+      <figcaption>Vilja lounge · Tåke lamp · Sten side table</figcaption>
+    </figure>
+  </header>
+
+  <section id="catalogue">
+    <div class="bar">
+      <h2>The catalogue</h2>
+      <div class="filters" id="filters" role="group" aria-label="Filter products"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <footer><span>Stilla Møbelverksted · Boat shed 3, Halvøra · an invented workshop</span><span>Made to order in 6–9 weeks · <a href="index.html">back to the hundred</a></span></footer>
+</div>
+
+<script>
+(() => {
+  const FAB={sage:'#9aa58f',clay:'#c48f76',fog:'#aab4b8',oat:'#d8cdb8',char:'#55524c'};
+  const floor='<rect width="400" height="500" fill="#ebe6dd"/><rect y="400" width="400" height="100" fill="#e3ddd0"/>';
+  const sh=(cx,rx)=>`<ellipse cx="${cx}" cy="432" rx="${rx}" ry="8" fill="#d6cfc0"/>`;
+  const ART={
+    dining:floor+sh(200,96)+'<path d="M150 150q-6 84 4 130M250 150q6 84-4 130" class="wood" stroke-width="8"/><path d="M146 170q54-22 108 0v36q-54-18-108 0z" class="fab"/><path d="M128 282h144l8 22H120z" class="fab"/><path d="M134 304l-16 126M266 304l16 126M158 304l-6 110M242 304l6 110" class="wood" stroke-width="8"/><path d="M128 360h144" class="wood" stroke-width="4"/>',
+    lounge:floor+sh(200,120)+'<path d="M96 196q-10 70 14 122h170q22-4 20-34q-76-10-128-8q-22-40-26-84q-26-12-50 4z" class="fab"/><path d="M112 318l-28 110M276 318l36 110M106 250l-30 178" class="wood" stroke-width="9"/><path d="M82 268q84-18 170 2" class="wood" stroke-width="7"/>',
+    stool:floor+sh(200,70)+'<ellipse cx="200" cy="232" rx="66" ry="14" class="fab"/><path d="M134 232v8q66 26 132 0v-8" class="fab" opacity=".8"/><path d="M158 250l-22 180M242 250l22 180M200 256v170" class="wood" stroke-width="8"/><ellipse cx="200" cy="356" rx="50" ry="9" class="wood" stroke-width="4"/>',
+    pendant:'<rect width="400" height="500" fill="#ebe6dd"/><path d="M200 0v170" stroke="#45423d" stroke-width="2"/><path d="M186 170h28l6 20h-40z" fill="#45423d"/><path d="M180 190h40q70 30 84 120H96q14-90 84-120z" class="fab"/><path d="M96 310h208" stroke="#00000022" stroke-width="3"/><ellipse cx="200" cy="312" rx="30" ry="8" fill="#fff6dc"/><path d="M110 322h180l60 178H50z" fill="#fff6dc" opacity=".22"/>',
+    floorlamp:floor+sh(210,60)+'<path d="M210 430V120" class="wood" stroke-width="5"/><path d="M170 430h80" class="wood" stroke-width="8"/><path d="M210 190l-70-58" class="wood" stroke-width="5"/><circle cx="210" cy="190" r="7" fill="#45423d"/><path d="M152 106l34 40l-64 30l-12-48z" class="fab"/><path d="M122 176l64-30l10 250H40z" fill="#fff6dc" opacity=".2"/>',
+    table:floor+sh(200,120)+'<path d="M60 300h280v14H60z" fill="#c9a77c"/><path d="M60 314h280v4H60z" fill="#b59068"/><path d="M84 318l-12 112M316 318l12 112M118 318l-4 96M282 318l4 96" class="wood" stroke-width="8"/><path d="M168 300q-4-34 10-48q16 14 12 48z" class="fab"/><path d="M178 252q-18-40 0-66M180 252q22-30 34-22M178 240q-22-14-30-6" stroke="#7d8a72" stroke-width="2.5" fill="none" stroke-linecap="round"/><rect x="230" y="288" width="60" height="6" fill="#f6f2e8"/><rect x="236" y="282" width="48" height="6" fill="#d9d3c7"/>',
+    sofa:'<rect width="640" height="400" fill="#ebe6dd"/><rect y="300" width="640" height="100" fill="#e3ddd0"/><ellipse cx="320" cy="338" rx="250" ry="9" fill="#d6cfc0"/><path d="M96 150q0-22 22-22h404q22 0 22 22v96H96z" class="fab"/><path d="M70 196q0-18 18-18t18 18v90H70zM534 196q0-18 18-18t18 18v90h-36z" class="fab"/><path d="M70 196q0-18 18-18t18 18v90H70zM534 196q0-18 18-18t18 18v90h-36z" fill="#00000012"/><path d="M106 236h428v50H106z" class="fab"/><path d="M106 236h428M320 236v50M320 128v108" stroke="#00000018" stroke-width="2.5"/><path d="M84 286h472v12H84z" fill="#c9a77c"/><path d="M110 298l-8 38M530 298l8 38M320 298v34" class="wood" stroke-width="8"/><rect x="150" y="176" width="74" height="60" rx="10" fill="#f3f0ea" transform="rotate(-8 187 206)"/>',
+    shelf:floor+'<path d="M90 90v340M310 90v340" class="wood" stroke-width="8"/><path d="M90 150h220M90 240h220M90 330h220M90 420h220" class="wood" stroke-width="7"/><rect x="110" y="104" width="14" height="42" class="fab"/><rect x="126" y="112" width="12" height="34" fill="#d8cdb8"/><rect x="140" y="100" width="16" height="46" fill="#55524c"/><path d="M250 236q-4-26 8-36q14 10 8 36z" class="fab"/><rect x="118" y="212" width="70" height="8" fill="#f6f2e8"/><rect x="124" y="220" width="58" height="8" fill="#d9d3c7"/><rect x="122" y="228" width="64" height="8" fill="#c48f76"/><circle cx="150" cy="306" r="20" fill="none" stroke="#45423d" stroke-width="3"/><rect x="220" y="286" width="60" height="40" fill="#f6f2e8"/>'
+  };
+  const ITEMS=[
+    {n:'Vilja',t:'Lounge chair',k:'Seating',a:'lounge',p:1480,d:'Steam-bent ash, wool bouclé',f:['sage','clay','oat'],tag:'New'},
+    {n:'Tåke',t:'Pendant lamp',k:'Lighting',a:'pendant',p:340,d:'Spun aluminium, linen cord',f:['fog','oat','char']},
+    {n:'Rolig',t:'Dining chair',k:'Seating',a:'dining',p:520,d:'Oiled oak, paper-cord option',f:['clay','sage','char']},
+    {n:'Lune',t:'Three-seat sofa',k:'Seating',a:'sofa',p:3260,d:'Oak plinth, feather-wrapped cushions, removable covers',f:['oat','fog','sage','clay'],wide:true,vb:'0 0 640 400',tag:'Workshop favourite'},
+    {quote:'A chair should ask nothing of you, and still be there in forty years.',who:'Ingrid Solvang, founder'},
+    {n:'Kvist',t:'Counter stool',k:'Seating',a:'stool',p:290,d:'Solid ash, saddle seat',f:['char','sage','clay']},
+    {n:'Grein',t:'Reading lamp',k:'Lighting',a:'floorlamp',p:610,d:'Oak stem, adjustable shade',f:['sage','fog','char']},
+    {n:'Sten',t:'Dining table',k:'Tables & storage',a:'table',p:2140,d:'Oak plank top, seats six',f:['clay','sage','fog']},
+    {n:'Hylle',t:'Open shelf',k:'Tables & storage',a:'shelf',p:980,d:'Oak ladder frame, four tiers',f:['sage','clay','fog'],tag:'Back in stock'}
+  ];
+  const grid=document.getElementById('grid'), fil=document.getElementById('filters');
+  const fmt=n=>'€ '+n.toLocaleString('en-GB');
+  ITEMS.forEach(it=>{
+    const el=document.createElement('article'); it.el=el;
+    if(it.quote){ el.className='item note'; el.innerHTML='<blockquote>“'+it.quote+'”<cite>'+it.who+'</cite></blockquote>'; grid.appendChild(el); return; }
+    el.className='item'+(it.wide?' wide':'');
+    el.innerHTML=`<button class="pic" type="button" aria-label="${it.n} ${it.t}: change fabric"><svg viewBox="${it.vb||'0 0 400 500'}" preserveAspectRatio="xMidYMid slice" style="--f:${FAB[it.f[0]]}">${ART[it.a]}</svg>${it.tag?'<span class="tag">'+it.tag+'</span>':''}</button>
+      <div class="meta"><h3>${it.n}</h3><span>${fmt(it.p)}</span></div><p class="sub">${it.t} · ${it.d}</p><div class="sw" role="group" aria-label="Colour"></div>`;
+    const svg=el.querySelector('svg'), sw=el.querySelector('.sw'); let cur=0;
+    const set=i=>{ cur=i; svg.style.setProperty('--f',FAB[it.f[i]]); [...sw.children].forEach((b,j)=>b.setAttribute('aria-pressed',j===i)); };
+    it.f.forEach((f,i)=>{ const b=document.createElement('button'); b.type='button'; b.style.background=FAB[f]; b.setAttribute('aria-label',f); b.onclick=()=>set(i); sw.appendChild(b); });
+    el.querySelector('.pic').onclick=()=>set((cur+1)%it.f.length); set(0);
+    grid.appendChild(el);
+  });
+  ['All','Seating','Lighting','Tables & storage'].forEach((k,i)=>{
+    const b=document.createElement('button'); b.type='button'; b.textContent=k; b.setAttribute('aria-pressed',i===0);
+    b.onclick=()=>{ [...fil.children].forEach(x=>x.setAttribute('aria-pressed',x===b)); ITEMS.forEach(it=>it.el.classList.toggle('hide',k!=='All'&&it.k!==k)); };
+    fil.appendChild(b);
+  });
+})();
+</script>
+</body>
+</html>

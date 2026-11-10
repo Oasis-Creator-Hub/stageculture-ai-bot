@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lantern Row, 2:47 a.m. — a neon alley in the rain</title>
+<meta name="description" content="A rain-soaked night alley of flickering neon shop signs, canvas rain and trembling puddle reflections. Tap a sign to cut its power.">
+<style>
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:#04040a}
+  body{overflow:hidden;color:#d9d4e6;font-family:"Arial Narrow","Helvetica Neue Condensed","Roboto Condensed","Franklin Gothic Medium",Arial,sans-serif}
+  .scene{position:fixed;inset:0;overflow:hidden;--u:clamp(5px,1.25vmin + .25vw,13px)}
+  .world{position:absolute;left:0;right:0;top:0;height:69%;overflow:hidden;font-size:var(--u);
+    background:
+      radial-gradient(ellipse 50% 40% at 47% 100%,rgba(255,60,150,.42),transparent 70%),
+      radial-gradient(ellipse 70% 60% at 50% 100%,rgba(60,90,220,.3),transparent 75%),
+      linear-gradient(#04040c,#0d0a22 60%,#221238)}
+  .far{position:absolute;left:28%;right:32%;bottom:0;height:62%;opacity:.9}
+  .bld{position:absolute;bottom:0;
+    background:
+      linear-gradient(90deg,rgba(0,0,0,.55),transparent 30%,transparent 70%,rgba(0,0,0,.5)),
+      repeating-linear-gradient(0deg,rgba(0,0,0,.5) 0 1px,transparent 1px 1.3em),
+      repeating-linear-gradient(90deg,rgba(0,0,0,.28) 0 1px,transparent 1px 3em),
+      linear-gradient(#17131f,#1d1624)}
+  .left{left:-1%;width:35%;top:5%}
+  .right{right:-1%;width:39%;top:0}
+  .backwall{left:33%;right:37%;top:30%;background:
+      repeating-linear-gradient(0deg,rgba(0,0,0,.5) 0 1px,transparent 1px .9em),linear-gradient(#0f0c18,#150f1c)}
+  .cornice{position:absolute;left:-2%;right:-2%;top:0;height:1.4em;background:#0a0810;box-shadow:0 .5em 1em rgba(0,0,0,.6)}
+  .win{position:absolute;width:5.2em;height:7.4em;background:#07060b;border:.35em solid #0b0910;box-shadow:inset 0 0 0 .12em #23202b}
+  .win.lit{background:linear-gradient(#ffd98a,#e89a3c);box-shadow:0 0 2.4em rgba(255,180,80,.45),inset 0 0 0 .12em #5a3b12}
+  .win.lit::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 47%,#3b2508 47% 53%,transparent 53%),linear-gradient(transparent 44%,#3b2508 44% 49%,transparent 49%)}
+  .win.tv{background:#7fb7ff;animation:tv 5s steps(1) infinite;box-shadow:0 0 2em rgba(120,170,255,.4)}
+  @keyframes tv{0%{background:#7fb7ff}18%{background:#b9d4ff}22%{background:#5c84c8}47%{background:#a8c6ff}60%{background:#6c9be0}83%{background:#c2dcff}}
+  .door{position:absolute;bottom:0;width:7em;height:13em;background:#050408;border:.4em solid #0c0a12;border-bottom:0}
+  .door.glow{background:linear-gradient(#2a1206,#f08a3a);box-shadow:0 0 3em rgba(255,140,60,.5)}
+  .awning{position:absolute;height:2.6em;background:repeating-linear-gradient(90deg,#5b1220 0 1.6em,#16131b 1.6em 3.2em);transform:skewX(-14deg);box-shadow:0 1em 1.6em rgba(0,0,0,.6)}
+  .pipe{position:absolute;width:.7em;background:linear-gradient(90deg,#0a0910,#2a2633,#0a0910)}
+  .steam{position:absolute;width:9em;height:14em;border-radius:50%;background:radial-gradient(closest-side,rgba(255,220,240,.16),transparent);filter:blur(6px);animation:steam 7s ease-in infinite}
+  @keyframes steam{0%{transform:translateY(20%) scale(.5);opacity:0}30%{opacity:1}100%{transform:translateY(-90%) scale(1.5);opacity:0}}
+
+  /* ——— neon ——— */
+  .sign{position:absolute;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:0;padding:0;margin:0;color:inherit;font:inherit;line-height:1;text-align:center}
+  .sign::before{content:"";position:absolute;inset:-60%;background:radial-gradient(closest-side,var(--c),transparent);opacity:.2;pointer-events:none;transition:opacity .2s}
+  .sign:focus-visible{outline:2px dashed #fff;outline-offset:6px}
+  .n{position:relative;display:block;color:#fff;text-shadow:0 0 .05em #fff,0 0 .22em var(--c),0 0 .55em var(--c),0 0 1.3em var(--c),0 0 2.6em var(--c)}
+  .tube{border:.12em solid #fff;border-radius:.5em;box-shadow:0 0 .2em var(--c),0 0 .8em var(--c),0 0 1.8em var(--c),inset 0 0 .2em var(--c),inset 0 0 .8em var(--c)}
+  .sign svg{display:block;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 2px var(--c)) drop-shadow(0 0 7px var(--c));overflow:visible}
+  .sign.off::before{opacity:0}
+  .sign.off .n{color:#2f2a38;text-shadow:none}
+  .sign.off .tube{border-color:#2f2a38;box-shadow:none}
+  .sign.off svg{stroke:#2f2a38;filter:none}
+  .sign:not(.off) .f1{animation:f1 6.3s steps(1) infinite}
+  .sign:not(.off) .f2{animation:f2 9.1s steps(1) infinite}
+  .sign:not(.off) .f3{animation:f3 2.7s steps(1) infinite}
+  @keyframes f1{0%,100%{opacity:1}41%{opacity:.25}42%{opacity:1}43.5%{opacity:.4}45%{opacity:1}78%{opacity:.6}79%{opacity:1}}
+  @keyframes f2{0%,100%{opacity:1}12%{opacity:.15}12.6%{opacity:1}13.4%{opacity:.15}14.5%{opacity:1}66%{opacity:.5}67%{opacity:1}}
+  @keyframes f3{0%,100%{opacity:1}8%{opacity:.2}16%{opacity:.9}22%{opacity:.1}31%{opacity:1}58%{opacity:.3}63%{opacity:1}}
+
+  .hotel{--c:#ff9a2e;right:-4.4em;top:7%;width:4.4em;padding:.9em 0;font:900 2.7em/1.02 Impact,"Haettenschweiler","Arial Narrow Bold","Arial Black",sans-serif;background:#0a0810;box-shadow:0 0 0 .1em #000}
+  .hotel .n{letter-spacing:0}.hotel .sm{font-size:.42em;letter-spacing:.2em;margin:.5em 0 .7em;font-family:"Arial Narrow",Arial,sans-serif;font-weight:700}
+  .hotel .tube{position:absolute;inset:.22em;border-radius:.25em}
+  .moth{--c:#ff3d9a;left:8%;top:13%;font:italic 400 5.6em/.86 "Brush Script MT","Snell Roundhand","Segoe Script","Lucida Handwriting","URW Chancery L",cursive}
+  .moth svg{width:1.5em;height:1em;margin:0 auto .12em}
+  .moth .sm{font:700 .2em/1 "Arial Narrow",Arial,sans-serif;letter-spacing:.5em;margin-top:.9em;--c:#ffe14a}
+  .keys{--c:#2ee6ff;left:8%;top:9%;font:700 2.1em/1.1 "Courier New","Nimbus Mono PS",monospace;padding:.5em .7em}
+  .keys .tube{position:absolute;inset:0}
+  .keys svg{width:3.2em;height:1.3em;margin:0 auto .3em}
+  .bar{--c:#5dff7a;right:6%;top:36%;font:900 3.2em/.9 "Arial Black","Helvetica Neue",Arial,sans-serif;letter-spacing:.08em}
+  .bar .sm{font:italic 400 .52em/1 Georgia,serif;letter-spacing:.02em;--c:#fff36b;margin-top:.3em}
+  .bar svg{width:1em;height:1.2em;margin:.2em auto 0}
+  .open{--c:#ff3b30;left:14%;bottom:21%;font:700 1.5em/1.15 "Arial Narrow",Arial,sans-serif;letter-spacing:.24em;padding:.5em .8em}
+  .open .tube{position:absolute;inset:0;border-radius:1.4em}
+  .laund{--c:#b06bff;left:6%;top:16%;font:400 2.2em/1 Georgia,"Times New Roman",serif;letter-spacing:.3em}
+  .laund .sm{font-size:.5em;letter-spacing:.34em;font-style:italic;margin-top:.5em}
+
+  /* ——— wet ground ——— */
+  .ground{position:absolute;left:0;right:0;bottom:0;height:31%;overflow:hidden;background:#05050b;border-top:1px solid #000}
+  .reflect{position:absolute;left:0;right:0;top:0;transform:scaleY(-1);transform-origin:top;pointer-events:none;opacity:.62;filter:url(#ripple) blur(2px)}
+  .reflect .world{position:relative;height:auto}
+  .sheen{position:absolute;inset:0;pointer-events:none;background:
+      repeating-linear-gradient(0deg,rgba(0,0,0,.42) 0 2px,transparent 2px 7px),
+      linear-gradient(rgba(5,5,11,.15),rgba(5,5,11,.55) 55%,#05050b 96%)}
+  .kerb{position:absolute;left:0;right:0;top:0;height:5px;background:linear-gradient(#2a2633,#07060b)}
+  #rain{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 55%,transparent 50%,rgba(0,0,0,.72))}
+
+  .cap{position:absolute;left:clamp(14px,3vw,36px);bottom:clamp(12px,3vh,28px);pointer-events:none;z-index:5;text-shadow:0 1px 6px #000}
+  .cap h1{margin:0;font:400 clamp(20px,3.2vw,38px)/1 Georgia,"Times New Roman",serif;font-style:italic;color:#f2ecff}
+  .cap p{margin:.6em 0 0;font-size:11px;letter-spacing:.34em;text-transform:uppercase;opacity:.7}
+  .back{position:absolute;right:clamp(14px,3vw,36px);bottom:clamp(12px,3vh,28px);z-index:6;color:#ff3d9a;text-decoration:none;font:700 12px/1 "Courier New",monospace;letter-spacing:.2em;
+    text-shadow:0 0 8px #ff3d9a;border:1px solid currentColor;padding:7px 10px;border-radius:3px;box-shadow:0 0 10px rgba(255,61,154,.5),inset 0 0 6px rgba(255,61,154,.4)}
+  @media (max-width:560px){.laund{display:none}.hotel{font-size:2.2em}}
+  @media (prefers-reduced-motion:reduce){.sign .n,.sign .tube,.sign svg,.steam,.win.tv{animation:none !important}.steam{opacity:.6}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="ripple" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="turb" type="fractalNoise" baseFrequency=".006 .11" numOctaves="2" seed="3" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="26" xChannelSelector="R" yChannelSelector="G"/></filter>
+</defs></svg>
+
+<div class="scene" id="scene">
+  <div class="world" id="world">
+    <svg class="far" viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <path d="M0 300V120h40V70h50v60h30V30h60v110h40V90h46v50h30V56h54v84h50v160z" fill="#0b0918"/>
+      <g fill="#ff9ccf" opacity=".65"><rect x="130" y="50" width="5" height="7"/><rect x="150" y="80" width="5" height="7"/><rect x="60" y="92" width="5" height="7"/><rect x="250" y="110" width="5" height="7"/><rect x="310" y="76" width="5" height="7"/><rect x="330" y="104" width="5" height="7"/><rect x="164" y="118" width="5" height="7"/></g>
+      <g fill="#8fd3ff" opacity=".6"><rect x="142" y="66" width="5" height="7"/><rect x="76" y="110" width="5" height="7"/><rect x="298" y="92" width="5" height="7"/><rect x="232" y="124" width="5" height="7"/></g>
+    </svg>
+
+    <div class="bld backwall">
+      <div class="pipe" style="right:9%;top:0;bottom:0"></div>
+      <button class="sign keys" data-s="keys" aria-label="Kiko's Keys sign"><span class="tube f2"></span>
+        <svg class="f2" viewBox="0 0 64 26"><circle cx="12" cy="13" r="9"/><circle cx="12" cy="13" r="3"/><path d="M21 13h38M46 13v8M54 13v6"/></svg>
+        <span class="n f2">KIKO'S KEYS</span><span class="n" style="font-size:.5em;margin-top:.4em;letter-spacing:.14em">cut while you doubt</span></button>
+      <button class="sign bar" data-s="bar" aria-label="Bar Third Tuesday sign"><span class="n">BAR</span><span class="n sm f1">Third Tuesday</span>
+        <svg viewBox="0 0 20 24" class="f1"><path d="M10 2v18M3 13l7 8 7-8"/></svg></button>
+      <div class="door glow" style="right:20%"></div>
+      <div class="steam" style="right:10%;bottom:0"></div>
+    </div>
+
+    <div class="bld left"><div class="cornice"></div>
+      <div class="win lit" style="left:16%;top:12%"></div><div class="win" style="left:50%;top:12%"></div>
+      <div class="win" style="left:16%;top:40%"></div><div class="win tv" style="left:50%;top:40%"></div>
+      <div class="awning" style="left:6%;width:66%;bottom:16.5em"></div>
+      <div class="door" style="left:22%"></div><div class="pipe" style="left:4%;top:1.4em;bottom:0"></div>
+      <button class="sign open" data-s="open" aria-label="Open late-ish sign" style="left:auto;right:8%;bottom:6em"><span class="tube f3"></span><span class="n f3">OPEN<br>LATE-ISH</span></button>
+      <button class="sign hotel" data-s="hotel" aria-label="Hotel Slow Comet sign"><span class="tube"></span>
+        <span class="n">H</span><span class="n">O</span><span class="n f1">T</span><span class="n">E</span><span class="n">L</span><span class="n sm">Slow<br>Comet</span>
+        <svg viewBox="0 0 40 24" style="width:1.3em;height:.8em;margin:0 auto"><circle cx="30" cy="9" r="5"/><path d="M25 12L4 21M26 8L8 12M28 15l-14 8"/></svg></button>
+    </div>
+
+    <div class="bld right"><div class="cornice"></div>
+      <div class="win" style="right:14%;top:8%"></div><div class="win lit" style="right:14%;top:50%"></div>
+      <div class="pipe" style="right:5%;top:1.4em;bottom:0"></div>
+      <button class="sign moth" data-s="moth" aria-label="Noodle Moth sign">
+        <svg viewBox="0 0 60 40" class="f2"><path d="M30 12v20M30 14C22 2 6 2 4 12s12 14 26 6M30 14C38 2 54 2 56 12s-12 14-26 6M30 22c-6 6-14 8-16 14 6 2 12-2 16-8M30 22c6 6 14 8 16 14-6 2-12-2-16-8M27 10l-4-7M33 10l4-7"/></svg>
+        <span class="n">Noodle</span><span class="n f1">Moth</span><span class="n sm">BROTH · UNTIL · DAWN</span></button>
+      <button class="sign laund" data-s="laund" aria-label="Laundry of Regret sign" style="top:auto;bottom:17em"><span class="n f2">LAUNDRY</span><span class="n sm">of small regrets · 24 hrs</span></button>
+      <div class="awning" style="left:4%;width:60%;bottom:13.4em;background:repeating-linear-gradient(90deg,#123a4a 0 1.6em,#16131b 1.6em 3.2em)"></div>
+      <div class="door glow" style="left:12%;background:linear-gradient(#06222c,#49c7d9);box-shadow:0 0 3em rgba(80,210,230,.45)"></div>
+      <div class="win lit" style="left:40%;bottom:2em;top:auto;width:9em;background:linear-gradient(#bff3ff,#49c7d9);box-shadow:0 0 2.4em rgba(80,210,230,.45)"></div>
+    </div>
+  </div>
+
+  <div class="ground" id="ground"><div class="reflect" id="reflect"></div><div class="sheen"></div><div class="kerb"></div></div>
+  <canvas id="rain" aria-hidden="true"></canvas>
+  <div class="vig"></div>
+  <div class="cap"><h1>Lantern Row, 2:47 a.m.</h1><p>Tap a sign to cut its power</p></div>
+  <a class="back" href="index.html">← 100</a>
+</div>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const scene = document.getElementById('scene'), world = document.getElementById('world'), reflect = document.getElementById('reflect');
+  // mirror the street into the puddles
+  const twin = world.cloneNode(true); twin.removeAttribute('id'); twin.setAttribute('aria-hidden', 'true');
+  twin.querySelectorAll('button').forEach(b => { b.tabIndex = -1; });
+  reflect.appendChild(twin);
+
+  let ac = null;
+  function buzz(on){
+    try{ ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime;
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(on ? 110 : 62, t); o.frequency.linearRampToValueAtTime(on ? 118 : 40, t + .22);
+      g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.06, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + .26);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t + .3); }catch(_){}
+  }
+  world.querySelectorAll('.sign').forEach(s => s.addEventListener('click', () => {
+    const off = s.classList.toggle('off'); s.setAttribute('aria-pressed', off);
+    const t = twin.querySelector('[data-s="' + s.dataset.s + '"]'); if (t) t.classList.toggle('off', off);
+    buzz(!off);
+  }));
+
+  const cv = document.getElementById('rain'), ctx = cv.getContext('2d');
+  let W, H, dpr, gy, drops = [], rings = [];
+  function size(){
+    dpr = Math.min(2, devicePixelRatio || 1); W = scene.clientWidth; H = scene.clientHeight; gy = H * .69;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    twin.style.height = world.offsetHeight + 'px';
+    const n = Math.min(320, Math.round(W * H / 4200));
+    drops = Array.from({length: n}, () => mk(true));
+  }
+  function mk(init){ const z = .35 + Math.random() * .9;
+    return {x: Math.random() * (W + 120), y: init ? Math.random() * H : -40 - Math.random() * 80, z, v: (15 + Math.random() * 8) * z, land: gy + 4 + Math.random() * (H - gy) * z * .95}; }
+  function draw(still){
+    ctx.clearRect(0, 0, W, H);
+    ctx.lineCap = 'round';
+    for (const d of drops){
+      if (!still){ d.y += d.v; d.x -= d.v * .16;
+        if (d.y > d.land){ if (rings.length < 70) rings.push({x: d.x, y: d.land, r: 1, z: d.z, a: .7}); Object.assign(d, mk(false)); } }
+      ctx.strokeStyle = 'rgba(190,205,255,' + (.1 + d.z * .22).toFixed(2) + ')'; ctx.lineWidth = d.z * 1.15;
+      ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x + d.v * .16 * 1.5, d.y - d.v * 1.5); ctx.stroke();
+    }
+    for (let i = rings.length - 1; i >= 0; i--){ const r = rings[i]; r.r += .55 * r.z; r.a -= .03;
+      if (r.a <= 0){ rings.splice(i, 1); continue; }
+      ctx.strokeStyle = 'rgba(215,205,255,' + r.a.toFixed(2) + ')'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.ellipse(r.x, r.y, r.r * 2.4, r.r * .7, 0, 0, 6.283); ctx.stroke(); }
+  }
+  // puddles shiver: nudge the displacement noise a few times a second
+  const turb = document.getElementById('turb'); let last = 0, seed = 3;
+  function loop(t){
+    draw(false);
+    if (t - last > 140){ last = t; seed = seed % 40 + 1; turb.setAttribute('seed', seed); }
+    requestAnimationFrame(loop);
+  }
+  addEventListener('resize', () => { size(); if (reduce) draw(true); });
+  size();
+  if (reduce) draw(true); else requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

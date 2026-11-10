@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tallgrass County Storm Log — call down the lightning</title>
+<meta name="description" content="Procedural branching lightning over a dark prairie. Click to strike, count the seconds, and hear synthesized thunder roll in at the speed of sound.">
+<style>
+  html, body { margin: 0; height: 100%; background: #07090d; overflow: hidden; }
+  body { font-family: "Avenir Next Condensed", "Roboto Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif; color: #dfe3ea; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; }
+  .hud { position: fixed; pointer-events: none; text-transform: uppercase; letter-spacing: .22em; font-size: .68rem; line-height: 1.7; text-shadow: 0 1px 8px #000; }
+  .title { left: clamp(16px, 4vw, 48px); top: clamp(16px, 4vh, 40px); }
+  .title b { display: block; font-size: clamp(1.7rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: .04em; line-height: .95; color: #f4f1e4; }
+  .title b span { color: #f0c05a; }
+  .title i { font-style: normal; color: #8f97a6; }
+  .log { left: clamp(16px, 4vw, 48px); bottom: clamp(16px, 4vh, 40px); color: #aab1bf; }
+  .log .count { font-size: clamp(2.6rem, 9vw, 5.4rem); font-weight: 200; letter-spacing: 0; line-height: 1; color: #f4f1e4; font-variant-numeric: tabular-nums; }
+  .log .count small { font-size: .28em; letter-spacing: .2em; color: #f0c05a; margin-left: .4em; font-weight: 600; }
+  .log #verdict { color: #f0c05a; min-height: 1.7em; }
+  .tally { right: clamp(16px, 4vw, 48px); bottom: clamp(16px, 4vh, 40px); text-align: right; color: #8f97a6; }
+  .tally b { color: #f4f1e4; font-weight: 600; }
+  .back { position: fixed; right: clamp(16px, 4vw, 48px); top: clamp(16px, 4vh, 40px); font-size: .68rem; letter-spacing: .26em; color: #8f97a6; text-decoration: none; border: 1px solid #8f97a655; padding: .6em .8em; background: #07090d66; }
+  .back:hover, .back:focus-visible { color: #f0c05a; border-color: #f0c05a; }
+</style>
+</head>
+<body>
+<canvas id="sky" aria-label="Storm over a prairie. Click anywhere to call a lightning strike."></canvas>
+<a class="back" href="index.html">&larr; 100</a>
+<div class="hud title"><b>Tallgrass <span>County</span></b><i>Storm log &middot; cell 14 &middot; moving north-east at 22 mph</i><br><span id="hint">Click the sky to call a strike &mdash; sound wakes on first touch</span></div>
+<div class="hud log">
+  <div>Flash to bang</div>
+  <div class="count"><span id="secs">0.0</span><small>sec</small></div>
+  <div id="verdict">&nbsp;</div>
+</div>
+<div class="hud tally">Strikes logged <b id="n">0</b><br>Nearest <b id="nearest">&mdash;</b></div>
+<script>
+(() => {
+  const cv = document.getElementById('sky'), ctx = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = id => document.getElementById(id);
+  let W, H, dpr, horizon, clouds, land, rain = [], bolts = [], pending = [], strikes = 0, nearest = Infinity;
+  let timing = null; // {start, due}
+
+  function buildClouds() {
+    clouds = document.createElement('canvas'); const cw = Math.ceil(W * 1.6), chh = Math.ceil(H * .8);
+    clouds.width = cw; clouds.height = chh; clouds.cw = cw;
+    const g = clouds.getContext('2d');
+    for (let i = 0; i < 190; i++) {
+      const y = Math.pow(Math.random(), 1.5) * chh * .82, r = 60 + Math.random() * Math.max(140, W * .16), x = Math.random() * cw;
+      const lum = 26 + (1 - y / chh) * 30 + Math.random() * 16;
+      for (const dx of [0, -cw, cw]) {
+        const rg = g.createRadialGradient(x + dx, y, 0, x + dx, y + r * .1, r);
+        rg.addColorStop(0, `rgba(${lum},${lum + 5},${lum + 16},.5)`); rg.addColorStop(.6, `rgba(${lum * .6},${lum * .65},${lum * .8},.22)`); rg.addColorStop(1, 'rgba(10,12,18,0)');
+        g.fillStyle = rg; g.beginPath(); g.ellipse(x + dx, y, r * 1.5, r * .62, 0, 0, 7); g.fill();
+      }
+    }
+  }
+  function buildLand() {
+    land = document.createElement('canvas'); land.width = W * dpr; land.height = H * dpr;
+    const g = land.getContext('2d'); g.scale(dpr, dpr); g.fillStyle = '#040506'; g.strokeStyle = '#040506';
+    const u = Math.min(H, W * 1.2) / 100;
+    // grass fringe along the horizon and tufts in the foreground
+    for (let x = 0; x < W; x += 2.2) { const hh = 2 + Math.random() * 5; g.fillRect(x, horizon - hh, 1.2, hh + 2); }
+    g.lineCap = 'round';
+    for (let i = 0; i < 520; i++) {
+      const d = Math.pow(Math.random(), 2.2), y = horizon + d * (H - horizon) + 6, x = Math.random() * W, len = 4 + d * 46;
+      g.lineWidth = .6 + d * 2.2; g.globalAlpha = .5 + d * .5; g.beginPath(); g.moveTo(x, y);
+      g.quadraticCurveTo(x + len * .15, y - len * .6, x + (Math.random() - .3) * len * .7, y - len); g.stroke();
+    }
+    g.globalAlpha = 1;
+    // windpump
+    const wx = W * .8, base = horizon + 2, th = u * 21;
+    g.lineWidth = Math.max(1, u * .32);
+    g.beginPath(); g.moveTo(wx - u * 3.4, base); g.lineTo(wx - u * .5, base - th); g.moveTo(wx + u * 3.4, base); g.lineTo(wx + u * .5, base - th);
+    for (let k = 0; k < 4; k++) { const a = k / 4, b = (k + 1) / 4, xa = u * (3.4 - 2.9 * a), xb = u * (3.4 - 2.9 * b); g.moveTo(wx - xa, base - th * a); g.lineTo(wx + xb, base - th * b); g.moveTo(wx + xa, base - th * a); g.lineTo(wx - xb, base - th * b); }
+    g.stroke();
+    const hy = base - th - u * .6; g.lineWidth = Math.max(1, u * .5);
+    for (let a = 0; a < 18; a++) { const an = a / 18 * 6.283; g.beginPath(); g.moveTo(wx + Math.cos(an) * u * 1, hy + Math.sin(an) * u * 1); g.lineTo(wx + Math.cos(an + .1) * u * 4.2, hy + Math.sin(an + .1) * u * 4.2); g.stroke(); }
+    g.beginPath(); g.moveTo(wx, hy); g.lineTo(wx + u * 6.5, hy - u * .3); g.lineTo(wx + u * 8.4, hy - u * 1.7); g.lineTo(wx + u * 8.4, hy + u * 1.5); g.lineTo(wx + u * 6.5, hy + .3 * u); g.closePath(); g.fill();
+    // farmhouse with one lamp left burning
+    const fx = W * .27, fy = horizon + 1;
+    g.beginPath(); g.moveTo(fx - u * 4, fy); g.lineTo(fx - u * 4, fy - u * 3.2); g.lineTo(fx - u * 1.4, fy - u * 5.6); g.lineTo(fx + u * 1.2, fy - u * 3.2); g.lineTo(fx + u * 5, fy - u * 3.2); g.lineTo(fx + u * 5, fy); g.closePath(); g.fill();
+    g.fillRect(fx + u * 3, fy - u * 5.2, u * .9, u * 2.4);
+    g.fillStyle = '#ffb648'; g.shadowColor = '#ff9a2e'; g.shadowBlur = u * 2; g.fillRect(fx - u * 2, fy - u * 2.4, u * .9, u * 1.1); g.shadowBlur = 0; g.fillStyle = '#040506';
+    // fence running off to the vanishing point
+    g.beginPath();
+    for (let k = 0; k < 14; k++) {
+      const d = Math.pow(1 - k / 14, 2.4), x = W * .52 - d * W * .56, y = horizon + 4 + d * (H - horizon) * .95, ph = 4 + d * u * 16;
+      g.rect(x, y - ph, Math.max(1.2, d * u * 1.5), ph);
+      if (k) { g.moveTo(x, y - ph * .8); g.lineTo(g.px, g.py - g.ph * .8); g.moveTo(x, y - ph * .45); g.lineTo(g.px, g.py - g.ph * .45); }
+      g.px = x; g.py = y; g.ph = ph;
+    }
+    g.lineWidth = 1; g.fill(); g.stroke();
+  }
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight; horizon = H * .7;
+    cv.width = W * dpr; cv.height = H * dpr; buildClouds(); buildLand();
+    rain = []; const n = Math.min(260, Math.round(W * H / 5200));
+    for (let i = 0; i < n; i++) rain.push({ x: Math.random() * W * 1.2, y: Math.random() * H, l: 10 + Math.random() * 22, v: 700 + Math.random() * 500 });
+  }
+
+  // a bolt is a set of jagged polylines: one leader plus forks
+  function makeBolt(tx, ty) {
+    const sx = tx + (Math.random() - .5) * W * .3, sy = H * (.05 + Math.random() * .16), lines = [];
+    (function walk(x, y, gx, gy, width, budget, depth) {
+      const pts = [[x, y]]; let ang = Math.atan2(gy - y, gx - x);
+      while (budget-- > 0) {
+        const toGoal = Math.atan2(gy - y, gx - x), step = 7 + Math.random() * 16;
+        ang += (toGoal - ang) * (depth ? .1 : .34) + (Math.random() - .5) * 1.15;
+        x += Math.cos(ang) * step; y += Math.sin(ang) * step; pts.push([x, y]);
+        if (depth < 3 && Math.random() < (depth ? .05 : .11)) { const a2 = ang + (Math.random() < .5 ? -1 : 1) * (.4 + Math.random() * .7); walk(x, y, x + Math.cos(a2) * 400, y + Math.sin(a2) * 400 + 120, width * .5, 8 + Math.random() * 22 | 0, depth + 1); }
+        if (!depth && Math.hypot(gx - x, gy - y) < 18) { pts.push([gx, gy]); break; }
+        if (y > gy && !depth) { pts.push([gx, gy]); break; }
+      }
+      lines.push({ pts, width });
+    })(sx, sy, tx, ty, 3.4, 400, 0);
+    return { lines, sx, sy, tx, ty, born: performance.now(), f1: .12 + Math.random() * .08, f2: .26 + Math.random() * .12, power: 1 };
+  }
+  const glowAt = (b, t) => { // flicker envelope: strike, restrike, restrike
+    const p = (c, w) => Math.max(0, 1 - Math.abs(t - c) / w);
+    return Math.max(Math.max(0, 1 - t / .1), .75 * p(b.f1, .05), .55 * p(b.f2, .07), .25 * Math.max(0, 1 - t / .7)) * b.power;
+  };
+  function strike(x, y, user) {
+    const ty = Math.max(horizon + 3, y), b = makeBolt(x, ty); bolts.push(b);
+    const miles = +(.12 + (1 - (ty - horizon) / (H - horizon)) * 1.08).toFixed(2), delay = miles * 4.7;
+    if (!user) return;
+    strikes++; $('n').textContent = strikes;
+    timing = { start: performance.now(), due: delay, miles }; $('verdict').innerHTML = '&nbsp;';
+    pending.push(setTimeout(() => {
+      thunder(miles); $('secs').textContent = delay.toFixed(1);
+      $('verdict').textContent = `Thunder — ${miles.toFixed(2)} mi · ${miles < .35 ? 'get indoors' : miles < .8 ? 'close enough' : 'rolling off east'}`;
+      if (miles < nearest) { nearest = miles; $('nearest').textContent = miles.toFixed(2) + ' mi'; }
+      if (timing && timing.miles === miles) timing = null;
+    }, delay * 1000));
+  }
+
+  // thunder: filtered brown noise with a crack up close and a long uneven roll
+  let ac, noise, master;
+  function wake() {
+    if (ac) { if (ac.state === 'suspended') ac.resume(); return; }
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    ac = new AC(); noise = ac.createBuffer(1, ac.sampleRate * 4, ac.sampleRate);
+    const d = noise.getChannelData(0); let v = 0;
+    for (let i = 0; i < d.length; i++) { v = (v + (Math.random() * 2 - 1) * .045) / 1.02; d[i] = v * 5.5; }
+    master = ac.createDynamicsCompressor(); master.connect(ac.destination);
+    $('hint').textContent = 'Sound on — count the seconds between flash and bang';
+  }
+  function thunder(miles) {
+    if (!ac) return;
+    const now = ac.currentTime, dur = 4.5 + miles * 3.5, vol = Math.max(.18, 1.05 - miles * .7), near = miles < .5;
+    const src = ac.createBufferSource(); src.buffer = noise; src.loop = true; src.playbackRate.value = .7 + Math.random() * .5;
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = .4;
+    lp.frequency.setValueAtTime(near ? 3200 : 520, now); lp.frequency.exponentialRampToValueAtTime(70, now + dur * .8);
+    const g = ac.createGain(); g.gain.setValueAtTime(.0001, now);
+    if (near) { g.gain.linearRampToValueAtTime(vol, now + .015); g.gain.linearRampToValueAtTime(vol * .4, now + .22); } else g.gain.linearRampToValueAtTime(vol * .45, now + .5);
+    let t = now + .5;
+    for (let i = 0; i < 7; i++) { t += .22 + Math.random() * .55; g.gain.linearRampToValueAtTime(vol * (.2 + Math.random() * .65) * (1 - i / 8), t); }
+    g.gain.linearRampToValueAtTime(.0001, Math.max(t + .5, now + dur));
+    src.connect(lp); lp.connect(g); g.connect(master); src.start(now); src.stop(Math.max(t + .6, now + dur) + .1);
+    if (near) { const o = ac.createOscillator(), og = ac.createGain(); o.frequency.setValueAtTime(64, now); o.frequency.exponentialRampToValueAtTime(26, now + 1.1);
+      og.gain.setValueAtTime(.0001, now); og.gain.linearRampToValueAtTime(vol * .8, now + .03); og.gain.exponentialRampToValueAtTime(.0001, now + 1.3); o.connect(og); og.connect(master); o.start(now); o.stop(now + 1.4); }
+  }
+
+  let prev = 0, nextAmbient = 3;
+  function frame(ms) {
+    const t = ms / 1000, dt = Math.min(.05, t - prev); prev = t;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    let flash = 0; const now = performance.now();
+    bolts = bolts.filter(b => now - b.born < 750);
+    for (const b of bolts) { b.g = glowAt(b, (now - b.born) / 1000); flash = Math.max(flash, b.g); }
+    const fl = reduce ? flash * .35 : flash;
+    const sky = ctx.createLinearGradient(0, 0, 0, horizon);
+    sky.addColorStop(0, '#080a10'); sky.addColorStop(.6, '#161b27'); sky.addColorStop(.92, '#33372f'); sky.addColorStop(1, '#4a4a36');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, horizon + 1);
+    const off = reduce ? 0 : (t * 9) % clouds.cw;
+    for (const dx of [-off, clouds.cw - off]) ctx.drawImage(clouds, dx, 0);
+    if (fl > .01) {
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = fl * .9; for (const dx of [-off, clouds.cw - off]) ctx.drawImage(clouds, dx, 0);
+      ctx.globalAlpha = 1;
+      for (const b of bolts) { const r = Math.max(W, H) * .55, rg = ctx.createRadialGradient(b.sx, b.sy, 0, b.sx, b.sy, r);
+        rg.addColorStop(0, `rgba(190,200,255,${b.g * .55})`); rg.addColorStop(.4, `rgba(110,120,200,${b.g * .2})`); rg.addColorStop(1, 'rgba(60,70,140,0)'); ctx.fillStyle = rg; ctx.fillRect(0, 0, W, horizon); }
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    // prairie, lit from above when the sky goes white
+    const k = fl * .75, gr = ctx.createLinearGradient(0, horizon, 0, H);
+    gr.addColorStop(0, `rgb(${22 + k * 150},${24 + k * 150},${18 + k * 110})`); gr.addColorStop(1, `rgb(${6 + k * 70},${7 + k * 72},${6 + k * 52})`);
+    ctx.fillStyle = gr; ctx.fillRect(0, horizon, W, H - horizon);
+    ctx.drawImage(land, 0, 0, W, H);
+    // rain
+    ctx.strokeStyle = `rgba(190,205,230,${.1 + fl * .35})`; ctx.lineWidth = 1; ctx.beginPath();
+    for (const r of rain) {
+      if (!reduce) { r.y += r.v * dt; r.x -= r.v * dt * .22; if (r.y > H) { r.y = -r.l; r.x = Math.random() * W * 1.2; } }
+      ctx.moveTo(r.x, r.y); ctx.lineTo(r.x - r.l * .22, r.y + r.l);
+    }
+    ctx.stroke();
+    // bolts
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    for (const b of bolts) {
+      if (b.g < .02) continue;
+      for (const pass of [[7, `rgba(150,160,255,${b.g * .28})`, 26], [2.4, `rgba(200,210,255,${b.g * .8})`, 12], [1, `rgba(255,255,255,${Math.min(1, b.g * 1.4)})`, 0]]) {
+        ctx.strokeStyle = pass[1]; ctx.shadowColor = '#9aa8ff'; ctx.shadowBlur = pass[2];
+        for (const l of b.lines) { ctx.lineWidth = l.width * pass[0] * (.6 + b.g * .4); ctx.beginPath(); l.pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke(); }
+      }
+      ctx.shadowBlur = 0;
+      const ig = ctx.createRadialGradient(b.tx, b.ty, 0, b.tx, b.ty, 90);
+      ig.addColorStop(0, `rgba(255,250,230,${b.g})`); ig.addColorStop(.3, `rgba(255,200,120,${b.g * .4})`); ig.addColorStop(1, 'rgba(255,160,60,0)');
+      ctx.fillStyle = ig; ctx.beginPath(); ctx.ellipse(b.tx, b.ty, 90, 26, 0, 0, 7); ctx.fill();
+    }
+    if (fl > .02) { ctx.fillStyle = `rgba(215,222,255,${fl * .2})`; ctx.fillRect(0, 0, W, H); }
+    if (timing) $('secs').textContent = Math.min(timing.due, (now - timing.start) / 1000).toFixed(1);
+    if (!reduce && t > nextAmbient) { nextAmbient = t + 5 + Math.random() * 9; const b = makeBolt(Math.random() * W, horizon + 2); b.power = .45; b.lines.forEach(l => l.width *= .5); bolts.push(b); }
+    requestAnimationFrame(frame);
+  }
+  cv.addEventListener('pointerdown', e => { wake(); strike(e.clientX, e.clientY, true); });
+  addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { wake(); strike(W * (.15 + Math.random() * .7), horizon + Math.random() * (H - horizon), true); } });
+  let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(resize, 120); });
+  resize(); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Descent — into the Verrin Trench</title>
+<meta name="description" content="A scroll-driven dive from sunlit surface to hadal trench: the water darkens, the gauge climbs, and bioluminescent creatures drift out of the black.">
+<style>
+  :root{--txt:#e9f6ff;--glow:#7df9ff}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;color:var(--txt);background:#01030a;overflow-x:hidden;
+    font-family:"Avenir Next","Century Gothic","Segoe UI","Helvetica Neue",sans-serif;font-weight:300}
+  #water{position:fixed;inset:0;z-index:-3;background:#2aa3d6}
+  #rays{position:fixed;inset:-10% -20% 0;z-index:-2;pointer-events:none;mix-blend-mode:screen;transform-origin:50% 0;
+    background:repeating-conic-gradient(from 150deg at 50% -12%,rgba(255,255,255,.17) 0 2.2deg,transparent 2.2deg 7deg,rgba(255,255,255,.08) 7deg 8deg,transparent 8deg 15deg);
+    -webkit-mask-image:linear-gradient(#000,transparent 85%);mask-image:linear-gradient(#000,transparent 85%);animation:sway 14s ease-in-out infinite alternate}
+  @keyframes sway{from{transform:rotate(-2.5deg)}to{transform:rotate(2.5deg)}}
+  #snow{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+
+  .back{position:fixed;left:16px;top:14px;z-index:20;color:var(--txt);text-decoration:none;font-size:11px;letter-spacing:.3em;opacity:.75;
+    padding:6px 10px;border:1px solid rgba(255,255,255,.35);border-radius:999px;backdrop-filter:blur(4px)}
+  .back:hover,.back:focus-visible{opacity:1;outline:none;border-color:#fff}
+
+  /* depth gauge */
+  .gauge{position:fixed;right:clamp(8px,2.2vw,30px);top:50%;transform:translateY(-50%);z-index:15;height:min(74vh,620px);width:clamp(54px,9vw,104px);
+    display:grid;grid-template-rows:auto 1fr auto;gap:12px;font-family:"SF Mono","Menlo","Consolas","DejaVu Sans Mono",monospace;font-size:10px;text-align:right;pointer-events:none}
+  .read b{display:block;font-size:clamp(17px,2.4vw,27px);font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:#fff}
+  .read span{letter-spacing:.24em;text-transform:uppercase;opacity:.7}
+  .track{position:relative;justify-self:end;width:26px;border-right:1px solid rgba(255,255,255,.6);
+    background:repeating-linear-gradient(to bottom,rgba(255,255,255,.55) 0 1px,transparent 1px 10%) right/10px 100% no-repeat,
+               repeating-linear-gradient(to bottom,rgba(255,255,255,.3) 0 1px,transparent 1px 2%) right/5px 100% no-repeat}
+  .mark{position:absolute;right:-6px;top:0;width:34px;height:2px;background:var(--glow);box-shadow:0 0 12px 2px var(--glow);transform:translateY(-1px)}
+  .mark::after{content:"";position:absolute;right:-1px;top:-5px;border:6px solid transparent;border-right-color:var(--glow)}
+  .zl{position:absolute;right:34px;white-space:nowrap;letter-spacing:.2em;text-transform:uppercase;font-size:8.5px;opacity:.35;transform:translateY(-50%);transition:opacity .5s,color .5s}
+  .zl.on{opacity:1;color:var(--glow)}
+  .stats{display:grid;gap:5px;font-variant-numeric:tabular-nums;opacity:.85;letter-spacing:.06em}
+  .stats i{font-style:normal;opacity:.6}
+
+  section{position:relative;min-height:150vh;padding:16vh clamp(70px,13vw,190px) 10vh clamp(20px,7vw,110px)}
+  .hero{min-height:100vh;padding-top:0;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:12vh}
+  .sky{position:absolute;inset:0 0 auto 0;height:30vh;background:linear-gradient(#f7c98f,#fbe3b8 55%,#bfe6f2);overflow:hidden}
+  .sun{position:absolute;left:68%;bottom:-6vh;width:17vh;height:17vh;border-radius:50%;background:#fff6dc;box-shadow:0 0 80px 30px rgba(255,236,190,.8)}
+  .wave{position:absolute;left:0;bottom:-1px;width:200%;height:5vh;animation:wave 9s linear infinite}
+  .wave + .wave{opacity:.5;animation-duration:15s;bottom:6px}
+  @keyframes wave{to{transform:translateX(-50%)}}
+  .hero h1{margin:0;font-weight:200;font-size:clamp(46px,13.5vw,210px);letter-spacing:.14em;line-height:.9;text-transform:uppercase;
+    background:linear-gradient(#fff,rgba(255,255,255,.35));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{max-width:32em;font-size:clamp(15px,1.7vw,20px);line-height:1.6;margin:1.6em 0 0}
+  .cue{margin-top:5vh;font-size:11px;letter-spacing:.4em;text-transform:uppercase;display:flex;align-items:center;gap:14px}
+  .cue::before{content:"";width:1px;height:54px;background:linear-gradient(#fff,transparent);animation:drop 2.2s ease-in-out infinite}
+  @keyframes drop{0%,100%{transform:scaleY(.3);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}}
+
+  .zone{max-width:30em;position:relative;z-index:2}
+  .zone.r{margin-left:auto}
+  .zone small{font-family:"SF Mono","Menlo","Consolas",monospace;font-size:11px;letter-spacing:.3em;text-transform:uppercase;opacity:.75}
+  .zone h2{margin:.25em 0 .4em;font-weight:200;font-size:clamp(34px,6.4vw,84px);line-height:.98;letter-spacing:-.01em}
+  .zone h2 i{font-family:"Iowan Old Style","Palatino","Book Antiqua",Georgia,serif;font-weight:400}
+  .zone p{font-size:clamp(15px,1.45vw,18px);line-height:1.65;opacity:.88;margin:0 0 1em}
+
+  .c{position:absolute;opacity:0;transform:translateY(40px) scale(.94);transition:opacity 1.8s ease,transform 2.4s cubic-bezier(.2,.7,.2,1);pointer-events:none}
+  .c.seen{opacity:1;transform:none}
+  .c svg{display:block;width:100%;height:auto;overflow:visible}
+  .c figcaption{font-family:"SF Mono","Menlo","Consolas",monospace;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;margin-top:10px;opacity:.7;white-space:nowrap}
+  .c figcaption em{font-family:Georgia,serif;font-style:italic;letter-spacing:.02em;text-transform:none;font-size:12px;display:block;opacity:.9;margin-top:3px}
+  figure{margin:0}
+  .bob{animation:bob 7s ease-in-out infinite alternate}
+  @keyframes bob{from{transform:translateY(-12px) rotate(-2deg)}to{transform:translateY(14px) rotate(2deg)}}
+  .school{animation:swim 26s linear infinite}
+  @keyframes swim{from{transform:translateX(-30%)}to{transform:translateX(30%)}}
+  .pulse{transform-box:fill-box;transform-origin:50% 0;animation:pulse 3.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{transform:scale(1,1)}50%{transform:scale(.9,1.1)}}
+  .tent path{animation:tent 3.4s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 0}
+  .tent path:nth-child(even){animation-delay:-1.7s}
+  @keyframes tent{from{transform:skewX(-7deg)}to{transform:skewX(7deg)}}
+  .blink{animation:blink 2.8s ease-in-out infinite}
+  .blink:nth-child(3n){animation-delay:-.9s}.blink:nth-child(3n+1){animation-delay:-1.8s}
+  @keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
+  .beads{stroke-dasharray:.1 15;animation:beads 5s linear infinite}
+  @keyframes beads{to{stroke-dashoffset:-151}}
+  .comb{stroke-dasharray:3 5;animation:beads 3s linear infinite}
+  .ember{animation:ember 5s ease-in infinite;transform-box:fill-box}
+  .ember:nth-child(2n){animation-delay:-2.2s;animation-duration:6.5s}.ember:nth-child(3n){animation-delay:-3.6s}
+  @keyframes ember{0%{transform:translateY(0);opacity:0}15%{opacity:1}100%{transform:translateY(-170px) translateX(14px);opacity:0}}
+
+  .floor{min-height:130vh;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:0}
+  .floor .zone{margin-bottom:8vh}
+  .vents{display:block;width:calc(100% + clamp(90px,20vw,300px));margin-left:calc(-1 * clamp(20px,7vw,110px));height:auto}
+  .end{font-family:"SF Mono","Menlo","Consolas",monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;text-align:center;padding:26px 0 34px;background:#000;margin:0 calc(-1 * clamp(70px,13vw,190px)) 0 calc(-1 * clamp(20px,7vw,110px))}
+  .end a{color:var(--glow);text-decoration:none;border-bottom:1px solid}
+  @media (max-width:640px){
+    section{padding-right:74px}
+    .c figcaption{white-space:normal}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    #rays,.wave,.bob,.school,.pulse,.tent path,.blink,.beads,.comb,.ember,.cue::before{animation:none}
+    .ember{opacity:.8}.c{transition:opacity .6s;transform:none}
+  }
+</style>
+</head>
+<body>
+<div id="water"></div><div id="rays"></div><canvas id="snow" aria-hidden="true"></canvas>
+<a class="back" href="index.html">← 100</a>
+
+<aside class="gauge" aria-label="Depth gauge">
+  <div class="read"><b id="depth">0</b><span>metres</span></div>
+  <div class="track" id="track"><div class="mark" id="mark"></div></div>
+  <div class="stats"><div><span id="atm">1</span> <i>atm</i></div><div><span id="tmp">24.0</span> <i>°C</i></div><div><span id="lux">100</span> <i>% light</i></div></div>
+</aside>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="minnow" viewBox="0 0 60 24"><path d="M2 12C14 0 36 0 48 12 36 24 14 24 2 12zM46 12l12-9v18z" fill="currentColor"/><circle cx="12" cy="10" r="1.6" fill="#03324f"/></symbol>
+  <radialGradient id="jg" cx=".5" cy=".3" r=".8"><stop offset="0" stop-color="#e6fbff" stop-opacity=".95"/><stop offset=".55" stop-color="#63d8ff" stop-opacity=".45"/><stop offset="1" stop-color="#2a7bff" stop-opacity=".08"/></radialGradient>
+  <radialGradient id="lure" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff"/><stop offset=".3" stop-color="#b8ffd9"/><stop offset="1" stop-color="#3dffa8" stop-opacity="0"/></radialGradient>
+  <radialGradient id="oct" cx=".5" cy=".3" r=".8"><stop offset="0" stop-color="#ffd9ec" stop-opacity=".9"/><stop offset="1" stop-color="#ff5fa8" stop-opacity=".12"/></radialGradient>
+  <linearGradient id="rainbow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7df9ff"/><stop offset=".35" stop-color="#b08cff"/><stop offset=".7" stop-color="#ff7ad9"/><stop offset="1" stop-color="#ffd27a"/></linearGradient>
+  <linearGradient id="ventglow" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff5a1f" stop-opacity=".9"/><stop offset="1" stop-color="#ff5a1f" stop-opacity="0"/></linearGradient>
+</defs></svg>
+
+<main>
+  <section class="hero" data-from="0" data-to="4">
+    <div class="sky"><div class="sun"></div>
+      <svg class="wave" viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0 20c50-18 100-18 150 0s100 18 150 0 100-18 150 0 100 18 150 0 100-18 150 0 100 18 150 0 100-18 150 0 100 18 150 0v20H0z" fill="#2aa3d6"/></svg>
+      <svg class="wave" viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0 22c75-14 150-14 225 0s150 14 225 0 150-14 225 0 150 14 225 0 150-14 300 0v18H0z" fill="#2aa3d6"/></svg>
+    </div>
+    <h1>Descent</h1>
+    <p>The Verrin Trench is 9,840 metres of water stacked on water. Let go of the ladder. We will fall through five worlds, and the last light you see will not be the sun's.</p>
+    <div class="cue">Scroll to sink</div>
+  </section>
+
+  <section data-from="4" data-to="200" data-zone="Sunlight">
+    <div class="zone"><small>Zone I · 0 – 200 m</small><h2>The <i>Sunlight</i> Shallows</h2>
+      <p>Everything you think of as “the sea” lives in this thin bright skin. Light pours down in columns; the water is warm enough to forget about.</p>
+      <p>Shoals of sunstitch minnows turn together like a single thought, flashing silver, then vanishing edge-on.</p></div>
+    <figure class="c" style="right:8%;top:22%;width:min(58vw,560px);color:#dff6ff"><svg viewBox="0 0 560 240" class="school">
+      <g opacity=".95"><use href="#minnow" x="40" y="30" width="62" height="25"/><use href="#minnow" x="150" y="12" width="52" height="21"/><use href="#minnow" x="130" y="80" width="66" height="26"/><use href="#minnow" x="250" y="50" width="58" height="23"/><use href="#minnow" x="330" y="104" width="64" height="26"/><use href="#minnow" x="230" y="140" width="50" height="20"/><use href="#minnow" x="400" y="40" width="54" height="22"/><use href="#minnow" x="60" y="150" width="56" height="22"/><use href="#minnow" x="440" y="150" width="60" height="24"/><use href="#minnow" x="340" y="190" width="46" height="18"/></g>
+      <g opacity=".4"><use href="#minnow" x="10" y="96" width="36" height="14"/><use href="#minnow" x="200" y="200" width="34" height="14"/><use href="#minnow" x="480" y="96" width="36" height="14"/><use href="#minnow" x="300" y="4" width="30" height="12"/></g></svg>
+      <figcaption>Sunstitch minnow<em>Argentula filaris</em></figcaption></figure>
+    <figure class="c" style="left:6%;bottom:8%;width:min(30vw,220px);color:#0c5d86"><svg viewBox="0 0 200 320" class="bob">
+      <g fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round" opacity=".75"><path d="M60 320c-30-60 30-90 0-150s30-90 0-160"/><path d="M130 320c30-50-20-80 5-130s-25-80 0-120" stroke-width="10"/></g></svg></figure>
+  </section>
+
+  <section data-from="200" data-to="1000" data-zone="Twilight">
+    <div class="zone r"><small>Zone II · 200 – 1,000 m</small><h2>The <i>Twilight</i> Shelf</h2>
+      <p>The blue thins to a rumour. Down here, colour is something animals make for themselves — small lanterns carried against an enormous dusk.</p>
+      <p>A lantern veil jelly pulses past, unhurried, trailing eight metres of stinging thread like the hem of a gown.</p></div>
+    <figure class="c" style="left:9%;top:16%;width:min(40vw,300px);filter:drop-shadow(0 0 22px rgba(110,220,255,.65))"><div class="bob"><svg viewBox="0 0 200 340">
+      <g class="tent" fill="none" stroke="#9fe8ff" stroke-width="1.6" stroke-linecap="round" opacity=".8">
+        <path d="M52 112c-14 50 12 80 0 130s8 60-2 92"/><path d="M76 116c-8 60 14 90 4 140s-4 50 2 80"/><path d="M100 118c6 50-10 100 0 150s-6 40 0 66"/><path d="M124 116c10 60-12 90-2 140s6 50-4 78"/><path d="M148 112c14 50-10 80 2 130s-8 60 4 90"/>
+        <path d="M88 118c-4 30 8 50 2 80s6 40 0 60" stroke-width="4" opacity=".5"/><path d="M112 118c4 30-8 50-2 80s-6 40 0 60" stroke-width="4" opacity=".5"/></g>
+      <g class="pulse"><path d="M22 108C22 26 178 26 178 108c-12 10-22-6-32 6-10-12-22-12-30 2-8-14-22-14-32-2-10-12-22 4-32-6-8 8-20 8-30 0z" fill="url(#jg)" stroke="#d9faff" stroke-width="1.5"/>
+        <path d="M60 58c12-16 68-16 80 0" fill="none" stroke="#fff" stroke-width="2" opacity=".6"/>
+        <g fill="#fff"><circle class="blink" cx="70" cy="84" r="3"/><circle class="blink" cx="100" cy="76" r="3.6"/><circle class="blink" cx="130" cy="84" r="3"/><circle class="blink" cx="86" cy="96" r="2"/><circle class="blink" cx="114" cy="96" r="2"/></g></g></svg></div>
+      <figcaption>Lantern veil jelly<em>Velaria lucerna</em></figcaption></figure>
+    <figure class="c" style="right:12%;bottom:10%;width:min(46vw,340px);filter:drop-shadow(0 0 10px rgba(140,200,255,.5))"><svg viewBox="0 0 340 120" class="bob" style="animation-duration:9s">
+      <path d="M10 60C60 14 200 10 270 60 200 110 60 106 10 60zM266 60l60-34-14 34 14 34z" fill="rgba(160,215,255,.09)" stroke="#bfe4ff" stroke-width="1.4"/>
+      <path d="M40 60h210M70 40l20 40M110 32l20 56M150 32l20 56M190 38l16 44" stroke="#bfe4ff" stroke-width=".7" opacity=".5" fill="none"/>
+      <circle cx="46" cy="52" r="7" fill="none" stroke="#fff" stroke-width="1.4"/><circle cx="46" cy="52" r="2.6" fill="#fff"/>
+      <g fill="#8fffe0"><circle class="blink" cx="80" cy="84" r="3"/><circle class="blink" cx="104" cy="90" r="3"/><circle class="blink" cx="128" cy="93" r="3"/><circle class="blink" cx="152" cy="93" r="3"/><circle class="blink" cx="176" cy="90" r="3"/><circle class="blink" cx="200" cy="85" r="3"/><circle class="blink" cx="222" cy="78" r="3"/></g></svg>
+      <figcaption>Glassfin drifter<em>Hyalichthys vitreus</em></figcaption></figure>
+  </section>
+
+  <section data-from="1000" data-to="4000" data-zone="Midnight">
+    <div class="zone"><small>Zone III · 1,000 – 4,000 m</small><h2>The <i>Midnight</i> Water</h2>
+      <p>No sunlight has ever reached this water. Not once. The dark is not an absence here; it is the medium, like air.</p>
+      <p>Then a single green star swings toward you on a stalk. Behind it, slowly, a mouth assembles itself out of the black.</p></div>
+    <figure class="c" style="right:7%;top:24%;width:min(62vw,480px)"><div class="bob" style="animation-duration:11s"><svg viewBox="0 0 480 300">
+      <path d="M430 150c-30-70-130-110-220-100-70 8-130 50-150 104 24 60 90 96 160 98 90 4 180-32 210-102z" fill="#03060f" stroke="#2c4a6b" stroke-width="1.6"/>
+      <path d="M426 150l48-50-10 52 10 46z" fill="#03060f" stroke="#2c4a6b" stroke-width="1.4"/>
+      <path d="M250 60c20-30 60-36 90-26-10 16-30 30-50 34M270 244c20 22 50 26 76 16-12-14-28-22-46-24" fill="#03060f" stroke="#2c4a6b" stroke-width="1.2"/>
+      <path d="M62 152c40-14 90-10 140 8-50 26-100 30-140-8z" fill="#000" stroke="#2c4a6b"/>
+      <path d="M70 150l8 22 8-20 9 24 9-22 9 26 10-24 10 26 10-22 10 22 10-18 9 16 10-12M74 158l7-18 8 16 8-20 9 18 9-22 10 20 10-22 10 20 10-18 10 16 9-12" fill="none" stroke="#d6f5ff" stroke-width="1.5" stroke-linejoin="miter"/>
+      <circle cx="150" cy="104" r="12" fill="#000" stroke="#8fb6d9" stroke-width="1.5"/><circle cx="147" cy="101" r="3.4" fill="#eaffff"/>
+      <path d="M190 62C150 0 70 4 44 62" fill="none" stroke="#3d6485" stroke-width="2.4" stroke-linecap="round"/>
+      <g class="blink" style="animation-duration:4.5s"><circle cx="44" cy="70" r="46" fill="url(#lure)"/></g><circle cx="44" cy="70" r="7" fill="#f4fff9"/>
+      <g fill="#3dffa8"><circle class="blink" cx="250" cy="150" r="2"/><circle class="blink" cx="290" cy="158" r="2"/><circle class="blink" cx="330" cy="156" r="2"/><circle class="blink" cx="370" cy="150" r="2"/></g></svg></div>
+      <figcaption>Candlemouth angler<em>Lychnostoma patiens</em></figcaption></figure>
+    <figure class="c" style="left:10%;bottom:6%;width:min(52vw,420px);filter:drop-shadow(0 0 8px #ffb45e)"><svg viewBox="0 0 420 200">
+      <path d="M10 150C80 40 150 190 220 90S350 20 410 70" fill="none" stroke="#ffc27a" stroke-width=".8" opacity=".5"/>
+      <path class="beads" d="M10 150C80 40 150 190 220 90S350 20 410 70" fill="none" stroke="#ffd9a3" stroke-width="7" stroke-linecap="round"/></svg>
+      <figcaption>Threadlight colony<em>Catenaria ignis</em> — forty metres, one animal</figcaption></figure>
+  </section>
+
+  <section data-from="4000" data-to="6000" data-zone="Abyss">
+    <div class="zone r"><small>Zone IV · 4,000 – 6,000 m</small><h2>The <i>Abyssal</i> Plain</h2>
+      <p>Four hundred atmospheres. Two degrees above freezing. A flat grey desert of ooze, wider than continents, where a single footprint would last a thousand years.</p>
+      <p>Something soft opens above you like an umbrella in a doorway, considers the matter, and closes again.</p></div>
+    <figure class="c" style="left:8%;top:20%;width:min(46vw,330px);filter:drop-shadow(0 0 20px rgba(255,110,180,.5))"><div class="bob" style="animation-duration:10s"><svg viewBox="0 0 330 300">
+      <g class="pulse" style="animation-duration:5s"><path d="M40 170C30 60 120 10 165 10s135 50 125 160c-16 50-30 80-40 110-14-30-22-52-34-70-10 30-18 60-26 86-10-30-18-58-25-86-8 28-16 56-26 86-8-26-16-56-26-86-12 18-20 40-34 70-10-30-24-60-39-110z" fill="url(#oct)" stroke="#ffc4e0" stroke-width="1.4"/>
+      <path d="M92 74C60 40 40 60 44 84c14 6 32 4 44-2zM238 74c32-34 52-14 48 10-14 6-32 4-44-2z" fill="url(#oct)" stroke="#ffc4e0" stroke-width="1.2"/>
+      <circle cx="128" cy="118" r="10" fill="#1a0614"/><circle cx="202" cy="118" r="10" fill="#1a0614"/><circle cx="125" cy="115" r="3" fill="#fff"/><circle cx="199" cy="115" r="3" fill="#fff"/>
+      <g fill="#fff0f8"><circle class="blink" cx="96" cy="196" r="2.4"/><circle class="blink" cx="130" cy="210" r="2.4"/><circle class="blink" cx="165" cy="214" r="2.4"/><circle class="blink" cx="200" cy="210" r="2.4"/><circle class="blink" cx="234" cy="196" r="2.4"/></g></g></svg></div>
+      <figcaption>Parasol octopus<em>Umbrellina dubitans</em></figcaption></figure>
+    <figure class="c" style="right:14%;bottom:8%;width:min(24vw,150px);filter:drop-shadow(0 0 14px rgba(170,140,255,.6))"><svg viewBox="0 0 150 230" class="bob">
+      <path d="M75 8c40 0 62 50 62 110s-22 104-62 104S13 178 13 118 35 8 75 8z" fill="rgba(180,200,255,.07)" stroke="#cfd8ff" stroke-width="1.2"/>
+      <g fill="none" stroke="url(#rainbow)" stroke-width="3.4"><path class="comb" d="M40 30c-20 50-20 130 0 176"/><path class="comb" d="M62 16c-10 60-10 150 0 200"/><path class="comb" d="M88 16c10 60 10 150 0 200"/><path class="comb" d="M110 30c20 50 20 130 0 176"/></g></svg>
+      <figcaption>Prism comb<em>Iridella lenta</em></figcaption></figure>
+  </section>
+
+  <section class="floor" data-from="6000" data-to="9840" data-zone="Hadal">
+    <div class="zone"><small>Zone V · 6,000 – 9,840 m</small><h2>The <i>Hadal</i> Floor</h2>
+      <p>The trench narrows to a seam. Here the planet leaks: chimneys of black mineral breathe water hot enough to melt lead, and around them — against all sense — a garden.</p>
+      <p>You have run out of down. Above you is the height of a mountain range, made entirely of sea. Look up anyway.</p></div>
+    <svg class="vents" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <g fill="url(#ventglow)" opacity=".7"><path d="M230 150l30-150h20l30 150zM812 130l26-130h18l30 130z"/></g>
+      <g fill="#ffb37a"><circle class="ember" cx="262" cy="130" r="2.4"/><circle class="ember" cx="276" cy="140" r="1.8"/><circle class="ember" cx="286" cy="128" r="2"/><circle class="ember" cx="838" cy="116" r="2.4"/><circle class="ember" cx="852" cy="122" r="1.6"/><circle class="ember" cx="846" cy="106" r="2"/><circle class="ember" cx="270" cy="120" r="1.4"/></g>
+      <path d="M0 300V236c60-10 100 8 150-6 30-10 50-30 74-80l12-30h70l16 46c20 50 60 60 110 70 70 12 110-10 180-4 60 6 100 0 150-18 20-8 30-40 40-86h60l14 60c16 40 60 50 110 52 60 2 110-16 170-10 26 2 36 6 44 8v62z" fill="#000"/>
+      <g fill="none" stroke-linecap="round" stroke-width="5"><path d="M420 240c-4-30 6-40 0-66M436 242c2-26-6-36 2-56M452 244c-2-20 6-30 0-44M960 236c-4-30 6-40 0-62M978 238c2-24-6-34 2-50M1040 232c-2-20 4-28 0-40" stroke="#e9ecf2"/>
+        <path d="M420 178v-12M438 190v-12M452 204v-10M960 178v-12M980 192v-12M1040 196v-10" stroke="#ff4d5e"/></g>
+      <g fill="#7df9ff"><circle class="blink" cx="110" cy="226" r="2"/><circle class="blink" cx="560" cy="250" r="2"/><circle class="blink" cx="640" cy="244" r="1.6"/><circle class="blink" cx="1120" cy="232" r="2"/><circle class="blink" cx="700" cy="252" r="1.4"/></g>
+    </svg>
+    <p class="end">9,840 m · Bottom of the Verrin Trench · <a href="#" id="rise">Surface ↑</a></p>
+  </section>
+</main>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const MAX = 9840, $ = id => document.getElementById(id);
+  const water = $('water'), rays = $('rays'), mark = $('mark'), track = $('track');
+  const secs = [...document.querySelectorAll('section')].map(el => ({el, from: +el.dataset.from, to: +el.dataset.to, zone: el.dataset.zone}));
+  const stops = [[0,[42,163,214]],[200,[14,96,160]],[1000,[6,34,78]],[2600,[3,12,34]],[4000,[2,6,18]],[6000,[1,3,9]],[9840,[0,0,0]]];
+  // gauge uses a compressed scale so the shallow zones are not crushed
+  const gy = d => Math.pow(d / MAX, .5) * 100;
+  const labels = secs.filter(s => s.zone).map(s => { const l = document.createElement('div'); l.className = 'zl'; l.textContent = s.zone;
+    l.style.top = gy((s.from + s.to) / 2) + '%'; track.appendChild(l); return {l, s}; });
+  let depth = 0, lastY = scrollY, dy = 0;
+
+  function update(){
+    const mid = scrollY + innerHeight * .5; let d = 0;
+    for (const s of secs){ const top = s.el.offsetTop, h = s.el.offsetHeight;
+      if (mid >= top){ const f = Math.min(1, (mid - top) / h); d = s.from + (s.to - s.from) * f; } }
+    if (scrollY + innerHeight >= document.documentElement.scrollHeight - 4) d = MAX;
+    if (scrollY < 4) d = 0;
+    depth = d;
+    let c = stops[stops.length - 1][1];
+    for (let i = 1; i < stops.length; i++) if (d <= stops[i][0]){ const [d0, a] = stops[i - 1], [d1, b] = stops[i], f = (d - d0) / (d1 - d0);
+      c = a.map((v, k) => Math.round(v + (b[k] - v) * f)); break; }
+    water.style.background = `rgb(${c})`;
+    rays.style.opacity = Math.max(0, 1 - d / 420).toFixed(3);
+    $('depth').textContent = Math.round(d).toLocaleString('en-GB');
+    $('atm').textContent = Math.round(1 + d / 10).toLocaleString('en-GB');
+    $('tmp').textContent = (d < 1000 ? 24 - d / 1000 * 19.5 : Math.max(1.6, 4.5 - (d - 1000) / 3000 * 2.9)).toFixed(1);
+    const lx = 100 * Math.exp(-d / 46); $('lux').textContent = lx < .01 ? '0' : lx < 1 ? lx.toFixed(2) : Math.round(lx);
+    mark.style.top = gy(d) + '%';
+    labels.forEach(({l, s}) => l.classList.toggle('on', d >= s.from && d <= s.to));
+  }
+  let tick = false;
+  addEventListener('scroll', () => { dy += scrollY - lastY; lastY = scrollY; if (!tick){ tick = true; requestAnimationFrame(() => { tick = false; update(); }); } }, {passive: true});
+  addEventListener('resize', () => { size(); update(); });
+
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('seen'); }), {threshold: .25});
+  document.querySelectorAll('.c').forEach(c => io.observe(c));
+  $('rise').addEventListener('click', e => { e.preventDefault(); scrollTo({top: 0, behavior: reduce ? 'auto' : 'smooth'}); });
+
+  // marine snow: sinks slowly, streams upward past you as you fall
+  const cv = $('snow'), ctx = cv.getContext('2d'); let W, H, dpr, flakes = [];
+  function size(){ dpr = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.min(90, Math.round(W * H / 14000)); flakes = Array.from({length: n}, () => ({x: Math.random() * W, y: Math.random() * H, z: .3 + Math.random() * .9, p: Math.random() * 6.28})); }
+  function snow(t){
+    ctx.clearRect(0, 0, W, H);
+    const vis = Math.min(1, .25 + depth / 900), shift = dy; dy = 0;
+    for (const f of flakes){
+      f.y += (reduce ? 0 : .22 * f.z) - shift * .35 * f.z; f.x += reduce ? 0 : Math.sin(t * .0006 + f.p) * .18;
+      if (f.y > H + 5) f.y -= H + 10; if (f.y < -5) f.y += H + 10;
+      ctx.globalAlpha = vis * f.z * .55; ctx.fillStyle = '#dff3ff';
+      ctx.beginPath(); ctx.arc(f.x, f.y, f.z * 1.5, 0, 6.283); ctx.fill();
+    }
+    requestAnimationFrame(snow);
+  }
+  size(); update(); requestAnimationFrame(snow);
+})();
+</script>
+</body>
+</html>

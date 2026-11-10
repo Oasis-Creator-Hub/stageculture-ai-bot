@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grand Perhaps Terminus — Departures</title>
+<meta name="description" content="A clattering split-flap departure board with a live clock, listing trains to the Edge of Tuesday, Lost Sock Island, Second Thoughts and other places you cannot quite book a ticket to.">
+<style>
+:root{--cols:38;--w:clamp(8px,calc((100vw - 56px) / var(--cols)),27px);--h:calc(var(--w) * 1.56);--flap:#1d1f22;--amber:#ffc531}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100svh;font-family:"DIN Condensed","Roboto Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif;color:#e9e6dc;display:flex;flex-direction:column;align-items:center;overflow-x:hidden;
+  background:#26403f;background-image:linear-gradient(rgba(0,0,0,.5),transparent 30%,rgba(0,0,0,.45)),repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 2px,transparent 2px 62px),repeating-linear-gradient(90deg,rgba(0,0,0,.16) 0 2px,transparent 2px 124px)}
+.hang{display:flex;justify-content:space-between;width:min(72vw,760px);height:clamp(26px,6vh,64px)}
+.hang i{width:10px;background:linear-gradient(90deg,#555,#bbb 40%,#444)}
+.board{background:linear-gradient(#17181a,#0b0b0c);padding:clamp(10px,2vw,22px) clamp(10px,2vw,24px) clamp(12px,2vw,20px);border-radius:8px;border:2px solid #2e3033;box-shadow:0 0 0 5px #0c0c0d,0 30px 60px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);max-width:calc(100vw - 12px)}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:clamp(8px,1.4vw,16px);border-bottom:2px solid #2e3033;padding-bottom:clamp(6px,1vw,12px)}
+.head h1{margin:0;font-size:calc(var(--w) * 2.1);line-height:.9;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);font-weight:700}
+.head h1 small{display:block;font-size:.34em;letter-spacing:.3em;color:#9a9a92;font-weight:400;margin-bottom:.5em}
+.clock{display:flex;align-items:center;gap:calc(var(--w) * .12)}
+.clock em{font-style:normal;color:var(--amber);font-size:calc(var(--h) * .7);line-height:1;padding:0 1px}
+.labels,.row{display:flex;gap:calc(var(--w) * .9);align-items:center}
+.labels{font-size:calc(var(--w) * .62);letter-spacing:.24em;text-transform:uppercase;color:#8e8e86;margin-bottom:5px}
+.labels span,.grp{display:flex;gap:calc(var(--w) * .1);flex:none}
+.row{margin-bottom:calc(var(--w) * .26)}
+.lamp{width:calc(var(--w) * .5);height:calc(var(--w) * .5);border-radius:50%;background:#33342f;flex:none;margin-left:calc(var(--w) * -.5)}
+.lamp.on{background:var(--amber);box-shadow:0 0 10px var(--amber);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+.c{position:relative;width:var(--w);height:var(--h);flex:none;perspective:calc(var(--h) * 4);font-weight:700;font-size:calc(var(--h) * .74);color:#f1efe6}
+.c.y{color:var(--amber)}
+.c i{position:absolute;left:0;right:0;height:50%;overflow:hidden;background:var(--flap);backface-visibility:hidden}
+.c b{display:block;height:var(--h);line-height:calc(var(--h) * 1.06);text-align:center;font-weight:inherit}
+.c .t,.c .ft{top:0;border-radius:2px 2px 0 0;background:linear-gradient(#26282c,#1c1e21);box-shadow:inset 0 -1px 0 rgba(0,0,0,.8)}
+.c .b,.c .fb{bottom:0;border-radius:0 0 2px 2px;background:linear-gradient(#1a1b1e,#222428)}
+.c .b b,.c .fb b{margin-top:calc(var(--h) / -2)}
+.c .ft{transform-origin:50% 100%;visibility:hidden;z-index:2}.c .fb{transform-origin:50% 0;visibility:hidden;z-index:2}
+.c::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:#000;z-index:3}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:clamp(8px,1.4vw,14px);border-top:2px solid #2e3033;padding-top:8px;font-size:clamp(11px,1.5vw,14px);letter-spacing:.14em;text-transform:uppercase;color:#8e8e86}
+.foot p{margin:0;color:#c9c6ba;min-height:1.3em;flex:1}
+.foot button{font:inherit;letter-spacing:.14em;text-transform:uppercase;background:none;border:1px solid #55574f;color:#c9c6ba;padding:5px 10px;cursor:pointer;border-radius:3px;flex:none}
+.foot button[aria-pressed=true]{border-color:var(--amber);color:var(--amber)}
+.back{align-self:flex-start;margin:22px 0 30px 16px;color:#cfe3df;text-decoration:none;font-size:13px;letter-spacing:.24em}
+.rmk{display:flex}
+@media(max-width:700px){:root{--cols:27}.rmk{display:none}}
+@media(prefers-reduced-motion:reduce){.lamp.on{animation:none}}
+</style>
+</head>
+<body>
+<div class="hang"><i></i><i></i></div>
+<main class="board">
+  <div class="head"><h1><small>Grand Perhaps Terminus</small>Departures</h1><div class="clock" id="clock" aria-label="Current time"></div></div>
+  <div class="labels" id="labels"></div>
+  <div id="rows" aria-label="Departures list"></div>
+  <div class="foot"><p id="tick" aria-live="polite"></p><button id="snd" type="button" aria-pressed="false">Clatter: off</button></div>
+</main>
+<a class="back" href="index.html">← 100</a>
+<script>
+(function(){
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ALPHA=" ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:.'&-()",DIG="0123456789",STEP=62;
+let actx=null,sound=false,lastClick=0;
+function clack(){if(!sound||!actx)return;const now=actx.currentTime;if(now-lastClick<.028)return;lastClick=now;
+  const n=actx.sampleRate*.02|0,buf=actx.createBuffer(1,n,actx.sampleRate),d=buf.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);
+  const s=actx.createBufferSource(),f=actx.createBiquadFilter(),g=actx.createGain();s.buffer=buf;f.type='bandpass';f.frequency.value=1800+Math.random()*1400;g.gain.value=.16;s.connect(f).connect(g).connect(actx.destination);s.start()}
+function Cell(set,cls){const el=document.createElement('span');el.className='c'+(cls?' '+cls:'');el.innerHTML='<i class="t"><b></b></i><i class="b"><b></b></i><i class="ft"><b></b></i><i class="fb"><b></b></i>';
+  const q=s=>el.querySelector(s+' b'),c={el,set,cur:0,tgt:0,busy:false,t:q('.t'),b:q('.b'),ft:q('.ft'),fb:q('.fb')};
+  c.to=ch=>{let i=set.indexOf(ch);if(i<0)i=0;c.tgt=i;if(!c.busy)c.run()};
+  c.run=()=>{if(c.cur===c.tgt){c.busy=false;return}c.busy=true;const old=set[c.cur],nx=(c.cur+1)%set.length,nw=set[nx];
+    if(reduce){c.cur=c.tgt;c.t.textContent=c.b.textContent=set[c.cur];c.busy=false;return}
+    c.ft.textContent=old;c.fb.textContent=nw;c.t.textContent=nw;const F=c.ft.parentNode,B=c.fb.parentNode;F.style.visibility='visible';
+    F.animate([{transform:'rotateX(0)',filter:'brightness(1)'},{transform:'rotateX(-90deg)',filter:'brightness(.5)'}],{duration:STEP/2,easing:'ease-in'}).onfinish=()=>{
+      F.style.visibility='hidden';B.style.visibility='visible';
+      B.animate([{transform:'rotateX(90deg)',filter:'brightness(1.5)'},{transform:'rotateX(0)',filter:'brightness(1)'}],{duration:STEP/2,easing:'ease-out'}).onfinish=()=>{
+        B.style.visibility='hidden';c.b.textContent=nw;c.cur=nx;clack();c.run()}}};
+  return c}
+function group(parent,n,set,cls,gc){const g=document.createElement('span');g.className='grp'+(gc?' '+gc:'');const cells=[];for(let i=0;i<n;i++){const c=Cell(set,cls);cells.push(c);g.appendChild(c.el)}parent.appendChild(g);
+  return txt=>{txt=String(txt).toUpperCase().padEnd(n).slice(0,n);cells.forEach((c,i)=>setTimeout(()=>c.to(txt[i]),reduce?0:i*26))}}
+/* clock */
+const ck=document.getElementById('clock'),hh=group(ck,2,DIG,'y');ck.insertAdjacentHTML('beforeend','<em>:</em>');const mm=group(ck,2,DIG,'y');ck.insertAdjacentHTML('beforeend','<em>:</em>');const sx=group(ck,2,DIG,'y');
+const p2=n=>String(n).padStart(2,'0');
+function tickClock(){const d=new Date();hh(p2(d.getHours()));mm(p2(d.getMinutes()));sx(p2(d.getSeconds()))}
+/* rows */
+const W=[5,16,2,9],NAMES=['Time','Destination','Pl','Remarks'],lab=document.getElementById('labels');
+NAMES.forEach((n,i)=>{const s=document.createElement('span');s.textContent=n;s.style.width='calc(var(--w) * '+W[i]+' + var(--w) * '+(.1*(W[i]-1))+')';if(i===3)s.className='rmk';lab.appendChild(s)});
+const DEST=["EDGE OF TUESDAY","LOST SOCK ISLAND","CLOUD NINE","NOWHERE SPECIAL","BACK OF BEYOND","SECOND THOUGHTS","ATLANTIS CENTRAL","ALMOST THERE","THE LAST BISCUIT","SOMEWHERE NICE","MIDDLE OF A BOOK","NAP JUNCTION","ELSEWHERE","YESTERDAY","THE MOON & BACK","GRANDMA'S 1987","PILLOW FORT EAST","UPSIDE DOWNTON","A BETTER MOOD","THE DEEP END"];
+const RMK=["ON TIME","ON TIME","DELAYED","DREAMING","PROBABLY","SOONISH","NAPPING","ON TIME","SEE MOON","LAST CALL","ASK A CAT","ON TIME"];
+const NEWS=["Passengers for Second Thoughts are reminded that the train may turn back.","The buffet car to Nap Junction serves warm milk only.","Lost property: one left sock. Enquire at Lost Sock Island.","The 5:15 to Yesterday departed earlier than scheduled. It always does.","Please mind the gap between expectation and arrival.","Platform 9 is feeling shy today and will be Platform 8½."];
+const rowsEl=document.getElementById('rows'),rows=[],N=8;let data=[],di=Math.random()*DEST.length|0,base=new Date();
+function mk(off){const d=new Date(base.getTime()+off*60000);di=(di+1+(Math.random()*3|0))%DEST.length;
+  return{time:p2(d.getHours())+':'+p2(d.getMinutes()),dest:DEST[di],pl:String(1+(Math.random()*14|0)).padStart(2),rm:RMK[Math.random()*RMK.length|0]}}
+let offm=2;for(let i=0;i<N;i++){data.push(mk(offm));offm+=3+(Math.random()*9|0)}
+for(let i=0;i<N;i++){const r=document.createElement('div');r.className='row';const lamp=document.createElement('span');lamp.className='lamp';
+  const o={time:group(r,W[0],ALPHA,'y'),dest:group(r,W[1],ALPHA),pl:group(r,W[2],ALPHA,'y'),rm:group(r,W[3],ALPHA,'','rmk'),lamp};r.appendChild(lamp);rowsEl.appendChild(r);rows.push(o)}
+function show(){data.forEach((d,i)=>setTimeout(()=>{const r=rows[i];r.time(d.time);r.dest(d.dest);r.pl(d.pl);r.rm(i===0?'BOARDING':d.rm);r.lamp.classList.toggle('on',i===0)},reduce?0:i*140))}
+function advance(){data.shift();data.push(mk(offm));offm+=3+(Math.random()*9|0);show()}
+let ni=0;function news(){document.getElementById('tick').textContent=NEWS[ni++%NEWS.length]}
+const sb=document.getElementById('snd');
+sb.onclick=()=>{sound=!sound;if(sound&&!actx){try{actx=new (window.AudioContext||window.webkitAudioContext)()}catch(e){sound=false}}if(actx&&sound)actx.resume();sb.setAttribute('aria-pressed',sound);sb.textContent='Clatter: '+(sound?'on':'off')};
+tickClock();setInterval(tickClock,1000);show();news();setInterval(news,7000);setInterval(()=>{if(!document.hidden)advance()},11000);
+})();
+</script>
+</body>
+</html>

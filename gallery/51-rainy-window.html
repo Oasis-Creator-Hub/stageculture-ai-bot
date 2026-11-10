@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rain on the Fourth-Floor Window</title>
+<meta name="description" content="Raindrops gather, slide and merge on a night window in front of blurred city lights. Drag to wipe the glass.">
+<style>
+  html,body{margin:0;height:100%;background:#06080f;overflow:hidden}
+  body{font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;color:#e9e4d8}
+  #pane{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+  .mullion,.sill,.rail{position:fixed;pointer-events:none}
+  .mullion{top:0;bottom:0;left:66%;width:clamp(10px,1.5vw,20px);
+    background:linear-gradient(90deg,#030407,#161a22 38%,#0a0c11 60%,#020203);box-shadow:0 0 40px 6px rgba(0,0,0,.55)}
+  .rail{left:0;right:0;top:31%;height:clamp(6px,.9vw,12px);
+    background:linear-gradient(#020203,#14171e 45%,#040507);box-shadow:0 0 30px 4px rgba(0,0,0,.5)}
+  .sill{left:0;right:0;bottom:0;height:clamp(40px,8vh,84px);
+    background:linear-gradient(#1a1c22,#0b0c10 22%,#040406);border-top:1px solid rgba(255,225,190,.14);
+    box-shadow:0 -18px 50px rgba(0,0,0,.6)}
+  .words{position:fixed;left:clamp(20px,6vw,90px);bottom:calc(clamp(40px,8vh,84px) + clamp(22px,6vh,64px));
+    max-width:min(30em,56vw);pointer-events:none;text-shadow:0 1px 18px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.8)}
+  .words p{margin:0;font-size:clamp(17px,2.1vw,27px);line-height:1.42;font-style:italic;letter-spacing:.005em;
+    opacity:0;animation:rise 4s 1.2s ease forwards}
+  .words small{display:block;margin-top:1.3em;font:500 clamp(9px,.95vw,11px)/1.6 ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    letter-spacing:.28em;text-transform:uppercase;color:rgba(233,228,216,.55);opacity:0;animation:rise 4s 3s ease forwards}
+  #hint{transition:opacity 1.5s}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  a.back{position:fixed;top:14px;left:16px;font:500 11px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.2em;
+    color:rgba(233,228,216,.5);text-decoration:none;padding:6px 4px;z-index:5}
+  a.back:hover{color:#ffd9a0}
+  @media (max-width:560px){.words{max-width:80vw}.mullion{left:78%}}
+  @media (prefers-reduced-motion:reduce){.words p,.words small{animation:none;opacity:1}}
+</style>
+</head>
+<body>
+<canvas id="pane" aria-label="Rain running down a window at night"></canvas>
+<div class="rail"></div><div class="mullion"></div><div class="sill"></div>
+<div class="words">
+  <p>Somewhere below, the last tram is still running. You could go. You could also stay, and let the glass decide.</p>
+  <small><span id="clock">23:41</span> · fourth floor · <span id="hint">drag to wipe the pane</span></small>
+</div>
+<a class="back" href="index.html">← 100</a>
+<script>
+(() => {
+  const cv = document.getElementById('pane'), ctx = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const mk = (w, h) => { const c = document.createElement('canvas'); c.width = Math.max(1, w | 0); c.height = Math.max(1, h | 0); return c; };
+  let W, H, dpr, bg, film, fx, fog, fg, drops = [], maxDrops = 200;
+
+  // ---- the city, out of focus -------------------------------------------
+  function paintCity() {
+    const raw = mk(W / 2, H / 2), g = raw.getContext('2d'), w = raw.width, h = raw.height;
+    const sky = g.createLinearGradient(0, 0, 0, h);
+    sky.addColorStop(0, '#05070f'); sky.addColorStop(.5, '#0e1729'); sky.addColorStop(.78, '#261c2b'); sky.addColorStop(1, '#0d0a0e');
+    g.fillStyle = sky; g.fillRect(0, 0, w, h);
+    // dim tower blocks
+    for (let i = 0; i < 9; i++) {
+      const bw = rnd(.06, .16) * w, bh = rnd(.2, .55) * h, bx = rnd(-.05, 1) * w;
+      g.fillStyle = `rgba(${8 + i * 2},${11 + i * 2},${22 + i * 3},.75)`; g.fillRect(bx, h * .9 - bh, bw, bh);
+    }
+    const hues = ['255,178,88', '255,122,72', '255,218,160', '118,204,224', '238,78,92', '250,242,224', '120,146,255', '255,196,110'];
+    g.globalCompositeOperation = 'lighter';
+    const n = Math.round(46 + w * h / 5200), s = Math.max(.6, Math.min(1.4, w / 520));
+    for (let i = 0; i < n; i++) {
+      const depth = Math.random(), y = h * (.3 + .62 * Math.pow(Math.random(), .8));
+      const r = (5 + depth * 26 * (y / h)) * s, x = rnd(-.02, 1.02) * w, a = rnd(.07, .28) * (1.15 - depth * .5);
+      const col = hues[(Math.random() * hues.length) | 0];
+      g.fillStyle = `rgba(${col},${a})`; g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill();
+      g.strokeStyle = `rgba(${col},${a * .9})`; g.lineWidth = Math.max(.6, r * .07); g.stroke();
+    }
+    // a street of tail-lights and headlights receding
+    for (let i = 0; i < 26; i++) {
+      const t = i / 26, x = w * (.1 + t * .62), y = h * (.93 - t * .2), r = (11 - t * 8) * s;
+      g.fillStyle = `rgba(${i % 3 ? '255,70,60' : '255,236,200'},${.3 - t * .18})`;
+      g.beginPath(); g.arc(x + rnd(-6, 6), y + rnd(-3, 3), r, 0, 6.2832); g.fill();
+    }
+    bg = mk(w, h); const b = bg.getContext('2d');
+    if ('filter' in b) b.filter = `blur(${Math.max(1.5, 2.6 * s)}px)`;
+    b.drawImage(raw, 0, 0); b.filter = 'none';
+  }
+
+  // ---- one drop: a tiny upside-down lens ---------------------------------
+  function lens(g, x, y, r, st) {
+    if (r < 1.5) {
+      g.fillStyle = 'rgba(196,212,236,.22)'; g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill();
+      g.fillStyle = 'rgba(255,255,255,.5)'; g.fillRect(x - r * .5, y - r * .5, r * .5, r * .5); return;
+    }
+    const ry = r * st, k = bg.width / W, sw = r * 8 * k, sh = ry * 8 * k;
+    const sx = Math.max(0, Math.min(bg.width - sw, x * k - sw / 2)), sy = Math.max(0, Math.min(bg.height - sh, y * k - sh / 2));
+    g.save(); g.translate(x, y);
+    g.beginPath(); g.ellipse(0, 0, r, ry, 0, 0, 6.2832); g.clip();
+    g.scale(-1, -1); g.drawImage(bg, sx, sy, sw, sh, -r, -ry, r * 2, ry * 2); g.scale(-1, -1);
+    const sh2 = g.createRadialGradient(-r * .2, -ry * .3, r * .15, 0, 0, Math.max(r, ry) * 1.08);
+    sh2.addColorStop(0, 'rgba(255,255,255,.05)'); sh2.addColorStop(.62, 'rgba(0,0,0,.08)'); sh2.addColorStop(1, 'rgba(0,0,6,.72)');
+    g.fillStyle = sh2; g.fillRect(-r, -ry, r * 2, ry * 2);
+    g.strokeStyle = 'rgba(220,232,255,.28)'; g.lineWidth = Math.max(.5, r * .1);
+    g.beginPath(); g.ellipse(0, 0, r * .86, ry * .86, 0, .35, 2.2); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,.78)'; g.beginPath(); g.ellipse(-r * .34, -ry * .42, r * .2, r * .13, -.6, 0, 6.2832); g.fill();
+    g.restore();
+  }
+
+  const speck = () => lens(fx, rnd(0, W), rnd(0, H), Math.pow(Math.random(), 2.3) * 3 + .7, 1);
+  const newDrop = (x, y, r) => ({ x: x ?? rnd(0, W), y: y ?? rnd(0, H), r: r ?? rnd(2.2, 5.2), crit: rnd(6, 9), vx: 0, vy: 0, slide: false, hold: 0, dead: false });
+
+  function clearPath(x0, y0, x1, y1, r) {
+    fx.save(); fx.globalCompositeOperation = 'destination-out'; fx.lineCap = 'round'; fx.lineWidth = r * 2;
+    fx.beginPath(); fx.moveTo(x0, y0); fx.lineTo(x1, y1 + .01); fx.stroke(); fx.restore();
+    fg.save(); fg.globalCompositeOperation = 'destination-out'; fg.lineCap = 'round'; fg.lineWidth = r / 2 + .6;
+    fg.beginPath(); fg.moveTo(x0 / 4, y0 / 4); fg.lineTo(x1 / 4, y1 / 4 + .01); fg.stroke(); fg.restore();
+  }
+
+  function step() {
+    for (let i = 0; i < 4; i++) speck();
+    if (drops.length < maxDrops && Math.random() < .55) drops.push(newDrop());
+    fg.globalAlpha = .01; fg.fillRect(0, 0, fog.width, fog.height); fg.globalAlpha = 1;   // the glass slowly mists over again
+    for (const d of drops) {
+      if (d.dead) continue;
+      if (!d.slide) { d.r += .003 + Math.random() * .009; if (d.r > d.crit) d.slide = true; continue; }
+      const px = d.x, py = d.y;
+      if (d.hold > 0) { d.hold--; d.vy *= .72; }
+      else { d.vy += (d.r * .44 - d.vy) * .06; if (d.r < 8 && Math.random() < .014) d.hold = rnd(8, 55) | 0; }
+      d.vx = (d.vx + rnd(-.13, .13)) * .9; d.x += d.vx; d.y += d.vy;
+      clearPath(px, py, d.x, d.y, d.r * .92);
+      d.r -= d.vy * .0034;
+      if (d.vy > 1 && Math.random() < .09) lens(fx, d.x + rnd(-.3, .3) * d.r, d.y - d.r * 2.1 - d.vy, rnd(.8, Math.min(2.6, d.r * .4)), 1.25);
+      for (const o of drops) {
+        if (o === d || o.dead) continue;
+        const dx = o.x - d.x, dy = o.y - d.y, rr = d.r + o.r * .8;
+        if (dx * dx + dy * dy < rr * rr) { d.r = Math.min(14, Math.sqrt(d.r * d.r + o.r * o.r * .7)); d.hold = 0; o.dead = true; }
+      }
+      if (d.y - d.r * 2 > H) d.dead = true;
+      else if (d.r < 2.3) { d.slide = false; d.vy = 0; d.crit = rnd(6, 9); }
+    }
+    drops = drops.filter(d => !d.dead);
+  }
+
+  function render(t) {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.drawImage(bg, 0, 0, W, H);
+    const ph = (t / 17000) % 1, lx = (ph * 1.7 - .35) * W;                 // a car passes, far below
+    const beam = ctx.createRadialGradient(lx, H * .9, 0, lx, H * .9, Math.max(W, H) * .3);
+    beam.addColorStop(0, 'rgba(255,224,176,.13)'); beam.addColorStop(1, 'rgba(255,224,176,0)');
+    ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = beam; ctx.fillRect(0, 0, W, H); ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = .12; ctx.drawImage(fog, 0, 0, W, H); ctx.globalAlpha = 1;
+    ctx.drawImage(film, 0, 0, W, H);
+    for (const d of drops) lens(ctx, d.x, d.y, d.r, d.slide ? 1 + Math.min(.55, d.vy * .13) : 1);
+  }
+
+  function setup() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    paintCity();
+    film = mk(W * dpr, H * dpr); fx = film.getContext('2d'); fx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    fog = mk(W / 4 + 1, H / 4 + 1); fg = fog.getContext('2d'); fg.fillStyle = '#b4c2d6'; fg.fillRect(0, 0, fog.width, fog.height);
+    maxDrops = Math.round(Math.min(230, Math.max(70, W * H / 5200)));
+    drops = [];
+    for (let i = Math.min(2600, W * H / 480); i > 0; i--) speck();
+    for (let i = 0; i < maxDrops * .8; i++) drops.push(newDrop());
+    for (let i = 0; i < (reduce ? 500 : 160); i++) step();
+    render(0);
+  }
+
+  // ---- wiping --------------------------------------------------------------
+  let last = null;
+  function wipe(e) {
+    const x = e.clientX, y = e.clientY, R = Math.max(18, Math.min(34, W * .028));
+    clearPath(last.x, last.y, x, y, R);
+    for (const d of drops) if (Math.hypot(d.x - x, d.y - y) < R + d.r) d.dead = true;
+    drops = drops.filter(d => !d.dead);
+    if (Math.random() < .22) drops.push(Object.assign(newDrop(x + rnd(-R, R), y + R * .95, rnd(3.4, 5.4)), { crit: rnd(4, 6.5) }));
+    last = { x, y };
+    document.getElementById('hint').style.opacity = 0;
+    if (reduce) render(0);
+  }
+  cv.addEventListener('pointerdown', e => { last = { x: e.clientX, y: e.clientY }; try { cv.setPointerCapture(e.pointerId); } catch (_) {} wipe(e); });
+  cv.addEventListener('pointermove', e => { if (last) wipe(e); });
+  const end = () => { last = null; };
+  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+
+  const clock = document.getElementById('clock');
+  const tick = () => { const d = new Date(); clock.textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+  tick(); setInterval(tick, 20000);
+
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(setup, 150); });
+  setup();
+  if (!reduce) (function loop(t) { step(); render(t); requestAnimationFrame(loop); })(0);
+})();
+</script>
+</body>
+</html>

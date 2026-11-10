@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BOING! Club — a Memphis playground</title>
+<meta name="description" content="An 80s Memphis-style playground of squiggles, confetti and clashing pastels. Poke the shapes and they bounce, spin and boing.">
+<style>
+  :root{--pink:#ff8fb8;--mint:#7fe3c4;--lemon:#ffe14d;--sky:#6fb7ff;--lilac:#b99cff;--coral:#ff6a4d;--k:#111;--w:#fffdf5}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{overflow:hidden;background:var(--w);color:var(--k);font-family:"Futura","Century Gothic","Avenir Next","Trebuchet MS",sans-serif;
+    -webkit-user-select:none;user-select:none}
+  #stage{position:fixed;inset:0;overflow:hidden;touch-action:none;cursor:pointer;
+    background:
+      radial-gradient(var(--k) 1.6px,transparent 2px) 0 0/22px 22px,
+      var(--w)}
+  /* big static colour-blocks, laid out like a laminate sample board */
+  .blk{position:absolute}
+  .b1{left:0;top:0;width:38%;height:56%;background:var(--pink)}
+  .b2{right:0;top:0;width:30%;height:34%;background:var(--lemon);
+    background-image:repeating-linear-gradient(45deg,var(--k) 0 6px,transparent 6px 22px)}
+  .b3{right:0;bottom:0;width:46%;height:42%;background:var(--mint)}
+  .b4{left:8%;bottom:0;width:26%;height:26%;background:var(--sky);border-radius:999px 999px 0 0}
+  .b5{left:38%;top:0;width:8%;height:100%;
+    background:repeating-linear-gradient(0deg,var(--k) 0 14px,var(--w) 14px 28px)}
+  .b6{right:9%;top:24%;width:clamp(90px,17vw,220px);aspect-ratio:1;border-radius:50%;background:var(--lilac);
+    background-image:radial-gradient(var(--k) 22%,transparent 24%);background-size:26px 26px;border:5px solid var(--k)}
+  .b7{left:0;top:56%;width:38%;height:18px;background:
+    linear-gradient(135deg,var(--k) 25%,transparent 25%) 0 0/18px 18px,
+    linear-gradient(225deg,var(--k) 25%,transparent 25%) 0 0/18px 18px,var(--lemon)}
+  .terrazzo{right:0;bottom:42%;width:46%;height:9%;background:var(--w);border-block:5px solid var(--k);overflow:hidden}
+  .terrazzo i{position:absolute;width:16px;height:9px;border-radius:3px}
+
+  .title{position:absolute;left:clamp(14px,4vw,56px);bottom:clamp(64px,11vh,120px);pointer-events:none;z-index:2}
+  .title h1{margin:0;font-size:clamp(64px,17vw,250px);line-height:.8;font-weight:900;letter-spacing:-.05em;font-style:italic;
+    color:var(--w);-webkit-text-stroke:clamp(3px,.5vw,7px) var(--k);paint-order:stroke fill;
+    text-shadow:.045em .045em 0 var(--coral),.09em .09em 0 var(--k)}
+  .title h1 em{font-style:normal;color:var(--lemon)}
+  .title p{display:inline-block;margin:1.4em 0 0;background:var(--k);color:var(--w);padding:.5em .9em;
+    font-weight:700;font-size:clamp(11px,1.4vw,15px);letter-spacing:.24em;text-transform:uppercase;transform:rotate(-2deg)}
+  .hud{position:absolute;right:clamp(12px,3vw,36px);top:clamp(12px,3vh,30px);z-index:6;display:flex;gap:10px;align-items:stretch}
+  .hud > *{border:4px solid var(--k);background:var(--w);box-shadow:5px 5px 0 var(--k);font:inherit;font-weight:900;color:var(--k)}
+  .score{padding:6px 14px 4px;text-align:center;font-size:10px;letter-spacing:.2em;text-transform:uppercase}
+  .score b{display:block;font-size:28px;letter-spacing:-.03em;line-height:1}
+  .hud button{cursor:pointer;padding:0 16px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;background:var(--coral);
+    transition:transform .1s,box-shadow .1s}
+  .hud button:active{transform:translate(4px,4px);box-shadow:1px 1px 0 var(--k)}
+  .hud button:focus-visible,.back:focus-visible{outline:4px dotted var(--sky);outline-offset:4px}
+  .back{position:absolute;left:clamp(14px,4vw,56px);top:clamp(12px,3vh,30px);z-index:6;background:var(--lemon);color:var(--k);text-decoration:none;
+    font-weight:900;font-size:14px;padding:8px 12px;border:4px solid var(--k);box-shadow:5px 5px 0 var(--k);transform:rotate(-3deg)}
+  .foot{position:absolute;left:clamp(14px,4vw,56px);bottom:clamp(14px,3vh,30px);z-index:2;pointer-events:none;
+    font-weight:700;font-size:clamp(11px,1.3vw,14px);max-width:min(30em,80vw);line-height:1.35}
+
+  .shape{position:absolute;left:0;top:0;will-change:transform;z-index:4;touch-action:none;cursor:grab}
+  .shape svg{display:block;overflow:visible;filter:drop-shadow(6px 6px 0 rgba(17,17,17,.9))}
+  .shape.pop svg{animation:pop .45s cubic-bezier(.3,1.9,.5,1)}
+  @keyframes pop{0%{transform:scale(1.5,.6)}45%{transform:scale(.8,1.25)}100%{transform:scale(1)}}
+  .ring{position:absolute;border:5px solid var(--k);border-radius:50%;pointer-events:none;z-index:5;
+    animation:ring .5s ease-out forwards;transform:translate(-50%,-50%)}
+  @keyframes ring{from{width:10px;height:10px;opacity:1}to{width:170px;height:170px;opacity:0}}
+  @media (prefers-reduced-motion:reduce){.shape.pop svg,.ring{animation:none}.ring{display:none}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="blk b1"></div><div class="blk b2"></div><div class="blk b3"></div><div class="blk b4"></div>
+  <div class="blk b5"></div><div class="blk b7"></div><div class="blk terrazzo" id="terrazzo"></div><div class="blk b6"></div>
+  <div class="title">
+    <h1>BO<em>I</em>NG!<br>Club</h1>
+    <p>Est. 1984 · Members must wobble</p>
+  </div>
+  <p class="foot">House rules: poke anything. Fling it if you like. Nothing here is load-bearing, least of all the taste.</p>
+</div>
+<a class="back" href="index.html">← 100</a>
+<div class="hud">
+  <div class="score"><b id="pokes">0</b>pokes</div>
+  <button type="button" id="more">+ Confetti</button>
+</div>
+
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const C = {pink:'#ff8fb8', mint:'#7fe3c4', lemon:'#ffe14d', sky:'#6fb7ff', lilac:'#b99cff', coral:'#ff6a4d', k:'#111', w:'#fffdf5'};
+  const cols = [C.pink, C.mint, C.lemon, C.sky, C.lilac, C.coral];
+  const rnd = (a, b) => a + Math.random() * (b - a), pick = a => a[Math.random() * a.length | 0];
+  let uid = 0;
+
+  // each maker returns SVG markup drawn inside a 100×100 box
+  const makers = [
+    c => `<path d="M6 60c10-34 20-34 30 0s20 34 30 0 20-34 28-8" fill="none" stroke="${C.k}" stroke-width="20" stroke-linecap="round"/><path d="M6 60c10-34 20-34 30 0s20 34 30 0 20-34 28-8" fill="none" stroke="${c}" stroke-width="10" stroke-linecap="round"/>`,
+    (c, id) => `<defs><pattern id="p${id}" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="12" height="12" fill="${c}"/><rect width="5" height="12" fill="${C.k}"/></pattern></defs><path d="M50 6L96 92H4z" fill="url(#p${id})" stroke="${C.k}" stroke-width="6" stroke-linejoin="round"/>`,
+    (c, id) => `<defs><pattern id="p${id}" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="${c}"/><circle cx="8" cy="8" r="3.4" fill="${C.k}"/></pattern></defs><circle cx="50" cy="50" r="44" fill="url(#p${id})" stroke="${C.k}" stroke-width="6"/>`,
+    c => `<path d="M6 62a44 44 0 0188 0z" fill="${c}" stroke="${C.k}" stroke-width="6" stroke-linejoin="round"/><path d="M22 62a28 28 0 0156 0" fill="none" stroke="${C.k}" stroke-width="6"/>`,
+    c => `<path d="M4 70L24 30l20 40 20-40 20 40 12-24" fill="none" stroke="${C.k}" stroke-width="18" stroke-linejoin="miter" stroke-linecap="square"/><path d="M4 70L24 30l20 40 20-40 20 40 12-24" fill="none" stroke="${c}" stroke-width="8" stroke-linejoin="miter" stroke-linecap="square"/>`,
+    c => `<path d="M36 6h28v30h30v28H64v30H36V64H6V36h30z" fill="${c}" stroke="${C.k}" stroke-width="6" stroke-linejoin="round"/>`,
+    c => `<circle cx="50" cy="50" r="36" fill="none" stroke="${C.k}" stroke-width="24"/><circle cx="50" cy="50" r="36" fill="none" stroke="${c}" stroke-width="13"/>`,
+    (c, id) => `<defs><pattern id="p${id}" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="${C.w}"/><path d="M0 0h14M0 0v14" stroke="${C.k}" stroke-width="4"/></pattern></defs><rect x="10" y="10" width="80" height="80" fill="url(#p${id})" stroke="${C.k}" stroke-width="6"/><rect x="58" y="-2" width="34" height="34" fill="${c}" stroke="${C.k}" stroke-width="6"/>`,
+    c => `<rect x="8" y="34" width="84" height="32" rx="16" fill="${c}" stroke="${C.k}" stroke-width="6"/><circle cx="28" cy="50" r="6" fill="${C.k}"/><circle cx="50" cy="50" r="6" fill="${C.k}"/><circle cx="72" cy="50" r="6" fill="${C.k}"/>`,
+    c => `<path d="M50 4l12 30 32 4-24 21 8 33-28-18-28 18 8-33L6 38l32-4z" fill="${c}" stroke="${C.k}" stroke-width="6" stroke-linejoin="round"/>`,
+    c => `<path d="M10 90V10h34a40 40 0 010 80z" fill="${c}" stroke="${C.k}" stroke-width="6" stroke-linejoin="round"/><path d="M26 28v44" stroke="${C.k}" stroke-width="6" stroke-dasharray="6 8"/>`
+  ];
+  const shapes = [];
+  let W = innerWidth, H = innerHeight;
+
+  function spawn(x, y, kind){
+    const size = rnd(.11, .2) * Math.max(320, Math.min(W, H, 900)) + 20;
+    const el = document.createElement('div'); el.className = 'shape';
+    const id = uid++, m = kind === undefined ? pick(makers) : makers[kind % makers.length];
+    el.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true">${m(cols[id % cols.length], id)}</svg>`;
+    stage.appendChild(el);
+    const s = {el, r: size / 2, x: x ?? rnd(size, W - size), y: y ?? rnd(size, H - size), vx: rnd(-1, 1), vy: rnd(-1, 1),
+      a: rnd(0, 360), va: rnd(-.6, .6), drag: null};
+    el.addEventListener('pointerdown', e => grab(e, s));
+    shapes.push(s);
+    if (shapes.length > 34){ const o = shapes.shift(); o.el.remove(); }
+    return s;
+  }
+
+  // sound: a rubbery "boing" — only ever started from a poke (user gesture)
+  let ac = null;
+  function boing(pitch){
+    try{
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime;
+      o.type = 'triangle'; o.frequency.setValueAtTime(pitch, t); o.frequency.exponentialRampToValueAtTime(pitch * 2.4, t + .09);
+      o.frequency.exponentialRampToValueAtTime(pitch * .7, t + .32);
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.16, t + .015); g.gain.exponentialRampToValueAtTime(.0001, t + .36);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t + .4);
+    }catch(_){}
+  }
+  const pokesEl = document.getElementById('pokes'); let pokes = 0;
+  function poke(s, px, py, power){
+    const dx = s.x - px, dy = s.y - py, d = Math.hypot(dx, dy) || 1;
+    s.vx += dx / d * power + rnd(-2, 2); s.vy += dy / d * power - 4; s.va += rnd(-14, 14);
+    s.el.classList.remove('pop'); void s.el.offsetWidth; s.el.classList.add('pop');
+    pokesEl.textContent = ++pokes; boing(170 + (100 - s.r) * 3 + rnd(0, 60));
+  }
+  function ring(x, y){ const r = document.createElement('div'); r.className = 'ring'; r.style.left = x + 'px'; r.style.top = y + 'px';
+    stage.appendChild(r); setTimeout(() => r.remove(), 520); }
+
+  function grab(e, s){
+    e.stopPropagation(); e.preventDefault();
+    s.el.setPointerCapture(e.pointerId);
+    s.drag = {id: e.pointerId, ox: s.x - e.clientX, oy: s.y - e.clientY, lx: e.clientX, ly: e.clientY, moved: 0, vx: 0, vy: 0};
+    s.el.style.zIndex = 5; ring(e.clientX, e.clientY);
+    const mv = ev => { const d = s.drag; if (!d || ev.pointerId !== d.id) return;
+      d.vx = ev.clientX - d.lx; d.vy = ev.clientY - d.ly; d.moved += Math.abs(d.vx) + Math.abs(d.vy); d.lx = ev.clientX; d.ly = ev.clientY;
+      s.x = ev.clientX + d.ox; s.y = ev.clientY + d.oy; };
+    const up = ev => { const d = s.drag; if (!d || ev.pointerId !== d.id) return;
+      s.el.removeEventListener('pointermove', mv); s.el.removeEventListener('pointerup', up); s.el.removeEventListener('pointercancel', up);
+      s.drag = null; s.el.style.zIndex = '';
+      if (d.moved < 8) poke(s, ev.clientX + rnd(-4, 4), ev.clientY + s.r * .6, 16);
+      else { s.vx = d.vx * 1.2; s.vy = d.vy * 1.2; s.va = d.vx * .5; pokesEl.textContent = ++pokes; boing(240); } };
+    s.el.addEventListener('pointermove', mv); s.el.addEventListener('pointerup', up); s.el.addEventListener('pointercancel', up);
+  }
+  // poking empty floor sends a shockwave through the neighbours
+  stage.addEventListener('pointerdown', e => {
+    ring(e.clientX, e.clientY); let hit = false;
+    for (const s of shapes){ const d = Math.hypot(s.x - e.clientX, s.y - e.clientY); if (d < 230){ poke(s, e.clientX, e.clientY, 13 * (1 - d / 260)); hit = true; } }
+    if (!hit) spawn(e.clientX, e.clientY).vy = -8;
+  });
+  document.getElementById('more').addEventListener('click', () => { for (let i = 0; i < 4; i++){ const s = spawn(W / 2 + rnd(-60, 60), H * .3); s.vx = rnd(-12, 12); s.vy = rnd(-14, -4); s.va = rnd(-12, 12); } boing(330); });
+
+  function tick(){
+    const g = .32, cruise = reduce ? 0 : .55;
+    for (const s of shapes){
+      if (!s.drag){
+        const sp = Math.hypot(s.vx, s.vy);
+        // fast shapes feel gravity and friction; slow ones settle into a lazy drift
+        if (sp > 2.2){ s.vy += g; s.vx *= .992; s.vy *= .992; }
+        else if (sp < cruise && cruise){ const a = Math.atan2(s.vy, s.vx) || rnd(0, 6.28); s.vx = Math.cos(a) * cruise; s.vy = Math.sin(a) * cruise; }
+        else if (!cruise){ s.vx *= .94; s.vy *= .94; }
+        s.va *= .985; if (!reduce && Math.abs(s.va) < .15) s.va = s.va < 0 ? -.15 : .15;
+        if (reduce && sp < .05) s.va *= .9;
+        s.x += s.vx; s.y += s.vy; s.a += s.va;
+        const b = .78;
+        if (s.x < s.r){ s.x = s.r; s.vx = Math.abs(s.vx) * b; s.va += s.vy * .3; }
+        if (s.x > W - s.r){ s.x = W - s.r; s.vx = -Math.abs(s.vx) * b; s.va -= s.vy * .3; }
+        if (s.y < s.r){ s.y = s.r; s.vy = Math.abs(s.vy) * b; }
+        if (s.y > H - s.r){ s.y = H - s.r; s.vy = -Math.abs(s.vy) * b; s.va += s.vx * .3; if (Math.abs(s.vy) < 1.4) s.vy *= .4; }
+      }
+      s.el.style.transform = `translate(${(s.x - s.r).toFixed(1)}px,${(s.y - s.r).toFixed(1)}px) rotate(${s.a.toFixed(1)}deg)`;
+    }
+    requestAnimationFrame(tick);
+  }
+  addEventListener('resize', () => { W = innerWidth; H = innerHeight; });
+
+  // terrazzo chips
+  const tz = document.getElementById('terrazzo');
+  for (let i = 0; i < 70; i++){ const c = document.createElement('i');
+    c.style.cssText = `left:${rnd(0, 100)}%;top:${rnd(-5, 95)}%;background:${pick([...cols, C.k])};transform:rotate(${rnd(0, 180)}deg) scale(${rnd(.6, 1.5)})`; tz.appendChild(c); }
+  const n = W < 600 ? 9 : 15;
+  for (let i = 0; i < n; i++) spawn(undefined, undefined, i);
+  tick();
+})();
+</script>
+</body>
+</html>

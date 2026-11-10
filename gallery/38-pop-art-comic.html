@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Miss Meridian vs. the Monday Machine! — Issue 38</title>
+<meta name="description" content="A pop-art comic page with halftone dots, thick ink outlines, speech bubbles and original characters. Click any panel to pop an onomatopoeia.">
+<style>
+  :root{--k:#111;--red:#e8222e;--yel:#ffd91c;--cy:#19b5e6;--paper:#f6efdc;--pink:#ff8fa8}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#2a2622;font-family:"Comic Sans MS","Chalkboard SE","Comic Neue","Marker Felt","Trebuchet MS",sans-serif;color:var(--k);padding:clamp(8px,2vw,28px);overflow-x:hidden}
+  .imp{font-family:Impact,"Haettenschweiler","Arial Narrow Bold","Franklin Gothic Heavy","Arial Black",sans-serif}
+  .page{max-width:1000px;margin:0 auto;background:var(--paper);padding:clamp(10px,2.2vw,26px);position:relative;box-shadow:0 30px 60px -20px #000;
+    background-image:radial-gradient(rgba(120,90,40,.09) 1px,transparent 1.4px);background-size:5px 5px}
+  .mast{position:relative;background:var(--cy);border:5px solid var(--k);padding:clamp(10px,2vw,20px) clamp(12px,2.4vw,26px) clamp(14px,2.6vw,26px);overflow:hidden;
+    background-image:radial-gradient(#0d8fc0 22%,transparent 24%);background-size:11px 11px}
+  .mast .kick{display:inline-block;background:var(--k);color:var(--yel);font-size:clamp(10px,1.5vw,14px);letter-spacing:.18em;text-transform:uppercase;padding:4px 10px;transform:rotate(-1.5deg)}
+  .mast h1{font-size:clamp(44px,12.4vw,128px);line-height:.84;color:var(--yel);-webkit-text-stroke:clamp(2px,.4vw,4px) var(--k);paint-order:stroke fill;text-shadow:clamp(3px,.7vw,7px) clamp(3px,.7vw,7px) 0 var(--red),clamp(5px,1vw,10px) clamp(5px,1vw,10px) 0 var(--k);transform:skew(-7deg) rotate(-2deg);letter-spacing:.01em;margin:10px 0 4px;text-transform:uppercase}
+  .mast p{font-weight:700;font-size:clamp(12px,1.9vw,19px);background:#fff;border:3px solid var(--k);display:inline-block;padding:3px 10px;transform:rotate(-1deg)}
+  .price{position:absolute;right:clamp(6px,2vw,22px);top:clamp(6px,1.4vw,16px);width:clamp(62px,12vw,112px);aspect-ratio:1;display:grid;place-items:center;text-align:center;color:#fff;font-size:clamp(11px,2vw,19px);line-height:1;
+    background:var(--red);clip-path:polygon(50% 0,61% 14%,79% 7%,80% 26%,98% 30%,88% 46%,100% 62%,82% 68%,84% 88%,66% 82%,54% 100%,42% 84%,22% 92%,22% 72%,2% 66%,13% 49%,0 32%,19% 27%,20% 8%,39% 15%)}
+  .price b{font-size:1.9em;display:block}
+  .back{position:absolute;left:0;bottom:0;background:var(--k);color:var(--paper);font-size:11px;letter-spacing:.2em;padding:5px 9px;text-decoration:none;z-index:3}
+  .back:hover,.back:focus-visible{background:var(--red)}
+  .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:clamp(8px,1.4vw,14px);margin-top:clamp(8px,1.4vw,14px)}
+  .p{position:relative;border:5px solid var(--k);overflow:hidden;cursor:pointer;min-height:230px;background:#fff;user-select:none;-webkit-user-select:none;touch-action:manipulation;outline-offset:3px}
+  .p svg.art{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .p1{grid-column:span 6;min-height:clamp(220px,34vw,330px)}
+  .p2,.p3{grid-column:span 3;min-height:clamp(280px,40vw,380px)}
+  .p4{grid-column:span 4;min-height:clamp(260px,36vw,340px)}
+  .p5{grid-column:span 2;min-height:clamp(260px,36vw,340px)}
+  .p6{grid-column:span 6;min-height:0;cursor:default;background:var(--yel);padding:14px 18px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;
+    background-image:radial-gradient(#ffb800 20%,transparent 22%);background-size:9px 9px}
+  .p6 strong{font-size:clamp(22px,4.4vw,44px);line-height:.95;text-transform:uppercase;color:var(--red);-webkit-text-stroke:1.5px var(--k);paint-order:stroke fill}
+  .p6 span{background:#fff;border:3px solid var(--k);padding:5px 10px;font-weight:700;font-size:clamp(12px,1.6vw,15px);transform:rotate(1deg)}
+  .cap{position:absolute;left:0;top:0;background:var(--yel);border-right:4px solid var(--k);border-bottom:4px solid var(--k);padding:6px 11px;font-size:clamp(11px,1.5vw,14.5px);font-weight:700;max-width:min(82%,340px);line-height:1.25;text-transform:uppercase;z-index:2}
+  .cap.br{left:auto;top:auto;right:0;bottom:0;border:0;border-left:4px solid var(--k);border-top:4px solid var(--k)}
+  .bub{position:absolute;background:#fff;border:4px solid var(--k);border-radius:50%;padding:clamp(12px,2vw,20px) clamp(14px,2.4vw,24px);font-weight:700;font-size:clamp(12.5px,1.75vw,17px);line-height:1.18;text-align:center;text-transform:uppercase;z-index:2;max-width:68%}
+  .bub::after{content:"";position:absolute;width:26px;height:30px;background:#fff;border:4px solid var(--k);border-top:0;border-left:0;bottom:-19px;left:var(--tail,30%);transform:skewX(var(--sk,28deg)) rotate(38deg);clip-path:polygon(100% 0,100% 100%,0 100%)}
+  .bub.jag{border-radius:0;border:0;background:var(--k);padding:0;filter:drop-shadow(0 0 0 #000)}
+  .bub.jag>span{display:block;background:var(--yel);margin:0;padding:clamp(20px,3.2vw,32px) clamp(20px,3.4vw,36px);clip-path:polygon(3% 20%,18% 14%,14% 1%,32% 12%,45% 2%,54% 13%,72% 3%,74% 16%,97% 12%,88% 34%,99% 52%,88% 62%,96% 86%,76% 80%,70% 98%,56% 84%,40% 99%,34% 84%,10% 94%,14% 72%,1% 58%,11% 44%)}
+  .bub.jag{clip-path:polygon(0 18%,16% 11%,11% -4%,31% 8%,45% -3%,55% 9%,74% -2%,76% 12%,101% 8%,91% 34%,103% 52%,91% 63%,100% 91%,77% 84%,71% 104%,56% 88%,39% 105%,32% 88%,5% 100%,10% 73%,-4% 58%,7% 44%)}
+  .bub.jag::after{display:none}
+  .bub.think{border-radius:44% 56% 50% 50%/56% 50% 50% 44%}
+  .bub.think::after{width:14px;height:14px;border:4px solid var(--k);border-radius:50%;clip-path:none;transform:none;bottom:-22px;box-shadow:-12px 16px 0 -3px #fff,-12px 16px 0 1px var(--k)}
+  .fx{position:absolute;z-index:5;pointer-events:none;transform:translate(-50%,-50%);display:grid;place-items:center}
+  .fx svg{position:absolute;width:150%;height:190%;overflow:visible}
+  .fx b{position:relative;font-family:Impact,"Haettenschweiler","Arial Narrow Bold","Arial Black",sans-serif;font-weight:400;font-size:clamp(30px,6vw,58px);letter-spacing:.02em;white-space:nowrap;-webkit-text-stroke:2.5px var(--k);paint-order:stroke fill;text-shadow:4px 4px 0 var(--k);padding:.1em .35em}
+  .fx{animation:pop 1.25s cubic-bezier(.2,1.6,.4,1) forwards}
+  @keyframes pop{0%{scale:.1;opacity:0}16%{scale:1.25;opacity:1}28%{scale:.94}40%,78%{scale:1;opacity:1}100%{scale:1.15;opacity:0}}
+  .hint{text-align:center;color:#d8cfbb;font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin:16px 0 4px}
+  @media(max-width:640px){.p2,.p3,.p4{grid-column:span 6}.p5{grid-column:span 6;min-height:250px}.p{border-width:4px}}
+  @media(prefers-reduced-motion:reduce){.fx{animation:fade 1.2s forwards}@keyframes fade{0%,75%{opacity:1}100%{opacity:0}}}
+</style>
+</head>
+<body>
+<div class="page">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <pattern id="dR" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="3.5" cy="3.5" r="1.9" fill="#e8222e"/></pattern>
+    <pattern id="dP" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="3" cy="3" r="1.25" fill="#f0607c"/></pattern>
+    <pattern id="dC" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(20)"><circle cx="4" cy="4" r="2.4" fill="#19b5e6"/></pattern>
+    <pattern id="dK" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><circle cx="3" cy="3" r="1.5" fill="#111"/></pattern>
+    <pattern id="dY" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(15)"><circle cx="4.5" cy="4.5" r="2.8" fill="#ffb800"/></pattern>
+  </defs></svg>
+  <header class="mast">
+    <span class="kick">Astounding Tales of Punctuality · No. 38</span>
+    <h1 class="imp">Miss<br>Meridian</h1>
+    <p>versus THE MONDAY MACHINE!</p>
+    <div class="price imp"><span><b>38¢</b>STILL!</span></div>
+    <a class="back" href="index.html">← 100</a>
+  </header>
+  <main class="grid" id="grid">
+    <section class="p p1" tabindex="0" aria-label="Panel 1: a giant robot looms over the city skyline at sunrise">
+      <svg class="art" viewBox="0 0 900 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect width="900" height="320" fill="#ffd91c"/><rect width="900" height="320" fill="url(#dR)" opacity=".55"/>
+        <circle cx="660" cy="250" r="150" fill="#e8222e" stroke="#111" stroke-width="6"/>
+        <g stroke="#111" stroke-width="6" stroke-linejoin="round">
+          <path d="M340 320V120h200v200z" fill="#19b5e6"/><path d="M340 120h200v200H340z" fill="url(#dK)" opacity=".25" stroke="none"/>
+          <path d="M370 120V60h140v60" fill="#fff"/><path d="M440 60V24" fill="none"/><circle cx="440" cy="18" r="9" fill="#e8222e"/>
+          <circle cx="408" cy="90" r="14" fill="#ffd91c"/><circle cx="472" cy="90" r="14" fill="#ffd91c"/>
+          <path d="M340 150l-70 30v90M540 150l70 30v90" fill="none" stroke-width="18"/><path d="M340 150l-70 30v90M540 150l70 30v90" fill="none" stroke="#19b5e6" stroke-width="7"/>
+          <rect x="386" y="160" width="108" height="64" fill="#fff"/><path d="M400 176h80M400 192h80M400 208h50" stroke-width="4"/>
+        </g>
+        <g fill="#111"><path d="M0 320V214h46v-40h38v70h30v-96h54v60h28v-34h44v100h36v-60h50v106z"/><path d="M560 320v-80h40v-44h50v70h34v-110h56v84h30v-40h44v60h30v-90h56v150z"/></g>
+        <g fill="#ffd91c"><rect x="128" y="170" width="8" height="10"/><rect x="146" y="196" width="8" height="10"/><rect x="62" y="196" width="8" height="10"/><rect x="700" y="176" width="8" height="10"/><rect x="718" y="206" width="8" height="10"/><rect x="852" y="200" width="8" height="10"/><rect x="258" y="236" width="8" height="10"/><rect x="606" y="220" width="8" height="10"/></g>
+      </svg>
+      <div class="cap">Nine Bridges City, 8:59 a.m. — when out of the fog of the weekend strides…</div>
+      <div class="cap br">…a tyrant with a calendar for a heart!</div>
+    </section>
+    <section class="p p2" tabindex="0" aria-label="Panel 2: Miss Meridian, masked heroine, looks up defiantly">
+      <svg class="art" viewBox="0 0 400 400" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <rect width="400" height="400" fill="#19b5e6"/><rect width="400" height="400" fill="url(#dC)" opacity=".0"/>
+        <g stroke="#fff" stroke-width="5" opacity=".7"><path d="M200 230L-40 40M200 230L80-40M200 230L260-40M200 230L440 30M200 230L460 200M200 230L-60 220"/></g>
+        <g stroke="#111" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M92 400c-30-90-36-190 8-250 40-56 150-70 208-10 52 54 40 170 10 260z" fill="#1b1b3a"/>
+          <path d="M150 330l-70 34-10 36h264l-14-36-66-34z" fill="#e8222e"/>
+          <path d="M162 290v52l40 22 38-22v-52z" fill="#ffd2b0"/>
+          <path d="M124 196c0-66 34-98 80-98s78 34 78 96c0 60-32 114-78 114s-80-50-80-112z" fill="#ffd2b0"/>
+          <path d="M214 110c40 6 64 40 66 92 0 54-30 104-70 106 30-40 40-110 4-198z" fill="url(#dP)" stroke="none"/>
+          <path d="M112 210c-10-80 30-128 96-128 62 0 100 44 88 124-18-50-44-76-84-84-34 14-74 40-100 88z" fill="#1b1b3a"/>
+          <path d="M150 112c30-22 80-24 112 2" fill="none" stroke="#19b5e6" stroke-width="6"/>
+          <path d="M126 196c20-14 54-14 76 2 22-16 56-16 78-2-4 26-22 34-40 34-20 0-30-10-38-22-8 12-18 22-38 22-18 0-34-8-38-34z" fill="#ffd91c"/>
+          <path d="M146 204c12-10 28-10 40 0-12 8-28 8-40 0zM222 204c12-10 28-10 40 0-12 8-28 8-40 0z" fill="#fff" stroke-width="4"/>
+          <circle cx="170" cy="204" r="6" fill="#111" stroke="none"/><circle cx="246" cy="204" r="6" fill="#111" stroke="none"/>
+          <path d="M198 232l-8 26h16" fill="none" stroke-width="5"/>
+          <path d="M176 278c10-8 20-6 28-2 8-4 18-6 28 2-8 14-48 14-56 0z" fill="#e8222e" stroke-width="5"/>
+          <path d="M186 344l18 20 18-20" fill="#ffd91c"/>
+        </g>
+      </svg>
+      <div class="bub" style="left:5%;top:5%;--tail:58%">Not on <u>my</u> lunch break, you oversized alarm clock!</div>
+    </section>
+    <section class="p p3" tabindex="0" aria-label="Panel 3: the Monday Machine bellows">
+      <svg class="art" viewBox="0 0 400 400" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <rect width="400" height="400" fill="#e8222e"/><rect width="400" height="400" fill="url(#dK)" opacity=".28"/>
+        <g stroke="#111" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M200 148v-40" fill="none"/><circle cx="200" cy="98" r="13" fill="#ffd91c"/>
+          <path d="M70 400V190l30-42h200l30 42v210z" fill="#19b5e6"/>
+          <path d="M300 148l30 42v210h-60V148z" fill="url(#dK)" opacity=".35" stroke="none"/>
+          <circle cx="146" cy="234" r="38" fill="#fff"/><circle cx="254" cy="234" r="38" fill="#fff"/>
+          <path d="M146 234l16-22M254 234l-20-16" stroke-width="6"/><circle cx="146" cy="234" r="6" fill="#111"/><circle cx="254" cy="234" r="6" fill="#111"/>
+          <path d="M146 200v8M146 260v8M112 234h8M172 234h8M254 200v8M254 260v8M220 234h8M280 234h8" stroke-width="4"/>
+          <path d="M100 186l70 20M300 186l-70 20" stroke-width="10"/>
+          <rect x="112" y="304" width="176" height="58" fill="#111"/><path d="M134 304v58M156 304v58M178 304v58M200 304v58M222 304v58M244 304v58M266 304v58" stroke="#ffd91c" stroke-width="6"/>
+          <rect x="40" y="250" width="30" height="70" fill="#ffd91c"/><rect x="330" y="250" width="30" height="70" fill="#ffd91c"/>
+        </g>
+      </svg>
+      <div class="bub jag" style="right:4%;top:4%"><span>ALL — CALENDARS — MUST — COMPLY!</span></div>
+    </section>
+    <section class="p p4" tabindex="0" aria-label="Panel 4: a gloved fist smashes through a giant clock face">
+      <svg class="art" viewBox="0 0 600 340" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect width="600" height="340" fill="#fff"/><rect width="600" height="340" fill="url(#dY)"/>
+        <g stroke="#111" stroke-width="4"><path d="M300 170L0 20M300 170L0 170M300 170L0 320M300 170L170 0M300 170L170 340M300 170L430 0M300 170L430 340M300 170L600 20M300 170L600 170M300 170L600 320"/></g>
+        <path d="M300 22l34 70 62-50-2 80 82-12-46 66 76 30-76 28 44 68-80-14 0 80-60-52-36 72-36-72-60 52 0-80-80 14 44-68-76-28 76-30-46-66 82 12-2-80 62 50z" fill="#e8222e" stroke="#111" stroke-width="7" stroke-linejoin="round"/>
+        <g stroke="#111" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M0 250l190-54 20 70L0 340z" fill="#e8222e"/><path d="M0 300l200-40 6 14L0 340z" fill="url(#dK)" opacity=".3" stroke="none"/>
+          <path d="M186 180c10-30 40-44 96-40l70 8c26 4 30 34 6 40 20 6 18 34-4 38 16 8 12 32-10 34 8 14-2 28-22 28l-96-2c-34-2-50-20-52-48z" fill="#ffd91c"/>
+          <path d="M292 190l64-2M286 228l66-2M288 262l52-2" fill="none" stroke-width="5"/>
+          <path d="M228 152c30-20 70-14 76 14" fill="none" stroke-width="5"/>
+        </g>
+        <g stroke="#111" stroke-width="5" fill="#fff" stroke-linejoin="round"><path d="M452 60l40-14 10 34-34 16z"/><path d="M500 220l44 10-12 36-38-14z"/><path d="M420 290l20 30-34 12-10-30z"/><path d="M130 50l30 24-22 26-28-22z"/></g>
+        <g font-family="Impact,Arial Black,sans-serif" font-size="30" fill="#111"><text x="460" y="90" transform="rotate(-12 470 80)">XII</text><text x="505" y="254" transform="rotate(14 520 244)">III</text><text x="402" y="318" transform="rotate(-20 412 310)">VI</text></g>
+      </svg>
+      <div class="cap">One right hook, delivered precisely on time!</div>
+    </section>
+    <section class="p p5" tabindex="0" aria-label="Panel 5: Pip the office cat watches from a window ledge">
+      <svg class="art" viewBox="0 0 300 340" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <rect width="300" height="340" fill="#ff8fa8"/><rect width="300" height="340" fill="url(#dP)" opacity=".6"/>
+        <g stroke="#111" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M70 340c-10-70 10-110 40-126l-14-60 48 30c14-4 28-4 42 0l48-30-14 60c30 16 50 56 40 126z" fill="#fff"/>
+          <path d="M200 190c36 22 44 80 30 150h-40c14-60 20-110 10-150z" fill="url(#dK)" opacity=".3" stroke="none"/>
+          <path d="M122 232c8-8 22-8 30 0M178 232c8-8 22-8 30 0" fill="none"/>
+          <path d="M158 256h14l-7 9z" fill="#e8222e" stroke-width="4"/><path d="M165 265c-6 10-16 10-22 4M165 265c6 10 16 10 22 4" fill="none" stroke-width="4"/>
+          <path d="M96 258l-46-8M96 270l-44 10M234 258l46-8M234 270l44 10" stroke-width="3"/>
+          <path d="M120 318h90" stroke="#e8222e" stroke-width="10"/><circle cx="165" cy="326" r="9" fill="#ffd91c" stroke-width="4"/>
+        </g>
+      </svg>
+      <div class="bub think" style="left:6%;top:5%;--tail:52%;max-width:88%">She skipped the meeting <em>and</em> saved the city…</div>
+    </section>
+    <section class="p p6">
+      <strong class="imp">Next issue: The Tuesday Tangle!</strong>
+      <span>Story &amp; ink by the Halftone Bullpen · Printed on recycled deadlines</span>
+    </section>
+  </main>
+  <p class="hint">Click, tap or press Enter on any panel</p>
+</div>
+<script>
+(() => {
+  const WORDS = ['WHAM!', 'ZOK!', 'KRRNCH!', 'BLAMMO!', 'POW!', 'SPLOINK!', 'THWACK!', 'BZZAT!', 'KA-TOCK!', 'FWOOM!', 'DING!!', 'SNOOZE!'];
+  const COLS = [['#ffd91c', '#e8222e'], ['#fff', '#19b5e6'], ['#e8222e', '#ffd91c'], ['#19b5e6', '#fff'], ['#ffd91c', '#111']];
+  let ac = null, n = 0;
+  function star() { // irregular starburst
+    const k = 11 + Math.floor(Math.random() * 5); let d = '';
+    for (let i = 0; i < k * 2; i++) { const a = i / (k * 2) * Math.PI * 2, r = i % 2 ? 30 + Math.random() * 6 : 44 + Math.random() * 8; d += (i ? 'L' : 'M') + (50 + Math.cos(a) * r * 1.12).toFixed(1) + ' ' + (50 + Math.sin(a) * r).toFixed(1); }
+    return d + 'Z';
+  }
+  function thump() {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'square'; o.frequency.setValueAtTime(180 + Math.random() * 160, t); o.frequency.exponentialRampToValueAtTime(40, t + .16);
+      g.gain.setValueAtTime(.12, t); g.gain.exponentialRampToValueAtTime(.001, t + .2);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t + .22);
+    } catch (_) {}
+  }
+  function pop(panel, x, y) {
+    const r = panel.getBoundingClientRect(), [fg, bg] = COLS[n % COLS.length], word = WORDS[n++ % WORDS.length];
+    const fx = document.createElement('div'); fx.className = 'fx';
+    fx.style.left = Math.max(22, Math.min(78, (x - r.left) / r.width * 100)) + '%';
+    fx.style.top = Math.max(22, Math.min(78, (y - r.top) / r.height * 100)) + '%';
+    fx.style.rotate = (-16 + Math.random() * 32).toFixed(1) + 'deg';
+    fx.innerHTML = `<svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${star()}" fill="${bg}" stroke="#111" stroke-width="3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg><b style="color:${fg}">${word}</b>`;
+    panel.appendChild(fx); thump();
+    fx.addEventListener('animationend', () => fx.remove());
+    setTimeout(() => fx.remove(), 1600);
+  }
+  document.querySelectorAll('.p:not(.p6)').forEach(p => {
+    p.addEventListener('click', e => pop(p, e.clientX, e.clientY));
+    p.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); const r = p.getBoundingClientRect(); pop(p, r.left + r.width * (.3 + Math.random() * .4), r.top + r.height * (.3 + Math.random() * .4)); } });
+  });
+})();
+</script>
+</body>
+</html>

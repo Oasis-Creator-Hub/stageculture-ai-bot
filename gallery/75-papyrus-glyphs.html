@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Reed-Cutter's Sign List — write your name in Tessat</title>
+<meta name="description" content="A papyrus scroll with an invented pictographic script. Type a word and a scribe inks it, sign by sign, into SVG cartouches.">
+<style>
+  :root{--pap:#d8bd82;--pap2:#c9a968;--ink:#2a190c;--ochre:#9a3718;--lapis:#22506b;--wood:#5b3418}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:#1c130c radial-gradient(ellipse at 50% 0,#4a321d,#1c130c 70%) fixed;min-height:100vh;color:var(--ink);
+    font-family:"Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L",Georgia,serif;padding:26px 12px 40px}
+  a.back{position:fixed;top:10px;left:12px;z-index:4;color:#e6cf99;font-size:13px;text-decoration:none;letter-spacing:.14em;opacity:.75}
+  a.back:hover{opacity:1}
+  .scroll{max-width:860px;margin:0 auto;position:relative}
+  .rod{height:30px;border-radius:15px;margin:0 -14px;position:relative;z-index:2;
+    background:linear-gradient(#8a5a2e,#6b4220 30%,#3b210d 75%,#2a1608);box-shadow:0 8px 14px -4px rgba(0,0,0,.6)}
+  .rod::before,.rod::after{content:"";position:absolute;top:-5px;width:20px;height:40px;border-radius:8px;background:linear-gradient(90deg,#c59a45,#f0d58a 40%,#8a6524)}
+  .rod::before{left:-6px}.rod::after{right:-6px}
+  .sheet{position:relative;padding:44px clamp(18px,5vw,64px) 52px;margin:-6px 6px}
+  .fibre{position:absolute;inset:0;filter:url(#ragged);background-color:var(--pap);
+    background-image:
+      radial-gradient(ellipse at 20% 12%,rgba(255,236,180,.5),transparent 45%),radial-gradient(ellipse at 85% 80%,rgba(120,70,20,.3),transparent 50%),
+      repeating-linear-gradient(0deg,rgba(105,66,20,.13) 0 1px,transparent 1px 3px,rgba(255,238,190,.12) 3px 4px,transparent 4px 7px),
+      repeating-linear-gradient(90deg,rgba(105,66,20,.1) 0 2px,transparent 2px 19px,rgba(255,240,200,.14) 19px 21px,transparent 21px 34px)}
+  .grain{position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:multiply;opacity:.55;pointer-events:none}
+  .sheet>*:not(.fibre):not(.grain){position:relative}
+  .eyebrow{font-variant:small-caps;letter-spacing:.34em;font-size:12px;color:var(--ochre);text-align:center;margin:0}
+  h1{font-weight:400;font-size:clamp(30px,6vw,56px);line-height:1;text-align:center;margin:10px 0 6px;letter-spacing:.02em}
+  h1 i{color:var(--ochre)}
+  .lede{max-width:34em;margin:0 auto 26px;text-align:center;font-size:15.5px;line-height:1.6;color:#4a3016}
+  .rule{height:9px;margin:0 auto 26px;max-width:420px;background:
+    linear-gradient(var(--ochre),var(--ochre)) center/100% 1.5px no-repeat,
+    radial-gradient(circle,var(--ochre) 3.5px,transparent 4px) center/9px 9px no-repeat}
+  form{display:flex;gap:12px;max-width:520px;margin:0 auto 8px;align-items:flex-end}
+  label{flex:1;font-variant:small-caps;letter-spacing:.18em;font-size:12px;color:#6a4a22}
+  input{display:block;width:100%;margin-top:4px;background:transparent;border:0;border-bottom:2px solid var(--ink);font:inherit;font-size:26px;color:var(--ink);
+    padding:4px 2px;outline:none;letter-spacing:.06em;border-radius:0}
+  input:focus{border-bottom-color:var(--ochre)}
+  button{font:inherit;cursor:pointer;color:inherit}
+  .wipe{background:none;border:1.5px solid var(--ink);padding:8px 14px;font-variant:small-caps;letter-spacing:.14em;font-size:13px;border-radius:2px;transition:background .2s,color .2s}
+  .wipe:hover{background:var(--ink);color:var(--pap)}
+  #out{display:flex;flex-wrap:wrap;gap:18px 22px;justify-content:center;align-items:center;margin:30px 0 14px;min-height:118px}
+  #out svg{height:clamp(84px,17vw,118px);max-width:100%;width:auto;overflow:visible}
+  .cart{fill:none;stroke:var(--ochre);stroke-width:2.6;stroke-linecap:round}
+  .g{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+  .g .f{fill:var(--ink);stroke-width:1}
+  .draw *{stroke-dasharray:1;stroke-dashoffset:1;animation:ink .7s cubic-bezier(.5,0,.3,1) forwards;animation-delay:var(--d,0s)}
+  .draw .f{fill-opacity:0;animation-name:inkf}
+  @keyframes ink{to{stroke-dashoffset:0}}
+  @keyframes inkf{to{stroke-dashoffset:0;fill-opacity:1}}
+  .read{text-align:center;font-size:17px;font-style:italic;margin:0 0 4px;min-height:1.4em}
+  .gloss{text-align:center;font-size:13px;color:#6a4a22;letter-spacing:.06em;margin:0 0 34px;min-height:1.4em}
+  h2{font-weight:400;font-variant:small-caps;letter-spacing:.3em;font-size:14px;text-align:center;color:var(--lapis);margin:0 0 14px}
+  .signs{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:8px}
+  .signs button{background:rgba(255,244,210,.22);border:1px solid rgba(42,25,12,.35);border-radius:3px;padding:8px 2px 6px;display:grid;justify-items:center;gap:2px;
+    transition:transform .18s,background .18s,box-shadow .18s}
+  .signs button:hover,.signs button:focus-visible{background:rgba(255,244,210,.6);transform:translateY(-2px) rotate(-1deg);box-shadow:0 5px 8px -5px rgba(42,25,12,.6);outline:none}
+  .signs svg{width:38px;height:38px}
+  .signs b{font-weight:400;font-size:12px;font-style:italic}
+  .signs small{font-size:10px;letter-spacing:.14em;color:var(--ochre);text-transform:uppercase}
+  .colophon{text-align:center;font-size:12.5px;color:#6a4a22;margin:28px auto 0;max-width:38em;line-height:1.6;font-style:italic}
+  @media (max-width:480px){form{flex-direction:column;align-items:stretch}.wipe{align-self:flex-end}.signs{grid-template-columns:repeat(auto-fill,minmax(62px,1fr))}}
+  @media (prefers-reduced-motion:reduce){.draw *{animation:none;stroke-dashoffset:0}.draw .f{fill-opacity:1}}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← 100</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="ragged" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="4"/><feDisplacementMap in="SourceGraphic" scale="11" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <filter id="speck"><feTurbulence type="fractalNoise" baseFrequency=".7 .25" numOctaves="3" seed="9"/><feColorMatrix values="0 0 0 0 .35  0 0 0 0 .22  0 0 0 0 .08  0 0 0 .9 -.3"/></filter>
+  <filter id="brush" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="2"/><feDisplacementMap in="SourceGraphic" scale="1.3"/></filter>
+</defs></svg>
+<main class="scroll">
+  <div class="rod"></div>
+  <section class="sheet">
+    <div class="fibre"></div><svg class="grain" aria-hidden="true"><rect width="100%" height="100%" filter="url(#speck)"/></svg>
+    <p class="eyebrow">Sign list of the reed-cutters · scroll the seventy-fifth</p>
+    <h1>Write it in <i>Tessat</i></h1>
+    <p class="lede">The marsh people of Omu had twenty-six signs and no patience for vowels left unsaid. Give the scribe a word; a name is bound in its own ring, as names should be.</p>
+    <div class="rule"></div>
+    <form id="f" autocomplete="off"><label>Speak a word or a name
+      <input id="word" maxlength="30" value="heron of dawn" spellcheck="false" autocapitalize="off" inputmode="text"></label>
+      <button type="button" class="wipe" id="wipe">Wash the slate</button></form>
+    <div id="out" aria-live="polite"></div>
+    <p class="read" id="read"></p><p class="gloss" id="gloss"></p>
+    <h2>The twenty-six signs</h2>
+    <div class="signs" id="signs"></div>
+    <p class="colophon">Copied by the hand of Iru-Meket in the season of low water. Any resemblance to the writing of real river kingdoms is the fault of rivers.</p>
+  </section>
+  <div class="rod"></div>
+</main>
+<script>
+(function(){
+  // each sign is drawn in a 40×40 box: [spoken name, meaning, markup]. class "f" = solid ink.
+  const P=d=>'<path pathLength="1" d="'+d+'"/>',F=d=>'<path pathLength="1" class="f" d="'+d+'"/>',
+        C=(x,y,r,f)=>'<circle pathLength="1"'+(f?' class="f"':'')+' cx="'+x+'" cy="'+y+'" r="'+r+'"/>';
+  const G={
+    a:['ahu','sun',C(20,20,11)+C(20,20,3,1)],
+    b:['bek','house',P('M8 33V17l12-10 12 10v16z')+P('M17 33v-8h6v8')],
+    c:['cal','moon',P('M27 7a14 14 0 1 0 0 26a10 10 0 0 1 0-26z')],
+    d:['dor','gate',P('M9 34V8h22v26')+P('M9 16h22')+P('M20 16v18')],
+    e:['esh','eye',P('M4 20q16-15 32 0q-16 15-32 0z')+C(20,20,4.5,1)],
+    f:['fen','reed',P('M20 36V6')+P('M20 15q-8-1-10-9')+P('M20 22q8-1 10-9')+P('M20 29q-8-1-10-9')],
+    g:['gur','serpent',P('M5 27q4-11 9 0t9 0t9-3q3-6-1-10')+C(30.5,12,2.6,1)],
+    h:['hap','mountain',P('M3 33l10-19 6 9 7-15 11 25z')+P('M23 14l3 5 3-3')],
+    i:['ith','arrow',P('M20 36V6')+P('M13 13l7-7 7 7')+P('M15 31l5-4 5 4')],
+    j:['jor','crook',P('M25 36V14a8 8 0 1 0-16 0v3')],
+    k:['kes','heron',P('M8 14l8-2q5 0 5 6v4q8 0 12 8H17q-4-4-2-13')+P('M22 30v6')+P('M27 30v6')+C(15.5,14.5,1.2,1)],
+    l:['lun','water',P('M4 12q4-6 8 0t8 0t8 0t8 0')+P('M4 20q4-6 8 0t8 0t8 0t8 0')+P('M4 28q4-6 8 0t8 0t8 0t8 0')],
+    m:['mer','boat',P('M4 23h32q-4 11-16 11T4 23z')+P('M20 23V5l10 12H20')],
+    n:['nun','fish',P('M5 20q11-12 22 0q-11 12-22 0z')+P('M27 20l8-8v16z')+C(11,19,1.6,1)],
+    o:['oru','well',C(20,20,13)+C(20,20,6.5)],
+    p:['pel','palm',P('M20 36V17')+P('M20 17q-10-8-15 0')+P('M20 17q10-8 15 0')+P('M20 17q-7-13-13-10')+P('M20 17q7-13 13-10')],
+    q:['qat','whirl',P('M20 20a3 3 0 0 1 6 0a6 6 0 0 1-12 0a9 9 0 0 1 18 0a12 12 0 0 1-24 0')],
+    r:['rek','dawn',P('M5 29a15 15 0 0 1 30 0z')+P('M20 9V4')+P('M9 14l-4-4')+P('M31 14l4-4')+P('M3 34h34')],
+    s:['sef','star',P('M20 4l4.2 11.5H36l-9.6 7.3 3.8 12L20 27.5 9.8 34.8l3.8-12L4 15.5h11.8z')],
+    t:['tem','pillar',P('M11 35h18')+P('M20 35V11')+P('M9 11h22')+P('M13 11V5')+P('M27 11V5')+P('M20 11V5')],
+    u:['ulu','cup',P('M8 8v11a12 12 0 0 0 24 0V8')+P('M20 31v5')+P('M13 36h14')],
+    v:['vas','horns',P('M5 6q1 20 15 27q14-7 15-27')+C(20,14,2.6,1)],
+    w:['wen','flood',P('M3 13l8.5 16L20 13l8.5 16L37 13')+P('M8 35h24')],
+    x:['xis','crossing',P('M8 8l24 24')+P('M32 8L8 32')+C(20,20,3.4,1)],
+    y:['yod','branch',P('M20 36V21')+P('M20 21L8 6')+P('M20 21L32 6')+C(20,21,2.4,1)],
+    z:['zan','storm',F('M27 4L10 21h9l-7 15 18-20h-9z')]
+  };
+  const $=id=>document.getElementById(id),out=$('out'),inp=$('word');
+  function cartouche(word,wi){
+    const n=word.length,cw=44,w=n*cw+52,h=70;
+    let s='<svg viewBox="-4 -4 '+(w+14)+' '+(h+8)+'" role="img" aria-label="Cartouche: '+word+'" filter="url(#brush)">';
+    s+='<g class="draw" style="--d:'+(wi*.25)+'s"><rect pathLength="1" class="cart" x="0" y="0" width="'+w+'" height="'+h+'" rx="35"/><rect pathLength="1" class="cart" x="5" y="5" width="'+(w-10)+'" height="'+(h-10)+'" rx="30" style="stroke-width:1.1"/>'+
+       '<path pathLength="1" class="cart" d="M'+(w+6)+' 6v'+(h-12)+'"/><path pathLength="1" class="cart" style="stroke-width:1.6" d="M'+w+' '+(h/2-6)+'h6M'+w+' '+(h/2+6)+'h6"/></g>';
+    [...word].forEach((ch,i)=>{s+='<g class="g draw" style="--d:'+(wi*.25+.25+i*.16).toFixed(2)+'s" transform="translate('+(26+i*cw+2)+',15)">'+G[ch][2]+'</g>'});
+    return s+'</svg>'}
+  function render(){
+    const words=inp.value.toLowerCase().replace(/[^a-z\s]/g,'').trim().split(/\s+/).filter(Boolean).map(w=>w.slice(0,12));
+    if(!words.length){out.innerHTML='<p class="gloss" style="margin:0">The slate is clean. The scribe is waiting, and chewing a reed.</p>';$('read').textContent='';$('gloss').textContent='';return}
+    out.innerHTML=words.map(cartouche).join('');
+    $('read').textContent='“'+words.map(w=>[...w].map(c=>G[c][0]).join('·')).join('  ')+'”';
+    $('gloss').textContent=words.map(w=>[...w].map(c=>G[c][1]).join(' + ')).join('   /   ');
+  }
+  let tm;inp.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(render,180)});
+  $('f').addEventListener('submit',e=>{e.preventDefault();render()});
+  $('wipe').onclick=()=>{inp.value='';render();inp.focus()};
+  Object.keys(G).forEach(k=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Add sign '+G[k][0]+', '+G[k][1]+', for the letter '+k);
+    b.innerHTML='<svg viewBox="0 0 40 40" class="g" filter="url(#brush)">'+G[k][2]+'</svg><b>'+G[k][0]+'</b><small>'+k+' · '+G[k][1]+'</small>';
+    b.onclick=()=>{if(inp.value.length<30){inp.value+=k;render()}};$('signs').appendChild(b)});
+  render();
+})();
+</script>
+</body>
+</html>

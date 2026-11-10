@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gantry No. 4 Workers' Theatre — Ninth Season</title>
+<meta name="description" content="A constructivist agitprop poster and programme for the ninth season of a fictional dockworkers' theatre: diagonals, red, black and cream.">
+<style>
+  :root{--red:#d3251a;--ink:#141210;--cream:#eadfc6;--face:Impact,Haettenschweiler,"Franklin Gothic Heavy","Arial Narrow Bold","Roboto Condensed","DejaVu Sans Condensed",sans-serif}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--ink);color:var(--cream)}
+  body{font-family:var(--face);text-transform:uppercase;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  .sheet{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,1fr);min-height:100vh}
+  .poster{background:var(--cream);position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .poster svg{height:100%;width:100%;display:block}
+  .poster text{font-family:var(--face)}
+  /* entrance choreography */
+  .beam{animation:slide 1s cubic-bezier(.2,.9,.2,1) both}
+  .block{animation:drop 1s .25s cubic-bezier(.2,.9,.2,1) both}
+  .disc{transform-origin:590px 250px;animation:pop .9s .5s cubic-bezier(.2,1.4,.4,1) both}
+  .word{animation:fade .8s .9s both}
+  .rays line{stroke-dasharray:260;animation:ray 2.4s 1.2s ease-out infinite}
+  .rays line:nth-child(2){animation-delay:1.45s}.rays line:nth-child(3){animation-delay:1.7s}
+  @keyframes slide{from{transform:translateX(-1300px)}to{transform:none}}
+  @keyframes drop{from{transform:translateY(900px)}to{transform:none}}
+  @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes ray{0%{stroke-dashoffset:260}45%,70%{stroke-dashoffset:0}100%{stroke-dashoffset:-260}}
+
+  .season{position:relative;padding:clamp(28px,5vw,72px) clamp(20px,4vw,64px) 40px;overflow:hidden}
+  .season::before{content:"";position:absolute;right:-30%;top:-6%;width:90%;height:26px;background:var(--red);transform:rotate(-28deg);transform-origin:right top}
+  .kicker{font:700 12px/1.5 "Helvetica Neue",Arial,sans-serif;letter-spacing:.34em;color:var(--red);margin:0 0 14px}
+  h1{font-size:clamp(46px,7.2vw,112px);line-height:.86;margin:0 0 .28em;font-weight:400;letter-spacing:.005em}
+  h1 b{font-weight:400;color:var(--red);display:block}
+  .lede{font:500 clamp(13px,1.15vw,16px)/1.55 "Helvetica Neue",Arial,sans-serif;text-transform:none;max-width:34em;color:#cfc4ab;margin:0 0 clamp(26px,4vw,52px);border-left:6px solid var(--red);padding-left:16px}
+  ol{list-style:none;margin:0;padding:0;border-top:4px solid var(--cream)}
+  li{position:relative;display:grid;grid-template-columns:clamp(54px,7vw,96px) 1fr;gap:clamp(12px,2vw,26px);align-items:stretch;border-bottom:4px solid var(--cream);cursor:pointer;outline:0;overflow:hidden}
+  li::before{content:"";position:absolute;inset:0;background:var(--red);transform:translateX(-101%) skewX(-28deg);transform-origin:left;transition:transform .45s cubic-bezier(.2,.9,.2,1)}
+  li:hover::before,li:focus-visible::before,li.on::before{transform:translateX(-12%) skewX(-28deg)}
+  li>*{position:relative}
+  .num{background:var(--cream);color:var(--ink);font-size:clamp(40px,5.4vw,84px);line-height:1;display:flex;align-items:center;justify-content:center;transition:background .3s,color .3s}
+  li:hover .num,li:focus-visible .num,li.on .num{background:var(--ink);color:var(--cream)}
+  .play{padding:clamp(12px,1.6vw,22px) 12px clamp(12px,1.6vw,22px) 0}
+  .play h2{font-size:clamp(25px,3.3vw,50px);line-height:.95;margin:0 0 6px;font-weight:400;letter-spacing:.01em}
+  .play p{font:500 clamp(12px,1vw,14.5px)/1.45 "Helvetica Neue",Arial,sans-serif;text-transform:none;margin:0;max-width:36em;color:#d9cfb8}
+  li:hover .play p,li.on .play p{color:#fff3da}
+  .when{display:inline-block;font:700 11px/1 "Helvetica Neue",Arial,sans-serif;letter-spacing:.24em;margin-bottom:8px;padding:5px 8px;background:var(--ink);color:var(--cream);border:2px solid var(--cream)}
+  .ticket{margin-top:clamp(30px,4vw,56px);display:grid;grid-template-columns:1fr auto;background:var(--cream);color:var(--ink);transform:rotate(-2.2deg);max-width:560px}
+  .ticket div{padding:16px 18px}
+  .ticket strong{display:block;font-weight:400;font-size:clamp(26px,3vw,40px);line-height:.95}
+  .ticket span{font:600 12px/1.45 "Helvetica Neue",Arial,sans-serif;text-transform:none;display:block;margin-top:8px}
+  .ticket .stub{background:var(--red);color:var(--cream);border-left:3px dashed var(--ink);font-size:clamp(34px,4vw,56px);display:flex;align-items:center;writing-mode:vertical-rl;letter-spacing:.04em}
+  footer{margin-top:44px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font:700 11px/1.5 "Helvetica Neue",Arial,sans-serif;letter-spacing:.22em;color:#9d937d}
+  footer a{color:var(--cream);text-decoration:none;border-bottom:3px solid var(--red);padding-bottom:2px}
+  footer a:hover{color:var(--red)}
+  @media (max-width:860px){.sheet{grid-template-columns:1fr}.poster{position:relative;height:auto;aspect-ratio:800/1120}}
+  @media (prefers-reduced-motion:reduce){.beam,.block,.disc,.word,.rays line{animation:none}li::before{transition:none}}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <section class="poster" aria-label="Season poster">
+    <svg viewBox="0 0 800 1120" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Constructivist poster: Workers' Theatre, Season of the Red Gantry">
+      <defs>
+        <filter id="grain" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7"/>
+          <feColorMatrix values="0 0 0 0 .08  0 0 0 0 .06  0 0 0 0 .04  0 0 0 .55 -.16"/>
+        </filter>
+        <clipPath id="page"><rect width="800" height="1120"/></clipPath>
+      </defs>
+      <g clip-path="url(#page)">
+        <rect width="800" height="1120" fill="#eadfc6"/>
+        <!-- header, square to the page -->
+        <g class="word">
+          <rect x="44" y="46" width="250" height="14" fill="#141210"/>
+          <rect x="300" y="46" width="14" height="14" fill="#d3251a"/>
+          <text x="44" y="92" font-size="25" fill="#141210" textLength="270" lengthAdjust="spacingAndGlyphs">PORT VELM DOCKWORKERS'</text>
+          <text x="44" y="121" font-size="25" fill="#141210" textLength="270" lengthAdjust="spacingAndGlyphs">DRAMATIC CIRCLE PRESENTS</text>
+          <text x="40" y="262" font-size="158" fill="#141210" textLength="150" lengthAdjust="spacingAndGlyphs">N</text>
+          <text x="196" y="262" font-size="158" fill="#d3251a" textLength="96" lengthAdjust="spacingAndGlyphs">9</text>
+          <rect x="196" y="168" width="60" height="9" fill="#141210"/>
+          <text x="44" y="296" font-size="22" fill="#141210" textLength="250" lengthAdjust="spacing">THE NINTH SEASON</text>
+        </g>
+        <!-- the shouting disc -->
+        <g class="disc">
+          <circle cx="590" cy="250" r="176" fill="#d3251a"/>
+          <circle cx="590" cy="250" r="176" fill="none" stroke="#141210" stroke-width="5" stroke-dasharray="3 13"/>
+          <g transform="rotate(-28 590 250)">
+            <circle cx="498" cy="250" r="40" fill="#141210"/>
+            <path d="M498 210a40 40 0 0 1 0 80z" fill="#eadfc6"/>
+            <rect x="482" y="292" width="34" height="72" fill="#141210"/>
+            <path d="M540 232 704 176v148L540 268z" fill="#141210"/>
+            <path d="M704 176l26-9v166l-26-9z" fill="#eadfc6"/>
+            <g class="rays" stroke="#141210" stroke-width="11">
+              <line x1="748" y1="196" x2="1000" y2="120"/><line x1="752" y1="250" x2="1010" y2="250"/><line x1="748" y1="304" x2="1000" y2="380"/>
+            </g>
+          </g>
+        </g>
+        <!-- everything on the 28 degree diagonal -->
+        <g transform="rotate(-28 400 560)">
+          <g class="block">
+            <rect x="-320" y="600" width="650" height="900" fill="#d3251a"/>
+            <g fill="#eadfc6" font-size="64">
+              <text x="30" y="692" textLength="276" lengthAdjust="spacingAndGlyphs">THE STAGE</text>
+              <text x="30" y="758" textLength="276" lengthAdjust="spacingAndGlyphs">BELONGS TO</text>
+              <text x="30" y="824" textLength="276" lengthAdjust="spacingAndGlyphs">THOSE WHO</text>
+              <text x="30" y="890" textLength="276" lengthAdjust="spacingAndGlyphs" fill="#141210">BUILD IT.</text>
+            </g>
+            <rect x="30" y="906" width="276" height="10" fill="#141210"/>
+          </g>
+          <g class="word">
+            <text x="36" y="482" font-size="196" fill="#141210" textLength="530" lengthAdjust="spacingAndGlyphs">SEASON</text>
+            <text x="352" y="668" font-size="56" fill="#141210" textLength="380" lengthAdjust="spacingAndGlyphs">OF THE RED GANTRY</text>
+            <rect x="352" y="684" width="380" height="7" fill="#d3251a"/>
+            <g stroke="#141210" stroke-width="3"><line x1="352" y1="706" x2="732" y2="706"/><line x1="352" y1="716" x2="640" y2="716"/><line x1="352" y1="726" x2="540" y2="726"/></g>
+          </g>
+          <g class="beam">
+            <rect x="-300" y="500" width="1500" height="100" fill="#141210"/>
+            <text id="beamText" x="50" y="582" font-size="90" fill="#eadfc6" textLength="700" lengthAdjust="spacingAndGlyphs">WORKERS' THEATRE</text>
+          </g>
+        </g>
+        <!-- colophon block, square to the page -->
+        <g class="word" text-anchor="end" fill="#141210">
+          <rect x="640" y="936" width="128" height="12" fill="#d3251a"/>
+          <text x="768" y="984" font-size="32">FIVE NEW PLAYS</text>
+          <text x="768" y="1016" font-size="24">OCTOBER — MARCH</text>
+          <text x="768" y="1044" font-size="24">DOCK ROAD HALL</text>
+          <text x="768" y="1084" font-size="15" font-family="Helvetica Neue,Arial,sans-serif" font-weight="700" letter-spacing="2">DOORS AT THE SHIFT WHISTLE</text>
+        </g>
+        <g stroke="#141210" stroke-width="2" fill="none" opacity=".7">
+          <path d="M22 1080v18h18M778 40V22h-18"/><circle cx="31" cy="31" r="8"/><path d="M19 31h24M31 19v24"/>
+        </g>
+        <rect width="800" height="1120" filter="url(#grain)" opacity=".5"/>
+      </g>
+    </svg>
+  </section>
+
+  <section class="season">
+    <p class="kicker">Gantry No. 4 Workers' Theatre · Programme</p>
+    <h1>Five plays <b>built by hand.</b></h1>
+    <p class="lede">Written on night shifts, rehearsed between tides, hammered together from crate-wood and borrowed lamps. No stars, no velvet, no interval bar. Touch a play and the poster will shout its name.</p>
+    <ol id="plays">
+      <li tabindex="0" data-t="THE NIGHT SHIFT SINGS"><div class="num">1</div><div class="play"><span class="when">14 Oct — 2 Nov</span><h2>The Night Shift Sings</h2><p>Forty stevedores, one stubborn foghorn, and a cargo nobody will admit to ordering. A chorus-play for the whole quay.</p></div></li>
+      <li tabindex="0" data-t="IRON BREAD"><div class="num">2</div><div class="play"><span class="when">9 Nov — 30 Nov</span><h2>Iron Bread</h2><p>The foundry canteen goes on strike over the soup. By the third act the soup has a committee of its own.</p></div></li>
+      <li tabindex="0" data-t="A STRIKE IN THREE BELLS"><div class="num">3</div><div class="play"><span class="when">7 Dec — 4 Jan</span><h2>A Strike in Three Bells</h2><p>Three bells, three walk-outs, one clock-tower that refuses to take sides. Performed in real time, with a real bell.</p></div></li>
+      <li tabindex="0" data-t="THE CRANE-DRIVER'S WEDDING"><div class="num">4</div><div class="play"><span class="when">18 Jan — 15 Feb</span><h2>The Crane-Driver's Wedding</h2><p>She will not come down until the banns are read at altitude. A comedy at forty metres, with ladders.</p></div></li>
+      <li tabindex="0" data-t="ELECTRIC SPRING"><div class="num">5</div><div class="play"><span class="when">1 Mar — 29 Mar</span><h2>Electric Spring</h2><p>The district is promised light by April. The apprentices decide not to wait. The finale uses every bulb we own.</p></div></li>
+    </ol>
+    <div class="ticket">
+      <div><strong>Admit one worker<br>and one doubter</strong><span>Union card: free. Everyone else: one honest coin, or two hours with a paintbrush before curtain.</span></div>
+      <div class="stub">No. 9</div>
+    </div>
+    <footer><span>Set in borrowed type at the Hammer &amp; Quoin Press, Port Velm</span><a href="index.html">← 100</a></footer>
+  </section>
+</div>
+<script>
+(() => {
+  const beam = document.getElementById('beamText'), items = [...document.querySelectorAll('#plays li')];
+  const base = beam.textContent; let timer;
+  function shout(text) {
+    // long titles are squeezed onto the beam the way a compositor would: narrower, never smaller
+    beam.textContent = text;
+    beam.setAttribute('textLength', Math.min(760, Math.max(360, text.length * 44)));
+    beam.setAttribute('x', text.length > 17 ? 20 : 50);
+  }
+  function pick(li) {
+    clearTimeout(timer);
+    items.forEach(i => i.classList.toggle('on', i === li));
+    shout(li ? li.dataset.t : base);
+  }
+  items.forEach(li => {
+    li.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') pick(li); });
+    li.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') timer = setTimeout(() => pick(null), 500); });
+    li.addEventListener('click', () => pick(li.classList.contains('on') && !li.matches(':hover') ? null : li));
+    li.addEventListener('focus', () => pick(li));
+    li.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(li); } });
+  });
+})();
+</script>
+</body>
+</html>

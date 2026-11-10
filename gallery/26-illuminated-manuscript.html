@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Book of Small Hours — folio xxvi, recto</title>
+<meta name="description" content="An illuminated manuscript page: a gold-leaf historiated initial that catches the light, growing vine borders, and unruly marginal creatures on worn parchment.">
+<style>
+  :root { --ink:#2b1d12; --rubric:#a3261c; --azure:#23407f; --verd:#3d6b3a; --gold:#d3a433; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { min-height:100vh; padding:clamp(10px,3vw,44px) clamp(6px,2vw,24px) 60px; color:var(--ink);
+    background:radial-gradient(ellipse at 50% 0%, #4a3423, #23160d 70%);
+    font-family:"Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L",Georgia,serif; }
+  .back { position:fixed; top:10px; left:12px; z-index:5; font-size:13px; letter-spacing:.12em; color:#e9d9b0; text-decoration:none; font-style:italic; background:rgba(35,22,13,.7); padding:4px 9px; border-radius:2px; }
+  .back:hover { color:#fff; text-decoration:underline; }
+  .folio { position:relative; max-width:900px; margin:0 auto; padding:clamp(22px,5vw,64px) clamp(14px,4vw,56px) clamp(18px,3vw,40px) clamp(52px,11vw,128px);
+    background-color:#e8d6a9;
+    background-image:
+      radial-gradient(ellipse at 8% 4%, rgba(120,80,30,.35), transparent 30%), radial-gradient(ellipse at 96% 98%, rgba(110,70,25,.4), transparent 34%),
+      radial-gradient(ellipse at 100% 0%, rgba(120,80,30,.22), transparent 26%), radial-gradient(circle at 70% 40%, rgba(255,246,214,.5), transparent 46%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.035 .07' numOctaves='4' seed='8'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .28 0 0 0 0 .1 0 0 0 .9 -.28'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .2 0 0 0 0 .08 0 0 0 .5 -.14'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    box-shadow:0 0 0 1px #8d7240, inset 0 0 70px rgba(96,62,22,.5), 0 30px 60px rgba(0,0,0,.6);
+    border-radius:3px 9px 4px 12px / 8px 3px 10px 4px; }
+  .folio-no { position:absolute; top:14px; right:22px; font-style:italic; font-size:13px; color:#7a5c33; letter-spacing:.1em; }
+  #vine { position:absolute; left:0; top:0; width:clamp(48px,10.5vw,120px); height:100%; overflow:visible; pointer-events:none; }
+  .rubric { color:var(--rubric); text-align:center; font-size:clamp(13px,1.6vw,16px); letter-spacing:.22em; text-transform:uppercase; margin-bottom:.4em; }
+  .incipit { text-align:center; font-family:"UnifrakturCook","Old English Text MT","Luminari","Apple Chancery","URW Chancery L","Palatino Linotype",serif;
+    font-size:clamp(26px,4.6vw,46px); line-height:1.05; margin-bottom:.55em; color:#1f140b; }
+  .incipit em { color:var(--azure); font-style:normal; }
+  .text { font-size:clamp(16px,2vw,21px); line-height:1.62; text-align:justify; hyphens:auto; -webkit-hyphens:auto;
+    background-image:repeating-linear-gradient(180deg, transparent 0 calc(1.62em - 1px), rgba(150,70,50,.22) calc(1.62em - 1px) 1.62em); }
+  .text p { text-indent:0; }
+  .text p + p::before { content:"¶ "; color:var(--azure); font-weight:700; }
+  .text b { color:var(--rubric); font-weight:400; }
+  .text .cap { color:var(--azure); font-weight:700; }
+  .initial { float:left; width:clamp(118px,25vw,228px); margin:.25em .8em .1em 0; shape-outside:margin-box; cursor:crosshair; }
+  .initial svg { display:block; width:100%; height:auto; filter:drop-shadow(1px 2px 0 rgba(60,35,10,.35)); }
+  .first { font-variant:small-caps; letter-spacing:.08em; font-size:1.12em; }
+  .gloss { display:block; float:right; clear:right; width:clamp(92px,17vw,150px); margin:.2em 0 .3em 1em; font-size:12.5px; line-height:1.3; font-style:italic; color:#6b3d1e; text-align:left; hyphens:none;
+    border-left:1px solid rgba(163,38,28,.6); padding-left:8px; transform:rotate(-1.2deg); background:#e8d6a9; }
+  .bas { margin-top:1.2em; clear:both; }
+  .bas svg { width:100%; height:auto; display:block; overflow:visible; }
+  .beast { cursor:pointer; transform-box:fill-box; transform-origin:50% 100%; transition:transform .3s; outline:none; }
+  .beast:hover, .beast:focus-visible { transform:translateY(-4px) rotate(-3deg); }
+  .beast.hop { animation:hop .7s cubic-bezier(.3,1.6,.6,1); }
+  @keyframes hop { 30% { transform:translateY(-16px) rotate(-8deg);} 60% { transform:translateY(0) rotate(4deg);} }
+  .caption { text-align:center; font-style:italic; font-size:14px; color:#6b4a25; min-height:1.5em; margin-top:.3em; }
+  .colophon { text-align:center; color:var(--rubric); font-size:13px; letter-spacing:.14em; margin-top:1em; }
+  .ln { fill:none; stroke:#2b1d12; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+  @media (max-width:520px) { .gloss { display:none; } .text { text-align:left; } }
+  @media (prefers-reduced-motion: reduce) { .beast, .beast.hop { transition:none; animation:none; } }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← 100</a>
+<article class="folio" id="folio">
+  <span class="folio-no">fol. xxvi · r</span>
+  <svg id="vine" aria-hidden="true"></svg>
+
+  <p class="rubric">Here beginneth the seventh hour</p>
+  <h1 class="incipit">Of the <em>Owl</em> that kept the Abbey’s Clock</h1>
+
+  <div class="text">
+    <div class="initial" id="initial" title="Move across the gold">
+      <svg viewBox="0 0 200 200" role="img" aria-label="Historiated initial O: an owl on a tower beneath a star, framed in gold leaf">
+        <defs>
+          <linearGradient id="leaf" gradientUnits="userSpaceOnUse" x1="-60" y1="0" x2="140" y2="200">
+            <stop offset="0" stop-color="#8a5f12"/><stop offset=".3" stop-color="#d3a433"/><stop offset=".48" stop-color="#fff3b8"/><stop offset=".56" stop-color="#f1cf62"/><stop offset=".8" stop-color="#b98a22"/><stop offset="1" stop-color="#7a520e"/>
+          </linearGradient>
+          <pattern id="diaper" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#23407f"/><path d="M8 1 L15 8 L8 15 L1 8Z" fill="none" stroke="#5f7fc4" stroke-width=".8"/><circle cx="8" cy="8" r="1.3" fill="#e9d9b0"/></pattern>
+          <clipPath id="inO"><ellipse cx="100" cy="102" rx="50" ry="60"/></clipPath>
+        </defs>
+        <rect x="6" y="6" width="188" height="188" fill="url(#leaf)" stroke="#2b1d12" stroke-width="2"/>
+        <rect x="16" y="16" width="168" height="168" fill="url(#diaper)" stroke="#2b1d12" stroke-width="1.5"/>
+        <!-- scene inside the O -->
+        <g clip-path="url(#inO)">
+          <rect x="40" y="36" width="120" height="130" fill="#14254f"/>
+          <g fill="#f1cf62"><circle cx="72" cy="66" r="1.6"/><circle cx="128" cy="58" r="1.4"/><circle cx="118" cy="84" r="1.2"/><circle cx="64" cy="96" r="1.2"/><circle cx="138" cy="104" r="1.5"/></g>
+          <path d="M100 50 l3 8 8 1 -6 5 2 8 -7-5 -7 5 2-8 -6-5 8-1z" fill="url(#leaf)" stroke="#2b1d12" stroke-width=".8"/>
+          <path d="M40 150 Q70 128 100 144 Q130 126 160 146 V170 H40Z" fill="#3d6b3a" stroke="#2b1d12" stroke-width="1.2"/>
+          <path d="M84 150 V112 h-4 v-8 h6 v5 h5 v-5 h6 v5 h5 v-5 h6 v8 h-4 v38z" fill="#d9c9a8" stroke="#2b1d12" stroke-width="1.4"/>
+          <path d="M96 150 v-12 a4 4 0 0 1 8 0 v12z" fill="#2b1d12"/><circle cx="100" cy="122" r="5" fill="#f4ead0" stroke="#2b1d12"/><path d="M100 122 v-3.4 M100 122 h2.6" stroke="#2b1d12" stroke-width=".9"/>
+          <!-- owl -->
+          <g stroke="#2b1d12" stroke-width="1.2"><path d="M89 104 q-3 -22 11 -22 q14 0 11 22z" fill="#a3261c"/><circle cx="95" cy="90" r="4.6" fill="#f4ead0"/><circle cx="105" cy="90" r="4.6" fill="#f4ead0"/>
+            <path d="M98 93 l2 4 2-4z" fill="url(#leaf)"/><path d="M90 84 l-2 -6 6 3 M110 84 l2 -6 -6 3" fill="#a3261c"/></g>
+          <circle cx="95" cy="90" r="1.7" fill="#2b1d12"/><circle cx="105" cy="90" r="1.7" fill="#2b1d12"/>
+        </g>
+        <!-- the letter O in burnished gold -->
+        <path fill-rule="evenodd" d="M100 22 C146 22 172 58 172 102 C172 146 146 180 100 180 C54 180 28 146 28 102 C28 58 54 22 100 22Z M100 42 C72 42 50 68 50 102 C50 136 72 162 100 162 C128 162 150 136 150 102 C150 68 128 42 100 42Z" fill="url(#leaf)" stroke="#2b1d12" stroke-width="2"/>
+        <g fill="none" stroke="#7a520e" stroke-width="1" opacity=".8"><path d="M38 102 q0 -50 62 -70"/><path d="M162 102 q0 50 -62 70"/></g>
+        <g fill="#a3261c" stroke="#2b1d12" stroke-width=".8"><circle cx="39" cy="102" r="4"/><circle cx="161" cy="102" r="4"/><circle cx="100" cy="32" r="4"/><circle cx="100" cy="171" r="4"/></g>
+        <g fill="#f4ead0"><circle cx="24" cy="24" r="3"/><circle cx="176" cy="24" r="3"/><circle cx="24" cy="176" r="3"/><circle cx="176" cy="176" r="3"/></g>
+      </svg>
+    </div>
+    <p><span class="first">nce, in the vale of Saint Orrin-under-Fell,</span> there dwelt an owl of sober habit, who, seeing that the brothers’ great clock ran slow in frost and quick in thaw, took upon herself the keeping of the hours. <span class="gloss">Nota: the clock was a gift, &amp; ill-made; the owl was neither.</span> At <b>Matins</b> she cried once, softly, lest the novices be frighted; at <b>Lauds</b> twice; and so through the night, never erring, though no man had taught her number.</p>
+    <p>Now the <span class="cap">S</span>acristan, a man named Brother Aldwyn, who loved his sleep above his psalter, complained to the Abbot, saying: <i>It is not meet that a fowl should rule the house.</i> And the Abbot answered him: <i>Then rule it better, and she shall hold her peace.</i> Whereat Brother Aldwyn was silent for the space of one whole winter. <span class="gloss">Some copies say two winters. They flatter him.</span></p>
+    <p>It is further written that the snail, being slow, is never late, for he sets out the day before; and that the hare, being swift, hath never yet heard the end of a sermon. <b>Consider these things,</b> reader, and wind thy clock.</p>
+  </div>
+
+  <div class="bas">
+    <svg viewBox="0 0 700 150" role="group" aria-label="Marginal creatures at the foot of the page">
+      <path class="ln" d="M10 128 Q120 116 230 128 T450 126 T690 128" stroke-width="2"/>
+      <g fill="#3d6b3a" stroke="#2b1d12" stroke-width="1"><path d="M60 126 q4 -14 14 -12 q-2 10 -14 12z"/><path d="M300 124 q-2 -14 -14 -14 q0 10 14 14z"/><path d="M520 126 q6 -12 16 -8 q-4 9 -16 8z"/><path d="M640 127 q0 -12 -10 -15 q-3 9 10 15z"/></g>
+      <!-- snail knight -->
+      <g class="beast" tabindex="0" role="button" data-say="The snail, armed cap-à-pie, advanceth upon his enemy at the rate of one furlong per feast-day.">
+        <path d="M98 122 q-6 -2 -2 -10 l16 -16 q10 -6 10 8 l0 14 q30 8 66 2 q10 -2 6 4 q-40 10 -96 -2z" fill="#d9c9a8" stroke="#2b1d12" stroke-width="1.6"/>
+        <circle cx="158" cy="92" r="27" fill="#a3261c" stroke="#2b1d12" stroke-width="1.6"/><path class="ln" d="M158 92 m-17 0 a17 17 0 1 1 17 17 a10 10 0 1 1 -8 -15 a5 5 0 1 1 3 8"/>
+        <path class="ln" d="M110 98 l-8 -18 M118 96 l0 -20"/><circle cx="102" cy="79" r="2.4" fill="#2b1d12"/><circle cx="118" cy="75" r="2.4" fill="#2b1d12"/>
+        <path d="M104 102 l-64 -22" stroke="#2b1d12" stroke-width="3" stroke-linecap="round"/><path d="M40 80 l-8 -6 10 2z" fill="#d3a433" stroke="#2b1d12"/><path d="M60 87 l-4 -12 14 3z" fill="#23407f" stroke="#2b1d12"/>
+      </g>
+      <!-- hare with horn -->
+      <g class="beast" tabindex="0" role="button" data-say="The hare soundeth the horn for a hunt in which he hopeth to take no part.">
+        <path d="M352 126 q-18 -4 -14 -28 q4 -24 26 -22 q20 2 20 26 q0 22 -14 24z" fill="#c98d62" stroke="#2b1d12" stroke-width="1.6"/>
+        <circle cx="384" cy="68" r="13" fill="#c98d62" stroke="#2b1d12" stroke-width="1.6"/><path d="M378 58 q-10 -34 0 -36 q8 0 6 34 M388 57 q0 -34 10 -32 q8 4 -3 35" fill="#c98d62" stroke="#2b1d12" stroke-width="1.6"/>
+        <circle cx="389" cy="66" r="1.8" fill="#2b1d12"/><circle cx="340" cy="112" r="7" fill="#f4ead0" stroke="#2b1d12" stroke-width="1.4"/>
+        <path d="M396 72 q30 -4 46 -26 l10 10 q-22 26 -54 24z" fill="#d3a433" stroke="#2b1d12" stroke-width="1.6"/><path class="ln" d="M372 92 q16 -2 26 -14 M356 126 h-12 M372 126 h12"/>
+        <path class="ln" d="M462 40 q8 -4 12 -12 M466 50 q10 0 18 -6 M464 60 q9 4 18 2" stroke="#a3261c"/>
+      </g>
+      <!-- wyrm reading -->
+      <g class="beast" tabindex="0" role="button" data-say="A small wyrm, having eaten three leaves of this very book, pronounceth it dry.">
+        <path d="M560 124 q-10 -30 14 -30 q22 0 18 18 q-2 10 10 10 q14 0 12 -22 q-2 -26 20 -30 q16 -2 22 10 l-12 6 q-6 -6 -12 -2 q-8 6 -4 24 q2 22 -24 22 q-18 0 -20 -14 q0 -8 -8 -8 q-8 2 -4 16z" fill="#3d6b3a" stroke="#2b1d12" stroke-width="1.6"/>
+        <path d="M640 72 l6 -10 4 9 8 -6 -2 10z" fill="#a3261c" stroke="#2b1d12"/><circle cx="646" cy="78" r="2" fill="#f1cf62" stroke="#2b1d12" stroke-width=".8"/>
+        <path d="M656 86 l22 -6 0 22 -22 6z M656 86 l-18 -4 0 22 18 4z" fill="#f4ead0" stroke="#2b1d12" stroke-width="1.4"/><path class="ln" d="M661 91 l12 -3 M661 97 l12 -3 M651 90 l-9 -2 M651 96 l-9 -2" stroke-width=".9"/>
+        <g fill="#d3a433" stroke="#2b1d12" stroke-width=".8"><circle cx="574" cy="104" r="2.6"/><circle cx="596" cy="118" r="2.6"/><circle cx="618" cy="104" r="2.6"/></g>
+      </g>
+    </svg>
+    <p class="caption" id="cap">Touch the creatures in the margin; they have opinions.</p>
+  </div>
+  <p class="colophon">✠ Written by an idle hand at Saint Orrin’s, the candle being short ✠</p>
+</article>
+
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg', vine = document.getElementById('vine'), folio = document.getElementById('folio');
+  const mk = (n, a) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); vine.appendChild(e); return e; };
+  // the border vine grows to fit the page height
+  function grow() {
+    vine.innerHTML = ''; const W = vine.clientWidth, H = folio.clientHeight, cx = W * .52, amp = W * .2, top = 26, bot = H - 26, k = W / 100;
+    const X = y => cx + Math.sin(y / (58 * Math.max(.7, k)) ) * amp;
+    mk('rect', { x: cx - 3 * k - amp * 1.9, y: top, width: 5 * k, height: bot - top, fill: '#23407f', stroke: '#2b1d12', 'stroke-width': 1 });
+    mk('rect', { x: cx - 3 * k - amp * 1.9 + 5 * k, y: top, width: 3 * k, height: bot - top, fill: 'url(#leaf)', stroke: '#2b1d12', 'stroke-width': .8 });
+    let d = `M${X(top)} ${top}`; for (let y = top; y <= bot; y += 6) d += ` L${X(y).toFixed(1)} ${y}`;
+    mk('path', { d, fill: 'none', stroke: '#2b1d12', 'stroke-width': 4.2 * k + 1, 'stroke-linecap': 'round' });
+    mk('path', { d, fill: 'none', stroke: '#3d6b3a', 'stroke-width': 2.6 * k + .4, 'stroke-linecap': 'round' });
+    let i = 0;
+    for (let y = top + 16; y < bot - 10; y += 30 * Math.max(.7, k), i++) {
+      const x = X(y), side = i % 2 ? 1 : -1, L = (15 + (i * 7) % 9) * k, a = side * (38 + (i * 13) % 30);
+      const kind = i % 5;
+      if (kind === 2) { // gold bezant with rays
+        const bx = x + side * L * .9, by = y - 4;
+        mk('path', { d: `M${x} ${y} Q${x + side * L * .4} ${y - 10} ${bx} ${by}`, fill: 'none', stroke: '#2b1d12', 'stroke-width': 1 });
+        mk('circle', { cx: bx, cy: by, r: 4.6 * k + 1, fill: 'url(#leaf)', stroke: '#2b1d12', 'stroke-width': 1 });
+        for (let r = 0; r < 3; r++) mk('line', { x1: bx + side * (6 * k + 2), y1: by + (r - 1) * 4, x2: bx + side * (10 * k + 3), y2: by + (r - 1) * 7, stroke: '#2b1d12', 'stroke-width': .8 });
+      } else if (kind === 4) { // flower
+        const fx = x + side * L, fy = y - 6, col = i % 2 ? '#a3261c' : '#23407f';
+        mk('path', { d: `M${x} ${y} Q${x + side * L * .5} ${y - 14} ${fx} ${fy}`, fill: 'none', stroke: '#3d6b3a', 'stroke-width': 1.6 });
+        for (let p = 0; p < 5; p++) { const an = p * 72 * Math.PI / 180; mk('circle', { cx: fx + Math.cos(an) * 4 * k, cy: fy + Math.sin(an) * 4 * k, r: 3 * k + .6, fill: col, stroke: '#2b1d12', 'stroke-width': .7 }); }
+        mk('circle', { cx: fx, cy: fy, r: 2.2 * k + .4, fill: '#f1cf62', stroke: '#2b1d12', 'stroke-width': .6 });
+      } else { // ivy leaf
+        mk('path', { d: `M0 0 Q${L * .35} ${-L * .42} ${L} 0 Q${L * .35} ${L * .42} 0 0Z M0 0 L${L * .8} 0`, transform: `translate(${x.toFixed(1)},${y}) rotate(${side > 0 ? -a + 20 : 180 - a - 20})`,
+          fill: kind === 0 ? '#3d6b3a' : kind === 1 ? '#a3261c' : '#23407f', stroke: '#2b1d12', 'stroke-width': 1 });
+      }
+    }
+    // terminal curl
+    mk('path', { d: `M${X(top)} ${top} q${10 * k} ${-14} ${22 * k} ${-6} q${8 * k} 8 ${-2 * k} 12`, fill: 'none', stroke: '#3d6b3a', 'stroke-width': 2 * k + .6, 'stroke-linecap': 'round' });
+  }
+  grow();
+  if ('ResizeObserver' in window) { let t; new ResizeObserver(() => { clearTimeout(t); t = setTimeout(grow, 80); }).observe(folio); }
+
+  // gold leaf catches the light of the pointer
+  const leaf = document.getElementById('leaf');
+  function light(e) {
+    const p = (e.clientX / innerWidth - .5) * 2, q = (e.clientY / innerHeight - .5) * 2;
+    leaf.setAttribute('x1', -60 + p * 90); leaf.setAttribute('x2', 140 + p * 90); leaf.setAttribute('y1', q * 60); leaf.setAttribute('y2', 200 + q * 60);
+  }
+  addEventListener('pointermove', light, { passive: true });
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hover: none)').matches) {
+    let t0 = performance.now(); (function shimmer(now) { light({ clientX: innerWidth * (.5 + Math.sin((now - t0) / 2200) * .5), clientY: innerHeight * .5 }); requestAnimationFrame(shimmer); })(t0);
+  }
+
+  const cap = document.getElementById('cap');
+  document.querySelectorAll('.beast').forEach(b => {
+    const say = () => { cap.textContent = b.dataset.say; b.classList.remove('hop'); void b.getBoundingClientRect(); b.classList.add('hop'); };
+    b.addEventListener('click', say);
+    b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); say(); } });
+  });
+})();
+</script>
+</body>
+</html>

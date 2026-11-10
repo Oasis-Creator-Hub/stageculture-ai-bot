@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nine Verses in Wet Ink — sumi-e haiku</title>
+<meta name="description" content="Nine original haiku brushed in vertical columns over sumi-e ink that bleeds into rice paper, painted live with SVG filters. Click, tap or press space for a new verse.">
+<style>
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:#ebe1ca;color:#191613;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  font-family:"Iowan Old Style","Hoefler Text","Palatino Linotype",Palatino,"Book Antiqua","Noto Serif",Georgia,serif}
+.sheet{position:fixed;inset:0;background:radial-gradient(120% 90% at 40% 45%,#f3ebd8 0%,#ebe1ca 55%,#d9cbab 100%)}
+svg.lay,svg.paper{position:absolute;inset:0;width:100%;height:100%;display:block}
+svg.paper{mix-blend-mode:multiply;pointer-events:none}
+svg.lay{pointer-events:none;will-change:transform,opacity}
+svg.wash{animation:bleed var(--d,4s) cubic-bezier(.16,.6,.2,1) var(--w,0s) both}
+@keyframes bleed{0%{opacity:0;transform:scale(.72)}35%{opacity:.85}100%{opacity:1;transform:scale(1)}}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw var(--d,1.4s) cubic-bezier(.5,0,.25,1) var(--w,0s) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.pop{opacity:0;animation:pop .9s ease-out var(--w,0s) forwards}
+@keyframes pop{to{opacity:1}}
+#ink{position:absolute;inset:0;transition:opacity .7s ease}
+#ink.out{opacity:0}
+#verse{position:absolute;top:clamp(2.2rem,11vh,7rem);right:clamp(1.6rem,11vw,10rem);writing-mode:vertical-rl;-webkit-writing-mode:vertical-rl;
+  font-style:italic;font-size:clamp(1.1rem,3.5vh,2.05rem);line-height:2.15;letter-spacing:.04em;max-height:74vh;transition:opacity .5s}
+#verse.out{opacity:0}
+#verse p{white-space:nowrap}
+#verse p:nth-child(2){padding-top:1.6em}#verse p:nth-child(3){padding-top:3.2em}
+#verse span{display:inline-block;opacity:0;animation:brush .7s cubic-bezier(.2,.7,.2,1) calc(var(--i)*52ms + .5s) forwards}
+@keyframes brush{0%{opacity:0;filter:blur(7px);transform:translateY(-.35em) scale(1.25)}60%{opacity:1}100%{opacity:1;filter:blur(0);transform:none}}
+#seal{position:absolute;right:clamp(1.6rem,11vw,10rem);bottom:clamp(4.2rem,13vh,8rem);width:clamp(38px,6.4vh,54px);aspect-ratio:1;mix-blend-mode:multiply;
+  transform:rotate(-3deg);opacity:0}
+#seal.on{animation:stamp .5s cubic-bezier(.2,1.4,.4,1) 3.6s forwards}
+@keyframes stamp{0%{opacity:0;transform:rotate(-3deg) scale(1.7)}100%{opacity:.88;transform:rotate(-3deg) scale(1)}}
+.foot{position:absolute;left:clamp(1rem,4vw,3rem);bottom:clamp(1rem,4vh,2.4rem);right:clamp(1rem,4vw,3rem);display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;
+  font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;color:#5b5145}
+.foot h1{font-size:inherit;font-weight:400;color:#191613;letter-spacing:.3em}
+.foot em{display:block;font-size:.9rem;letter-spacing:.02em;text-transform:none;margin-top:.45rem;color:#6d6252}
+.foot button{font:inherit;letter-spacing:inherit;text-transform:inherit;color:#191613;background:none;border:0;border-bottom:1px solid #191613;padding:0 0 .25rem;cursor:pointer}
+.home{position:absolute;top:clamp(1rem,3.5vh,2rem);left:clamp(1rem,4vw,3rem);font-size:.7rem;letter-spacing:.24em;color:#5b5145;text-decoration:none}
+.home:hover{color:#a3271c}
+@media(prefers-reduced-motion:reduce){svg.wash,.draw,.pop,#verse span,#seal.on{animation-duration:.01s!important;animation-delay:0s!important}}
+</style>
+</head>
+<body>
+<div class="sheet" id="sheet">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <filter id="bleed" x="-45%" y="-45%" width="190%" height="190%" color-interpolation-filters="sRGB">
+      <feTurbulence id="tb" type="fractalNoise" baseFrequency=".010 .017" numOctaves="4" seed="3" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="95" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="6" result="b"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="2" seed="11" result="g"/>
+      <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.1 .28" result="ga"/>
+      <feComposite in="b" in2="ga" operator="in"/>
+    </filter>
+    <filter id="dry" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".035 .05" numOctaves="2" seed="5" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".5 .5" numOctaves="2" seed="2" result="s"/>
+      <feColorMatrix in="s" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 2.6 -.5" result="sa"/>
+      <feComposite in="d" in2="sa" operator="in"/><feGaussianBlur stdDeviation=".7"/>
+    </filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".9 .55" numOctaves="3" seed="7" result="a"/>
+      <feColorMatrix in="a" type="matrix" values="0 0 0 0 .42  0 0 0 0 .34  0 0 0 0 .22  0 0 0 .34 -.06" result="p"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".006 .35" numOctaves="2" seed="21" result="f"/>
+      <feColorMatrix in="f" type="matrix" values="0 0 0 0 .5  0 0 0 0 .42  0 0 0 0 .3  0 0 0 .5 -.2" result="q"/>
+      <feMerge><feMergeNode in="p"/><feMergeNode in="q"/></feMerge>
+    </filter>
+  </defs></svg>
+  <svg class="paper" aria-hidden="true"><rect width="100%" height="100%" filter="url(#grain)"/></svg>
+  <div id="ink" aria-hidden="true"></div>
+  <div id="verse" aria-live="polite"></div>
+  <svg id="seal" viewBox="0 0 50 50" aria-hidden="true"><g filter="url(#dry)"><rect x="2" y="2" width="46" height="46" rx="3" fill="#b3261a"/>
+    <path d="M12 13h26M25 13v25M13 24h10M27 24h10M12 38h26M17 30l-4 7M33 30l4 7" stroke="#ebe1ca" stroke-width="3.2" fill="none" stroke-linecap="square"/></g></svg>
+  <a class="home" href="index.html" onclick="event.stopPropagation()">← 100</a>
+  <div class="foot"><div><h1>Nine Verses in Wet Ink</h1><em id="count">verse one of nine</em></div><button id="next" type="button">New verse</button></div>
+</div>
+<script>
+(()=>{
+const INK='#191613',RED='#b3261a';
+const verses=[
+ ['morning fog lifts slow','the heron keeps its one leg','folded like a thought'],
+ ['ink stone, a small pond','the brush drinks before it speaks','mountains wait in it'],
+ ['first snow on the gate','even the crow’s complaining','comes out quieter'],
+ ['summer rain passes','the old roof goes on dripping','counting to itself'],
+ ['wind through the bamboo','a thousand green brushes sign','the same quiet name'],
+ ['moon in the rain barrel','I lift the lid carefully','not to spill the light'],
+ ['persimmon, last one','the branch remembers the weight','of all the others'],
+ ['the ferry bell fades','what the river carries off','it carries gently'],
+ ['paper lantern dusk','moths rehearse the old story','of wanting the flame']];
+const words=['one','two','three','four','five','six','seven','eight','nine'];
+const ink=document.getElementById('ink'),verse=document.getElementById('verse'),seal=document.getElementById('seal');
+const r=(a,b)=>a+Math.random()*(b-a),f=n=>n.toFixed(1);
+// --- primitives: each returns an SVG fragment ---
+const mt=(x,base,w,h,op)=>`<path filter="url(#bleed)" fill="${INK}" opacity="${op}" d="M${f(x-w/2)} ${base}Q${f(x-w*.22)} ${f(base-h*.92)} ${f(x)} ${f(base-h)}Q${f(x+w*.2)} ${f(base-h*.75)} ${f(x+w/2)} ${base}Z"/>`;
+const blot=(x,y,rx,ry,op,c=INK)=>`<ellipse filter="url(#bleed)" cx="${f(x)}" cy="${f(y)}" rx="${f(rx)}" ry="${f(ry)}" fill="${c}" opacity="${op}"/>`;
+const st=(d,w,op,delay,dur=1.3)=>`<path class="draw" pathLength="1" d="${d}" fill="none" stroke="${INK}" stroke-width="${w}" stroke-linecap="round" opacity="${op}" style="--w:${delay}s;--d:${dur}s"/>`;
+const leaf=(x,y,len,ang,delay)=>`<path class="pop" style="--w:${delay}s" fill="${INK}" opacity=".82" transform="translate(${f(x)} ${f(y)}) rotate(${f(ang)})" d="M0 0Q${f(len*.45)} ${f(-len*.14)} ${len} 0Q${f(len*.45)} ${f(len*.1)} 0 0Z"/>`;
+const bird=(x,y,s,delay)=>st(`M${f(x-9*s)} ${f(y-3*s)}Q${f(x-4*s)} ${f(y-7*s)} ${f(x)} ${f(y)}Q${f(x+5*s)} ${f(y-8*s)} ${f(x+11*s)} ${f(y-4*s)}`,2.2*s,.8,delay,.5);
+// layer(kind, origin%, delay, duration, fragment)
+const wash=(ox,oy,w,d,html)=>({cls:'wash',ox,oy,w,d,html});
+const marks=html=>({cls:'marks',html:`<g filter="url(#dry)">${html}</g>`});
+const scenes=[
+ ()=>{let s='';for(let i=0;i<6;i++){const x=r(90,330),t=r(180,360);s+=st(`M${f(x)} 690Q${f(x+r(-30,40))} ${f(t+180)} ${f(x+r(40,120))} ${f(t)}`,r(2.5,6),r(.6,.9),1+i*.22,1.5)}
+   return[wash(40,80,0,5,mt(520,560,760,150,.14)),wash(30,92,.4,4.5,blot(330,640,460,46,.32)),marks(s+bird(520,210,1.3,3)+st('M250 520q8-60 4-96q-2-20 14-26q14-4 24 6M268 400l44 6',3.4,.85,2.4,.9)+st('M254 520v70',2,.8,3,.5))]},
+ ()=>[wash(30,75,0,6,mt(300,560,640,r(260,320),.2)),wash(55,75,.5,5.5,mt(590,580,520,r(340,420),.36)),wash(15,85,1,5,mt(150,640,600,r(220,270),.62)),
+      wash(50,85,1.6,4,blot(460,610,520,50,.9,'#ebe1ca')),marks(bird(640,150,1,3.2)+bird(690,172,.7,3.5))],
+ ()=>{let tw='';[[210,318,-52,70],[330,322,-40,90],[460,318,-65,60],[560,296,-30,80]].forEach((t,i)=>tw+=st(`M${t[0]} ${t[1]}q${f(t[3]*.4)} ${f(t[2]*.7)} ${t[3]} ${t[2]}`,3,.85,1.4+i*.25,.6));
+   return[wash(50,95,.2,5,blot(430,680,620,40,.16)),marks(st('M-30 268Q170 250 330 322T700 280',11,.9,.2,1.8)+tw),
+      wash(42,36,2.4,2.2,blot(422,258,17,13,.92)),wash(56,34,2.7,2.2,blot(566,270,14,11,.9)),marks(st('M409 262l-12 4',3,.9,3.2,.3)+st('M553 273l-11 3',3,.9,3.4,.3))]},
+ ()=>{let s='';for(let i=0;i<46;i++){const x=r(20,820),y=r(40,560),l=r(50,120);s+=st(`M${f(x)} ${f(y)}l${f(-l*.28)} ${f(l)}`,r(.8,1.8),r(.25,.5),.8+i*.05,.5)}
+   return[wash(35,80,0,5.5,mt(360,600,760,r(300,360),.3)),wash(20,95,.6,4.5,blot(300,640,520,60,.5)),marks(s)]},
+ ()=>{let s='';[[150,10,.9],[250,7,.75],[325,13,.95],[420,6,.55]].forEach((b,i)=>{let y=700,x=b[0],k=0;while(y>30){const h=r(95,135),x2=x+r(1,5);
+     s+=st(`M${f(x)} ${f(y)}L${f(x2)} ${f(y-h)}`,b[1],b[2],.2+i*.35+k*.16,.35)+st(`M${f(x2-b[1])} ${f(y-h-3)}h${b[1]*2}`,2.2,b[2],.4+i*.35+k*.16,.2);y-=h+7;x=x2;k++}
+     for(let j=0;j<5;j++)s+=leaf(x+r(-6,8),r(110,440),r(48,92),r(18,62)*(j%2?1:-1)+(j%2?0:180),1.8+i*.3+j*.14)});
+   return[wash(30,60,0,6,blot(300,380,260,300,.08)),marks(s)]},
+ ()=>[wash(34,36,0,6,blot(340,250,112,112,.13)),wash(34,36,.8,5,`<circle filter="url(#bleed)" cx="340" cy="250" r="96" fill="none" stroke="${INK}" stroke-width="5" opacity=".3"/>`),
+      wash(30,90,.8,5,mt(220,650,700,170,.5)),wash(70,92,1.3,5,mt(640,660,560,120,.3)),marks(st('M150 596h120M168 596v52M252 596v52M158 648h104',5,.85,2.4,.5)+st('M176 590q34-10 68 0',2.5,.7,3,.5))],
+ ()=>{let tw='';[[250,300,-44,80],[390,318,-56,40],[470,300,-20,90]].forEach((t,i)=>tw+=st(`M${t[0]} ${t[1]}q${f(t[3]*.5)} ${f(t[2]*.8)} ${t[3]} ${t[2]}`,2.6,.85,1.5+i*.3,.6));
+   return[marks(st('M-30 330Q160 262 340 318T660 250',10,.9,.2,1.9)+tw+st('M512 290q4 22 0 40',2.2,.85,2.6,.4)),wash(51,52,3,3,blot(512,364,34,32,.9,RED)),
+      wash(51,52,3.4,2.4,blot(505,356,10,9,.35,'#f3d9a8')),wash(40,96,.6,5,blot(420,690,640,36,.14))]},
+ ()=>{let s='';for(let i=0;i<5;i++){const y=420+i*52,x=r(0,160);s+=st(`M${f(x)} ${y}q${f(r(140,220))} ${f(r(-12,12))} ${f(r(380,640))} ${f(r(-8,8))}`,r(8,16),r(.16,.34),.8+i*.3,1.6)}
+   return[wash(40,50,0,6,mt(380,400,680,r(170,220),.2)),marks(s+st('M390 478q46 22 96 0',5,.9,3,.6)+st('M436 482V420',2.2,.85,3.4,.4)+st('M436 424q22 14 4 40',1.6,.6,3.7,.4))]},
+ ()=>{let s='';for(let i=0;i<14;i++){const a=r(0,6.28),d=r(110,250),x=330+Math.cos(a)*d,y=290+Math.sin(a)*d*.8;s+=bird(x,y,r(.35,.6),2+i*.12)}
+   return[wash(33,41,0,5.5,blot(330,290,150,150,.1,RED)),wash(33,41,.5,4,blot(330,290,62,74,.86,RED)),marks(st('M330 130v76',2,.8,1.2,.6)+st('M310 368h40',3,.8,1.6,.3)+s),wash(40,96,.8,5,blot(380,690,600,44,.3))]}
+];
+let n=-1,busy=false;
+function paint(){
+  n=(n+1)%verses.length;
+  document.getElementById('tb').setAttribute('seed',1+Math.floor(Math.random()*90));
+  ink.innerHTML=scenes[n]().map(L=>`<svg class="lay ${L.cls}" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice" style="transform-origin:${L.ox||50}% ${L.oy||50}%;--w:${L.w||0}s;--d:${L.d||4}s">${L.html}</svg>`).join('');
+  let i=0;verse.innerHTML=verses[n].map(line=>'<p>'+line.split(' ').map(w=>[...w].map(c=>`<span style="--i:${i++}">${c}</span>`).join('')).join((i++," "))+'</p>').join('');
+  document.getElementById('count').textContent='verse '+words[n]+' of nine';
+  seal.classList.remove('on');void seal.offsetWidth;seal.classList.add('on');
+}
+function next(){if(busy)return;busy=true;ink.classList.add('out');verse.classList.add('out');
+  setTimeout(()=>{paint();ink.classList.remove('out');verse.classList.remove('out');busy=false},720)}
+document.getElementById('sheet').addEventListener('click',next);
+addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'||e.key==='ArrowRight'){if(e.target.tagName!=='BUTTON'&&e.target.tagName!=='A'){e.preventDefault();next()}}});
+n=Math.floor(Math.random()*verses.length)-1;paint();
+})();
+</script>
+</body>
+</html>

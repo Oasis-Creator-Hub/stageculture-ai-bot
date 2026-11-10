@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Molten Hour — a lava-lamp lounge</title>
+<meta name="description" content="Gooey lava-lamp metaballs that melt, merge and trail your pointer, dressed in a warm 1970s lounge palette.">
+<style>
+  :root{
+    --bg:#2c140b; --s1:#4a1f0e; --s2:#8f3413; --s3:#cf5f1b; --s4:#e6a02a; --s5:#f2dfb8;
+    --l1:#f6c648; --l2:#ee7a1c; --l3:#b5320f; --deep:#7c2710; --ink:#f4e4c1;
+  }
+  body[data-mood="avocado"]{
+    --bg:#1c2110; --s1:#2f3a16; --s2:#56661f; --s3:#93a02c; --s4:#d7c544; --s5:#f1e9c0;
+    --l1:#f0e36a; --l2:#a9b62f; --l3:#4d6a1c; --deep:#3c5218;
+  }
+  body[data-mood="plum"]{
+    --bg:#210d1c; --s1:#431334; --s2:#7a1f49; --s3:#b93a4c; --s4:#e88a4f; --s5:#f6dcc0;
+    --l1:#ffb86b; --l2:#e2476a; --l3:#7d1c63; --deep:#5a1650;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    background:var(--bg); color:var(--ink); overflow:hidden;
+    font-family:"Cooper Black","Bookman Old Style","URW Bookman","Bookman",Georgia,serif;
+    transition:background .8s;
+  }
+  .stage{position:fixed;inset:0;touch-action:none;cursor:crosshair;overflow:hidden}
+  /* 70s supergraphic: nested arches rising from the corner */
+  .arches{position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 88% 118%,
+        var(--s5) 0 9vmax, var(--s4) 9vmax 18vmax, var(--s3) 18vmax 27vmax,
+        var(--s2) 27vmax 36vmax, var(--s1) 36vmax 45vmax, transparent 45vmax),
+      radial-gradient(circle at -6% -14%,
+        var(--s1) 0 14vmax, var(--s2) 14vmax 17vmax, var(--s1) 17vmax 26vmax, transparent 26vmax),
+      var(--bg);
+    transition:filter .8s;
+  }
+  .arches::after{content:"";position:absolute;left:0;right:0;top:58%;height:7vmax;
+    background:linear-gradient(var(--s2) 0 33%,var(--s3) 33% 66%,var(--s4) 66%);
+    opacity:.5;mix-blend-mode:screen;transform:skewY(-4deg)}
+  svg#lamp{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .grain{position:absolute;inset:0;width:100%;height:100%;opacity:.22;mix-blend-mode:overlay;pointer-events:none}
+  .vig{position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse at 50% 45%,transparent 45%,rgba(20,6,2,.6) 100%)}
+
+  header{position:absolute;left:clamp(18px,5vw,64px);top:clamp(52px,8vh,90px);pointer-events:none;max-width:min(90vw,820px)}
+  .kicker{font:700 clamp(10px,1.3vw,13px)/1 "Trebuchet MS","Gill Sans",sans-serif;letter-spacing:.42em;text-transform:uppercase;
+    color:var(--s4);margin:0 0 1.2em}
+  h1{margin:0;font-size:clamp(54px,13.5vw,190px);line-height:.82;letter-spacing:-.035em;font-weight:900;
+    color:var(--s5);
+    text-shadow:.035em .035em 0 var(--s3), .07em .07em 0 var(--s2), .105em .105em 0 var(--s1)}
+  h1 span{display:block}
+  h1 span:nth-child(2){margin-left:.55em;font-style:italic}
+  .sub{margin:2.2em 0 0;font:italic clamp(14px,1.7vw,19px)/1.45 Georgia,"Times New Roman",serif;max-width:27em;color:var(--s5);opacity:.92;
+    text-shadow:0 1px 0 rgba(0,0,0,.35)}
+
+  .panel{position:absolute;left:clamp(18px,5vw,64px);bottom:clamp(18px,5vh,44px);display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+  .panel button{
+    appearance:none;border:3px solid var(--s5);background:transparent;color:var(--s5);cursor:pointer;
+    font:inherit;font-size:14px;padding:.55em 1.1em .6em;border-radius:999px;letter-spacing:.02em;
+    transition:background .25s,color .25s,transform .2s}
+  .panel button:hover{transform:translateY(-2px) rotate(-1.5deg)}
+  .panel button[aria-pressed="true"]{background:var(--s5);color:var(--s1)}
+  .panel button:focus-visible, .back:focus-visible{outline:3px dashed var(--s4);outline-offset:3px}
+  .hint{font:600 11px/1.3 "Trebuchet MS","Gill Sans",sans-serif;letter-spacing:.28em;text-transform:uppercase;opacity:.8;flex-basis:100%}
+  .back{position:absolute;top:16px;left:clamp(18px,5vw,64px);z-index:5;color:var(--s5);text-decoration:none;
+    font:700 12px/1 "Trebuchet MS","Gill Sans",sans-serif;letter-spacing:.3em;border-bottom:2px solid var(--s3);padding-bottom:4px}
+  .dial{position:absolute;right:clamp(16px,4vw,48px);top:clamp(16px,4vh,40px);width:clamp(74px,10vw,116px);aspect-ratio:1;border-radius:50%;
+    border:3px solid var(--s5);display:grid;place-items:center;text-align:center;pointer-events:none;
+    font:700 10px/1.25 "Trebuchet MS","Gill Sans",sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--s5);
+    background:radial-gradient(circle,transparent 58%,var(--s2) 59% 64%,transparent 65%)}
+  .dial b{display:block;font:900 clamp(22px,3vw,34px)/1 "Cooper Black","Bookman Old Style",Georgia,serif;letter-spacing:0}
+  @media (max-height:520px){.sub{display:none}}
+</style>
+</head>
+<body data-mood="tangerine">
+<div class="stage" id="stage">
+  <div class="arches"></div>
+  <svg id="lamp" aria-hidden="true">
+    <defs>
+      <filter id="goo" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="16"/>
+        <feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -13"/>
+      </filter>
+      <filter id="gooBack" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="24"/>
+        <feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 24 -10"/>
+      </filter>
+      <linearGradient id="lava" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" style="stop-color:var(--l1)"/>
+        <stop offset=".5" style="stop-color:var(--l2)"/>
+        <stop offset="1" style="stop-color:var(--l3)"/>
+      </linearGradient>
+      <radialGradient id="shine" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#fff" stop-opacity=".55"/>
+        <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+      </radialGradient>
+      <mask id="frontMask"><g id="front" filter="url(#goo)" fill="#fff"></g></mask>
+    </defs>
+    <g id="back" filter="url(#gooBack)" style="fill:var(--deep)" opacity=".8"></g>
+    <rect width="100%" height="100%" fill="url(#lava)" mask="url(#frontMask)"/>
+    <g mask="url(#frontMask)"><circle id="glow" r="220" fill="url(#shine)"/></g>
+  </svg>
+  <svg class="grain" aria-hidden="true"><filter id="nz"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 1.2 -.2"/></filter><rect width="100%" height="100%" filter="url(#nz)"/></svg>
+  <div class="vig"></div>
+
+  <header>
+    <p class="kicker">Channel Seven · After the Kettle</p>
+    <h1><span>The</span><span>Molten</span><span>Hour</span></h1>
+    <p class="sub">Slow radio for warm rooms. Sink into the conversation pit, loosen your collar, and let the wax do the thinking.</p>
+  </header>
+  <div class="dial"><div><b id="count">0</b>blobs<br>adrift</div></div>
+</div>
+<a class="back" href="index.html">← 100</a>
+<div class="panel">
+  <span class="hint">Stir with your pointer · tap to drop wax</span>
+  <button type="button" data-mood="tangerine" aria-pressed="true">Tangerine Shag</button>
+  <button type="button" data-mood="avocado" aria-pressed="false">Avocado Fondue</button>
+  <button type="button" data-mood="plum" aria-pressed="false">Plum Velour</button>
+</div>
+
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.getElementById('lamp'), front = document.getElementById('front'), back = document.getElementById('back');
+  const glow = document.getElementById('glow'), stage = document.getElementById('stage'), countEl = document.getElementById('count');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W = 0, H = 0, S = 1;
+  const blobs = [], pools = [];
+  const ptr = {x: 0, y: 0, tx: 0, ty: 0, active: false, last: -1e9, el: null};
+
+  function circle(layer){ const c = document.createElementNS(NS, 'circle'); layer.appendChild(c); return c; }
+  function addBlob(x, y, r, layer){
+    const b = {x, y, vx: (Math.random() - .5) * .6, vy: (Math.random() - .5) * .6, r, heat: Math.random(),
+      ph: Math.random() * 6.283, wob: .6 + Math.random() * .8, layer, el: circle(layer === 'f' ? front : back)};
+    blobs.push(b); return b;
+  }
+  function resize(){
+    W = stage.clientWidth; H = stage.clientHeight; S = Math.max(.55, Math.min(1.25, Math.min(W, H) / 760));
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    // wax pools resting at the floor and ceiling of the lamp
+    pools.forEach((p, i) => {
+      const n = pools.length / 2, k = i % n, top = i >= n;
+      p.setAttribute('cx', (k + .5) / n * W); p.setAttribute('cy', top ? -30 * S : H + 30 * S);
+      p.setAttribute('r', (W / n) * .62 + (k % 2) * 14);
+    });
+  }
+  for (let i = 0; i < 10; i++) pools.push(circle(front));
+  ptr.el = circle(front);
+  resize();
+  for (let i = 0; i < 6; i++) addBlob(Math.random() * W, Math.random() * H, (70 + Math.random() * 70) * S, 'b');
+  for (let i = 0; i < 13; i++) addBlob(Math.random() * W, H * (.15 + Math.random() * .7), (26 + Math.random() * 58) * S, 'f');
+  ptr.x = ptr.tx = W * .7; ptr.y = ptr.ty = H * .5;
+
+  function step(k, t){
+    const reach = 300 * S;
+    for (const b of blobs){
+      const slow = b.layer === 'b' ? .45 : 1;
+      const ny = b.y / H;
+      b.heat = Math.max(0, Math.min(1, b.heat + (ny - .5) * .0042 * k));
+      b.vy += -(b.heat - .5) * .034 * k * slow;
+      b.vx += Math.sin(t * .00035 * b.wob + b.ph) * .006 * k;
+      if (ptr.active && b.layer === 'f'){
+        const dx = ptr.x - b.x, dy = ptr.y - b.y, d = Math.hypot(dx, dy) || 1;
+        if (d < reach){ const f = (1 - d / reach) * .09 * k; b.vx += dx / d * f; b.vy += dy / d * f; }
+      }
+      // soft walls
+      if (b.x < b.r * .6) b.vx += .05 * k; if (b.x > W - b.r * .6) b.vx -= .05 * k;
+      if (b.y < -b.r * .2) b.vy += .06 * k; if (b.y > H + b.r * .2) b.vy -= .06 * k;
+      const damp = Math.pow(.984, k); b.vx *= damp; b.vy *= damp;
+      b.x += b.vx * k; b.y += b.vy * k;
+    }
+    ptr.x += (ptr.tx - ptr.x) * Math.min(1, .16 * k); ptr.y += (ptr.ty - ptr.y) * Math.min(1, .16 * k);
+  }
+  function draw(t){
+    for (const b of blobs){
+      const pulse = reduce ? 1 : 1 + Math.sin(t * .0011 * b.wob + b.ph) * .07;
+      b.el.setAttribute('cx', b.x.toFixed(1)); b.el.setAttribute('cy', b.y.toFixed(1)); b.el.setAttribute('r', (b.r * pulse).toFixed(1));
+    }
+    const pr = ptr.active ? 46 * S : 0;
+    ptr.el.setAttribute('cx', ptr.x.toFixed(1)); ptr.el.setAttribute('cy', ptr.y.toFixed(1));
+    ptr.cr = (ptr.cr || 0) + (pr - (ptr.cr || 0)) * .12; ptr.el.setAttribute('r', Math.max(0, ptr.cr).toFixed(1));
+    glow.setAttribute('cx', ptr.x.toFixed(1)); glow.setAttribute('cy', ptr.y.toFixed(1));
+  }
+  let prev = performance.now(), running = false;
+  function frame(now){
+    const k = Math.min(3, (now - prev) / 16.7); prev = now;
+    if (now - ptr.last > 2600) ptr.active = false;
+    step(k, now); draw(now);
+    if (reduce && now - ptr.last > 1500){ running = false; return; }   // rest when untouched
+    requestAnimationFrame(frame);
+  }
+  function kick(){ if (!running){ running = true; prev = performance.now(); requestAnimationFrame(frame); } }
+
+  function move(e){ ptr.tx = e.clientX; ptr.ty = e.clientY; ptr.active = true; ptr.last = performance.now(); kick(); }
+  stage.addEventListener('pointermove', move);
+  stage.addEventListener('pointerdown', e => {
+    move(e);
+    const b = addBlob(e.clientX, e.clientY, (30 + Math.random() * 40) * S, 'f');
+    b.vy = -1.5; b.heat = 1;
+    const fronts = blobs.filter(o => o.layer === 'f');
+    if (fronts.length > 24){ const old = fronts[0]; old.el.remove(); blobs.splice(blobs.indexOf(old), 1); }
+    countEl.textContent = blobs.length;
+  });
+  stage.addEventListener('pointerleave', () => { ptr.last = performance.now() - 2000; });
+  addEventListener('resize', () => { resize(); draw(performance.now()); });
+
+  document.querySelectorAll('.panel button').forEach(btn => btn.addEventListener('click', () => {
+    document.body.dataset.mood = btn.dataset.mood;
+    document.querySelectorAll('.panel button').forEach(o => o.setAttribute('aria-pressed', o === btn));
+  }));
+  countEl.textContent = blobs.length;
+  if (reduce){ for (let i = 0; i < 240; i++) step(1, i * 16); draw(0); } else kick();
+})();
+</script>
+</body>
+</html>

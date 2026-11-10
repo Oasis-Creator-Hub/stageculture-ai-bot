@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Pendulum Wave — Hall of Motion, Exhibit 14</title>
+<meta name="description" content="A physics pendulum wave on canvas: a row of pendulums of tuned lengths drifting in and out of phase, presented as a science-museum exhibit with controls for count, cycle, amplitude and time.">
+<style>
+:root{--paper:#f4f1e8;--ink:#1c2740;--mute:#6f7688;--red:#d6452c;--case:#141d33;--line:#cfc9b8}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;line-height:1.5}
+.hall{max-width:1180px;margin:0 auto;padding:clamp(16px,4vw,56px)}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--mute);border-bottom:1px solid var(--ink);padding-bottom:10px}
+.top a{color:inherit;text-decoration:none}.top a:hover{color:var(--red)}
+.head{display:grid;grid-template-columns:auto 1fr;gap:clamp(14px,3vw,40px);align-items:end;margin:clamp(18px,3vw,36px) 0}
+.num{font-size:clamp(70px,14vw,170px);line-height:.74;color:var(--red);font-style:italic;letter-spacing:-.04em}
+h1{font-weight:400;font-size:clamp(30px,5.4vw,68px);line-height:1;margin:0 0 .25em;letter-spacing:-.01em}
+.lede{font-size:clamp(15px,1.5vw,18px);max-width:56ch;margin:0;color:#3b4560}
+@media(max-width:560px){.head{grid-template-columns:1fr}.num{font-size:84px}}
+.case{position:relative;background:var(--case);border-radius:3px;box-shadow:0 0 0 1px #0b1122,0 0 0 9px #e4dfd0,0 0 0 10px var(--line),0 30px 50px -24px rgba(20,29,51,.6);margin:10px 0 0}
+canvas{display:block;width:100%;height:clamp(380px,62vw,640px);touch-action:pan-y}
+.tag{position:absolute;left:14px;top:12px;color:#aeb7cf;font:11px/1.5 "SF Mono",Menlo,Consolas,"Liberation Mono",monospace;letter-spacing:.06em;pointer-events:none}
+.tag b{color:#fff;font-weight:400}
+.tag.r{left:auto;right:14px;text-align:right}
+.ctrl{display:grid;grid-template-columns:auto 1fr;gap:14px 22px;align-items:center;margin-top:28px;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+.btns{display:flex;gap:8px}
+button{font:inherit;font-size:12px;letter-spacing:.16em;text-transform:uppercase;padding:12px 18px;border:1px solid var(--ink);background:none;color:var(--ink);cursor:pointer;border-radius:999px;transition:.2s}
+button:hover{background:var(--ink);color:var(--paper)}
+button.pri{background:var(--red);border-color:var(--red);color:#fff;min-width:96px}
+.scrub{display:flex;align-items:center;gap:12px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+input[type=range]{flex:1;min-width:0;accent-color:var(--red);height:22px}
+.knobs{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:10px 28px;border-top:1px solid var(--line);padding-top:16px}
+.knobs label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);display:flex;flex-direction:column;gap:4px}
+.knobs output{color:var(--ink);font-family:"Iowan Old Style",Palatino,Georgia,serif;font-size:22px;letter-spacing:0;text-transform:none;font-style:italic}
+@media(max-width:640px){.ctrl{grid-template-columns:1fr}.knobs{grid-template-columns:1fr}}
+.notes{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,3vw,44px);margin-top:clamp(28px,5vw,60px);border-top:3px double var(--ink);padding-top:22px}
+@media(max-width:760px){.notes{grid-template-columns:1fr}}
+.notes h2{font:700 11px "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.24em;text-transform:uppercase;margin:0 0 8px;color:var(--red)}
+.notes p{margin:0;font-size:15.5px;color:#333d57}
+.eq{font-style:italic;font-size:21px;display:block;margin:8px 0;color:var(--ink)}
+footer{margin-top:40px;font:11px "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="hall">
+  <div class="top"><span>Calloway Museum of Natural Philosophy · Hall of Motion</span><a href="index.html">← 100</a></div>
+  <div class="head">
+    <div class="num">14</div>
+    <div><h1>The Pendulum Wave</h1>
+    <p class="lede">Each bob hangs a little shorter than its neighbour, and so swings a little quicker. Released together they unravel into travelling waves, split into braided strands, dissolve into apparent chaos — and then, exactly on schedule, fall back into line.</p></div>
+  </div>
+  <div class="case">
+    <canvas id="c" aria-label="Animated row of pendulums of decreasing length swinging in and out of phase"></canvas>
+    <div class="tag">t = <b id="tt">0.0</b> s &nbsp;/&nbsp; T = <b id="TT">60</b> s<br><span id="pat">released together</span></div>
+    <div class="tag r">realign in <b id="left">60.0</b> s<br>longest <b id="lmax">34.4</b> cm · shortest <b id="lmin">20.5</b> cm</div>
+  </div>
+  <div class="ctrl">
+    <div class="btns"><button class="pri" id="play">Pause</button><button id="reset">Release</button></div>
+    <div class="scrub"><span>Time</span><input id="scrub" type="range" min="0" max="1" step="0.0005" value="0" aria-label="Scrub through the cycle"></div>
+    <div class="knobs">
+      <label>Pendulums <output id="oN">18</output><input id="N" type="range" min="15" max="28" value="18"></label>
+      <label>Cycle length <output id="oT">60 s</output><input id="T" type="range" min="20" max="120" step="5" value="60"></label>
+      <label>Release angle <output id="oA">20°</output><input id="A" type="range" min="6" max="32" value="20"></label>
+    </div>
+  </div>
+  <div class="notes">
+    <div><h2>What you are seeing</h2><p>Above, the row seen from a front corner; below, the same bobs seen from directly overhead, where the wave is plain. No bob ever touches or influences another. The pattern is entirely in your eye — a moiré made of time.</p></div>
+    <div><h2>The arithmetic</h2><p>In one full cycle the longest pendulum completes 51 swings, the next 52, then 53, and so on.<span class="eq">L<sub>n</sub> = g · ( T ⁄ 2π(51 + n) )²</span>After T seconds every bob has made a whole number of swings and they meet again.</p></div>
+    <div><h2>Try this</h2><p>Drag the time slider to one half of the cycle: odd and even bobs stand opposed in two rows. At one third there are three strands; at one quarter, four. Shorten the cycle and watch the lengths shrink to keep the promise.</p></div>
+  </div>
+  <footer><span>Brass, linen thread, ash frame · built in the museum workshop</span><span>Please do not lean on the glass</span></footer>
+</div>
+<script>
+(function(){
+const $=i=>document.getElementById(i),cv=$('c'),ctx=cv.getContext('2d');
+let W=0,H=0,dpr=1,N=18,T=60,A=20*Math.PI/180,t=0,playing=true,last=0,scrubbing=false;
+const N0=51,G=9.81,reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const len=i=>G*Math.pow(T/(2*Math.PI*(N0+i)),2);
+function resize(){dpr=Math.min(devicePixelRatio||1,2);const r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);draw()}
+function labels(){$('oN').textContent=N;$('oT').textContent=T+' s';$('oA').textContent=Math.round(A*180/Math.PI)+'°';$('TT').textContent=T;
+  $('lmax').textContent=(len(0)*100).toFixed(1);$('lmin').textContent=(len(N-1)*100).toFixed(1)}
+function pattern(ph){if(ph<.004||ph>.996)return'all in phase';
+  for(let m=2;m<=6;m++)for(let k=1;k<m;k++){if(Math.abs(ph-k/m)<.006){if(k>1&&[2,3].some(d=>k%d===0&&m%d===0))continue;return['','','two opposed rows','three strands','four strands','five strands','six strands'][m]+' · t = '+(k>1?k:'')+'T⁄'+m}}
+  return ph<.09||ph>.91?'travelling wave':ph>.44&&ph<.56?'counter-wave':'drifting'}
+function draw(){
+  const g=ctx.createRadialGradient(W*.5,H*.1,10,W*.5,H*.35,Math.max(W,H)*.8);g.addColorStop(0,'#2b3a63');g.addColorStop(.5,'#182342');g.addColorStop(1,'#0c1224');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  const hA=H*.74,top=H*.1,Lmax=len(0),s=hA*.82/Lmax,sp=Math.min(W*.26,300);
+  const fx=W/2+sp,fy=top+hA*.1,bx=W/2-sp,by=top;
+  // frame
+  ctx.strokeStyle='#d9c9a3';ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(bx-14,by-1.4);ctx.lineTo(fx+14,fy+1.4);ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;
+  for(let k=-2;k<=2;k++){ctx.beginPath();const o=Math.sin(k*A/2)*Lmax*s;ctx.moveTo(bx+o,by+Lmax*s);ctx.lineTo(fx+o,fy+Lmax*s);ctx.stroke()}
+  const xs=[];
+  for(let i=N-1;i>=0;i--){const u=N>1?i/(N-1):0,px=fx+(bx-fx)*u,py=fy+(by-fy)*u,L=len(i)*s,th=A*Math.cos(2*Math.PI*(N0+i)*t/T),
+    x=px+Math.sin(th)*L,y=py+Math.cos(th)*L,r=(W<520?5:7.5)*(1-u*.4);xs[i]=Math.sin(th)/Math.sin(A);
+    ctx.strokeStyle='rgba(226,220,200,'+(.75-u*.4)+')';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(x,y);ctx.stroke();
+    const hue=40-u*26,bg=ctx.createRadialGradient(x-r*.35,y-r*.4,r*.1,x,y,r);bg.addColorStop(0,'hsl('+hue+',90%,86%)');bg.addColorStop(.45,'hsl('+hue+',72%,56%)');bg.addColorStop(1,'hsl('+hue+',70%,24%)');
+    ctx.fillStyle=bg;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
+    ctx.fillStyle='#d9c9a3';ctx.beginPath();ctx.arc(px,py,1.8,0,7);ctx.fill()}
+  // overhead view
+  const y0=H*.905,amp=H*.055,x0=W*.1,x1=W*.9;
+  ctx.strokeStyle='rgba(255,255,255,.16)';ctx.setLineDash([2,5]);ctx.beginPath();ctx.moveTo(x0-10,y0);ctx.lineTo(x1+10,y0);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle='rgba(214,69,44,.9)';ctx.lineWidth=1.4;ctx.beginPath();
+  const P=xs.map((v,i)=>[x0+(x1-x0)*(N>1?i/(N-1):0),y0-v*amp]);
+  ctx.moveTo(P[0][0],P[0][1]);for(let i=1;i<N-1;i++)ctx.quadraticCurveTo(P[i][0],P[i][1],(P[i][0]+P[i+1][0])/2,(P[i][1]+P[i+1][1])/2);ctx.lineTo(P[N-1][0],P[N-1][1]);ctx.stroke();
+  P.forEach((p,i)=>{ctx.fillStyle='hsl('+(40-i/(N-1)*26)+',80%,66%)';ctx.beginPath();ctx.arc(p[0],p[1],3.2,0,7);ctx.fill()});
+  ctx.fillStyle='rgba(174,183,207,.8)';ctx.font='10px "SF Mono",Menlo,Consolas,monospace';ctx.textAlign='left';ctx.fillText('SEEN FROM ABOVE',x0-10,y0-amp-12);
+  ctx.textAlign='right';ctx.fillText('LONG → SHORT',x1+10,y0-amp-12);
+  const ph=(t/T)%1;$('tt').textContent=t.toFixed(1);$('left').textContent=(T-(t%T)).toFixed(1);$('pat').textContent=pattern(ph);
+  if(!scrubbing)$('scrub').value=ph}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(playing&&!scrubbing){t+=dt;draw()}requestAnimationFrame(loop)}
+function setPlay(v){playing=v;$('play').textContent=v?'Pause':'Play'}
+$('play').onclick=()=>setPlay(!playing);
+$('reset').onclick=()=>{t=0;setPlay(true);draw()};
+const sc=$('scrub');sc.addEventListener('input',()=>{scrubbing=true;t=sc.value*T;draw()});
+['change','pointerup','touchend','blur'].forEach(e=>sc.addEventListener(e,()=>{scrubbing=false}));
+$('N').oninput=e=>{N=+e.target.value;labels();draw()};
+$('T').oninput=e=>{const ph=t/T;T=+e.target.value;t=ph*T;labels();draw()};
+$('A').oninput=e=>{A=e.target.value*Math.PI/180;labels();draw()};
+addEventListener('resize',resize);
+labels();resize();if(reduce){setPlay(false);t=T*.085;draw()}
+requestAnimationFrame(n=>{last=n;loop(n)});
+})();
+</script>
+</body>
+</html>

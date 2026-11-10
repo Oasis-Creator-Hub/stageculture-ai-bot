@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Things Worth Keeping — a cork wall</title>
+<meta name="description" content="A cork pinboard of draggable instant photographs. Every picture is painted in SVG; drag them around, double-tap to read the back.">
+<style>
+  :root{--p:clamp(124px,17vw,206px);--hand:"Segoe Print","Bradley Hand","Chalkboard SE","Marker Felt","Comic Sans MS","Comic Neue",cursive}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:#6b4526}
+  #wall{position:fixed;inset:0;overflow:hidden;touch-action:none;
+    background:radial-gradient(ellipse at 28% 18%,rgba(255,236,196,.42),rgba(255,236,196,0) 58%),radial-gradient(ellipse at 80% 90%,rgba(70,36,10,.45),transparent 60%),#bb8a58;
+    box-shadow:inset 0 0 0 clamp(10px,1.6vw,20px) #5a3a20,inset 0 0 0 clamp(12px,1.8vw,23px) #2f1d0f,inset 0 0 90px rgba(50,24,6,.55)}
+  #wall>svg.cork{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:multiply;opacity:.9}
+  .tape{position:absolute;left:50%;top:clamp(26px,5vh,54px);transform:translateX(-50%) rotate(-1.4deg);padding:9px 26px 8px;white-space:nowrap;
+    font:700 clamp(15px,2.1vw,25px)/1 var(--hand);color:#3b2c1d;background:rgba(244,232,196,.88);
+    box-shadow:0 2px 5px rgba(50,24,6,.35);clip-path:polygon(0 0,100% 0,98.5% 22%,100% 46%,98.5% 72%,100% 100%,0 100%,1.5% 76%,0 50%,1.5% 26%)}
+  .note{position:absolute;right:clamp(22px,4vw,60px);bottom:clamp(24px,5vh,56px);width:clamp(128px,15vw,186px);padding:16px 14px 20px;
+    background:linear-gradient(#fbf08e,#f3e06a);font:400 clamp(11px,1.15vw,14px)/1.45 var(--hand);color:#4a3c1c;transform:rotate(3deg);
+    box-shadow:2px 6px 12px rgba(50,24,6,.4)}
+  .note::before,.pin{content:"";position:absolute;left:50%;top:-7px;width:15px;height:15px;margin-left:-7px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff8,transparent 35%),radial-gradient(circle at 50% 50%,var(--pin,#d33a2c) 60%,#0005 100%);
+    box-shadow:1px 3px 3px rgba(0,0,0,.45);z-index:3}
+  .note a{color:inherit}
+  .photo{position:absolute;left:0;top:0;width:var(--p);cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;
+    will-change:transform;perspective:800px;filter:drop-shadow(1px 3px 3px rgba(40,18,4,.45));transition:filter .25s}
+  .photo.held{cursor:grabbing;filter:drop-shadow(10px 22px 16px rgba(40,18,4,.42))}
+  .photo.held .pin{opacity:0;transform:translateY(-14px)}
+  .pin{transition:opacity .2s,transform .2s}
+  .card{position:relative;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.3,1.3,.5,1)}
+  .photo.flip .card{transform:rotateY(180deg)}
+  .front,.rear{backface-visibility:hidden;-webkit-backface-visibility:hidden;background:linear-gradient(135deg,#fdfbf4,#efeadc);border-radius:2px}
+  .front{padding:7% 7% 0}
+  .pic{position:relative;aspect-ratio:1;background:#222;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+  .pic svg{display:block;width:100%;height:100%;animation:develop 5s both ease-out;animation-delay:var(--d,0s)}
+  .pic::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(125deg,rgba(255,255,255,.26) 0,rgba(255,255,255,0) 32%),radial-gradient(ellipse at center,transparent 55%,rgba(30,10,0,.34))}
+  .cap{height:calc(var(--p)*.25);display:flex;align-items:center;justify-content:center;text-align:center;padding:0 2px;
+    font:400 calc(var(--p)*.074)/1.15 var(--hand);color:#2c2a3a}
+  .rear{position:absolute;inset:0;transform:rotateY(180deg);padding:12% 10%;font:400 calc(var(--p)*.07)/1.5 var(--hand);color:#3a3848;
+    background:linear-gradient(135deg,#e9e4d6,#d8d2c2)}
+  .rear b{display:block;font-weight:400;font-size:.8em;letter-spacing:.08em;opacity:.6;margin-bottom:.6em;font-family:ui-monospace,Menlo,Consolas,monospace}
+  @keyframes develop{0%{filter:brightness(2.6) contrast(.15) saturate(0) sepia(.7)}55%{filter:brightness(1.35) contrast(.6) saturate(.5) sepia(.4)}100%{filter:contrast(.96) saturate(.92) sepia(.12)}}
+  @media (prefers-reduced-motion:reduce){.pic svg{animation:none;filter:contrast(.96) saturate(.92) sepia(.12)}.card{transition:none}}
+  @media (max-width:560px){.note{width:118px;padding:12px 10px 14px}}
+</style>
+</head>
+<body>
+<div id="wall">
+  <svg class="cork" aria-hidden="true"><filter id="corkf"><feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="3" seed="11"/><feColorMatrix values="0 0 0 0 .42  0 0 0 0 .25  0 0 0 0 .1  0 0 0 2.6 -1.05"/></filter><rect width="100%" height="100%" filter="url(#corkf)"/></svg>
+  <div class="tape">things worth keeping</div>
+  <div class="note" style="--pin:#2f6fd0">drag them about.<br>double-tap one to read the back.<br><br><a href="index.html">← back to the 100</a></div>
+</div>
+<script>
+(() => {
+  const wall = document.getElementById('wall');
+  const sky = (id, a, b, c) => `<defs><linearGradient id="${id}" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset=".6" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></linearGradient></defs><rect width="100" height="100" fill="url(#${id})"/>`;
+  const stars = n => Array.from({ length: n }, (_, i) => `<circle cx="${(i * 37 + 11) % 100}" cy="${(i * 53 + 7) % 52}" r="${.35 + (i % 3) * .2}" fill="#fff" opacity="${.5 + (i % 4) * .12}"/>`).join('');
+  const PHOTOS = [
+    { cap: 'Skerry Light — last ferry home', back: ['OCT · roll 3', 'Missed the 5.40 on purpose. Worth it for this sky. Tea from a flask, hands like ice.'], pin: '#d33a2c',
+      art: sky('a', '#2b2a5e', '#d8607a', '#ffb45e') + `<circle cx="70" cy="60" r="9" fill="#ffe9a8"/><rect y="66" width="100" height="34" fill="#28335e"/><path d="M0 70h100M8 76h50M40 83h56M0 90h40" stroke="#6f7fb8" stroke-width=".8" opacity=".6"/><path d="M0 100V74q12-6 26-3t30 14l10 15z" fill="#15131f"/><path d="M33 22l52-10v9z" fill="#fff3b0" opacity=".5"/><path d="M27 72l2.5-44h7l2.5 44z" fill="#f4efe6"/><path d="M28 56h10.5l.5 8H27.6zM28.8 40h8.6l.4 7h-9.4z" fill="#c8402e"/><rect x="28" y="20" width="9.5" height="8" fill="#22202c"/><rect x="30" y="21.5" width="5.5" height="5" fill="#fff3b0"/><path d="M27 20l5.7-6 5.8 6z" fill="#c8402e"/>` },
+    { cap: 'Lake Onderry. water = FREEZING', back: ['JUL · roll 1', 'Wim swam anyway. Lasted eleven seconds, claims fourteen. The mountain did not care.'], pin: '#e8b422',
+      art: sky('b', '#5aa9e6', '#bfe3f7', '#eaf6fb') + `<path d="M-5 62l28-38 14 16 16-26 26 34 26-12v26z" fill="#6f86a6"/><path d="M23 24l-7 10 5-2 3 4 4-5 4 3zM53 14l-8 13 6-3 3 5 4-6 5 3z" fill="#fff"/><path d="M-5 62l20-12 22 10 30-14 38 16z" fill="#3d6b58"/><rect y="62" width="100" height="38" fill="#3f8fc0"/><path d="M-5 62l28 22 14-10 16 18 26-22 26 8v-16z" fill="#2f6f9e" opacity=".55"/><path d="M6 72h30M50 80h40M20 90h34" stroke="#d7efff" stroke-width=".9" opacity=".7"/><g fill="#1f4a3a"><path d="M8 66l5-18 5 18zM16 68l4-14 4 14zM84 66l5-20 5 20z"/></g>` },
+    { cap: 'Biscuit, supervising the rain', back: ['NOV · roll 4', 'She sat like this for two hours. I think she believes she is in charge of weather.'], pin: '#3aa76d',
+      art: `<rect width="100" height="100" fill="#b8553a"/><rect x="14" y="8" width="72" height="66" fill="#1c2a4a"/><circle cx="68" cy="24" r="7" fill="#f5f0d8"/><circle cx="71" cy="22" r="6" fill="#1c2a4a"/><path d="M22 14l-4 14M34 20l-4 14M46 12l-4 14M56 30l-4 14M70 40l-4 14M28 42l-4 14M80 14l-4 14" stroke="#8fb0e0" stroke-width=".9" opacity=".7"/><path d="M14 8h72v66H14zM50 8v66M14 40h72" fill="none" stroke="#f1e6d0" stroke-width="3.5"/><rect x="6" y="74" width="88" height="7" fill="#f1e6d0"/><rect y="81" width="100" height="19" fill="#8e3d28"/><path d="M40 74c-4-12 0-24 9-28l-2-9 6 5 5-6 1 10c7 5 9 16 6 28zM62 74c8 1 14-3 13-10" fill="#16130f" stroke="#16130f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>` },
+    { cap: 'midsummer fair — 4 times round!!', back: ['JUN · roll 1', 'Candyfloss in my hair, Ada screaming at the top, and the whole town small and gold below.'], pin: '#d33a2c',
+      art: sky('d', '#123a5c', '#2f7f8f', '#f0a868') + `<g stroke="#f3ead2" fill="none"><circle cx="50" cy="46" r="30" stroke-width="1.6"/><circle cx="50" cy="46" r="22" stroke-width=".6"/><path d="M50 16v60M20 46h60M28.8 24.8l42.4 42.4M71.2 24.8L28.8 67.2" stroke-width=".8"/><path d="M50 46L36 92M50 46l14 46" stroke-width="2"/></g>` +
+        [0, 45, 90, 135, 180, 225, 270, 315].map((a, i) => `<rect x="${47 + 30 * Math.cos(a * Math.PI / 180)}" y="${45 + 30 * Math.sin(a * Math.PI / 180)}" width="6" height="5" rx="1.5" fill="${['#ff5c5c', '#ffd23f', '#5ce1e6', '#ff8fd0'][i % 4]}"/>`).join('') +
+        `<circle cx="50" cy="46" r="3" fill="#ffd23f"/><rect y="90" width="100" height="10" fill="#10202c"/><path d="M0 84q25 8 50 0t50 0" stroke="#f3ead2" stroke-width=".5" fill="none"/><g fill="#ff5c5c"><path d="M10 85.6l3 5 3-4.2zM30 87.4l3 5 3-5zM64 87.4l3 5 3-5zM84 85.6l3 5 3-5.8z"/></g>` },
+    { cap: 'cabin week. no signal. bliss.', back: ['JAN · roll 2', 'Snowed in by Tuesday. We read every book on the shelf including the one about drains.'], pin: '#2f6fd0',
+      art: sky('e', '#0b1030', '#1f2c5c', '#4a4f86') + stars(22) + `<path d="M0 70q22-14 46-6t54-8v44H0z" fill="#dfe8f6"/><path d="M0 82q30-10 60-2t40-4v24H0z" fill="#f7faff"/><path d="M52 66V50l13-10 13 10v16z" fill="#4a2c20"/><path d="M49 51l16-13 16 13-2 2.4-14-11-14 11z" fill="#f7faff"/><rect x="57" y="54" width="6" height="6" fill="#ffd36e"/><rect x="69" y="56" width="5" height="10" fill="#2a1710"/><rect x="71" y="38" width="3.4" height="7" fill="#4a2c20"/><path d="M72.6 37q-4-5 0-9t-1-9" stroke="#c9cfe6" stroke-width="1.6" fill="none" opacity=".6" stroke-linecap="round"/><g fill="#12261f"><path d="M14 76l8-28 8 28zM28 80l6-22 6 22zM86 72l6-24 6 24z"/></g><path d="M18 62l4-14 4 14zM89 60l3-12 3 12z" fill="#f7faff"/>` },
+    { cap: "the field behind Nan's", back: ['AUG · roll 2', 'Taller than me this year. Nan says they turn to look at whoever is talking. Tested. Inconclusive.'], pin: '#e8b422',
+      art: sky('f', '#3f9be0', '#9fd2f2', '#e6f3d8') + `<circle cx="80" cy="18" r="8" fill="#fff6c4"/><path d="M0 52q50-8 100 0v48H0z" fill="#4c8f3a"/><path d="M0 70q50-8 100 0v30H0z" fill="#356f2b"/>` +
+        Array.from({ length: 16 }, (_, i) => { const row = i < 9 ? 0 : 1, x = row ? 8 + (i - 9) * 13.5 : 4 + i * 11.5, y = row ? 72 : 56, r = row ? 6.4 : 3.6;
+          return `<path d="M${x} ${y}v${row ? 30 : 16}" stroke="#2a5a22" stroke-width="${row ? 1.6 : 1}"/><circle cx="${x}" cy="${y}" r="${r}" fill="#ffc81f" stroke="#f09a12" stroke-width="${r * .3}" stroke-dasharray="${r * .5} ${r * .28}"/><circle cx="${x}" cy="${y}" r="${r * .45}" fill="#5a3413"/>`; }).join('') },
+    { cap: 'laundry day, Via Orsola', back: ['MAY · roll 5', "Signora Pell's sheets across the whole street like flags of a very clean country."], pin: '#3aa76d',
+      art: sky('g', '#58b6ee', '#bfe6fa', '#f3fbff') + `<path d="M0 0h16v100H0zM84 0h16v100H84z" fill="#e2a15c"/><path d="M0 0h16v100H0z" fill="#d98a4f"/><g fill="#5c3a22"><rect x="4" y="14" width="8" height="12"/><rect x="4" y="44" width="8" height="12"/><rect x="88" y="24" width="8" height="12"/><rect x="88" y="58" width="8" height="12"/></g><path d="M16 24q34 12 68 4M16 54q34 12 68 6" stroke="#3c3c3c" stroke-width=".7" fill="none"/><path d="M22 27l14 4-1 20-13-3z" fill="#fff"/><path d="M40 32l9 1v13l-9-1z" fill="#e8483c"/><path d="M53 33l12-1 1 22-12 2z" fill="#f6d04a"/><path d="M69 32l10-2 1 12-10 2z" fill="#4d8fe0"/><path d="M22 57l10 3-1 14-9-2zM36 61l18 2v17l-18-2zM60 63l8-.6.6 11-8 1zM72 62l8-1.6 1 16-8 1.6z" fill="#fff"/><path d="M36 67l18 2M36 73l18 2" stroke="#7fc0a0" stroke-width="2"/><rect y="94" width="100" height="6" fill="#9a9288"/>` },
+    { cap: 'Tide Flats, august. sand everywhere', back: ['AUG · roll 3', 'Found the umbrella two beaches down the next morning. It had a better holiday than us.'], pin: '#2f6fd0',
+      art: sky('h', '#35b0e8', '#9adcf4', '#dff5fb') + `<circle cx="18" cy="16" r="9" fill="#fff3a6"/><rect y="46" width="100" height="16" fill="#1f8fc4"/><path d="M0 52h100M0 57h100" stroke="#bfeeff" stroke-width=".8" stroke-dasharray="14 9"/><path d="M0 60q50-6 100 0v40H0z" fill="#f0d79a"/><path d="M58 84L64 40" stroke="#6a4a2a" stroke-width="1.6"/><path d="M34 44q30-30 60 0z" fill="#ff5a4d"/><path d="M46 44q8-22 18-23M82 44q-8-22-18-23" stroke="#fff" stroke-width="5" fill="none"/><path d="M34 44q30-30 60 0z" fill="none" stroke="#c8362c" stroke-width=".8"/><rect x="22" y="80" width="26" height="7" rx="1" fill="#3fbf9f" transform="rotate(-6 35 84)"/><circle cx="76" cy="86" r="5" fill="#ffd23f"/><path d="M71 86a5 5 0 0 1 10 0z" fill="#fff"/>` },
+    { cap: "Mum's 60th ♡ make a wish", back: ['MAR · roll 1', 'She wished out loud, which she says does not count against it. Sixty candles is a fire hazard.'], pin: '#d33a2c',
+      art: `<rect width="100" height="100" fill="#1a1016"/><circle cx="50" cy="44" r="46" fill="#ffb347" opacity=".2"/><circle cx="50" cy="40" r="26" fill="#ffd27a" opacity=".22"/><rect x="24" y="56" width="52" height="24" rx="3" fill="#f6e3d0"/><path d="M24 62q6.5 8 13 0t13 0 13 0 13 0v-4a3 3 0 0 0-3-3H27a3 3 0 0 0-3 3z" fill="#e2607a"/><rect x="14" y="80" width="72" height="5" rx="2" fill="#c9c2d4"/>` +
+        [32, 41, 50, 59, 68].map((x, i) => `<rect x="${x - 1.2}" y="42" width="2.4" height="13" fill="${['#7fd6e8', '#ffe07a', '#ff9bc0'][i % 3]}"/><path d="M${x} 33q3.4 4.6 0 8-3.4-3.4 0-8z" fill="#ffcf4a"/><circle cx="${x}" cy="38" r="5" fill="#ffcf4a" opacity=".28"/>`).join('') }
+  ];
+
+  let z = 10; const items = [];
+  PHOTOS.forEach((p, i) => {
+    const el = document.createElement('div'); el.className = 'photo'; el.style.setProperty('--d', (i * .35) + 's');
+    el.innerHTML = `<i class="pin" style="--pin:${p.pin}"></i><div class="card"><div class="front"><div class="pic"><svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${p.cap}">${p.art}</svg></div><div class="cap">${p.cap}</div></div><div class="rear"><b>${p.back[0]}</b>${p.back[1]}</div></div>`;
+    wall.appendChild(el);
+    const it = { el, x: 0, y: 0, r: 0, base: (Math.random() - .5) * 16, vx: 0, vy: 0, held: false, lastTap: 0 };
+    items.push(it); bind(it);
+  });
+
+  const put = it => { it.el.style.transform = `translate3d(${it.x}px,${it.y}px,0) rotate(${it.r}deg)`; };
+  function bounds(it) { const w = it.el.offsetWidth, h = it.el.offsetHeight, m = 6;
+    it.x = Math.max(m - w * .3, Math.min(innerWidth - w * .7 - m, it.x)); it.y = Math.max(m, Math.min(innerHeight - h * .6, it.y)); }
+
+  function scatter() {
+    const W = innerWidth, H = innerHeight, n = items.length, pw = items[0].el.offsetWidth, ph = items[0].el.offsetHeight;
+    const cols = Math.max(2, Math.min(n, Math.round(Math.sqrt(n * W / H)))), rows = Math.ceil(n / cols);
+    const top = Math.min(90, H * .12), cw = (W - 40) / cols, ch = (H - top - 30) / rows;
+    items.forEach((it, i) => {
+      const c = i % cols, r = (i / cols) | 0, off = (r === rows - 1 ? (cols - (n - r * cols)) * cw / 2 : 0);
+      it.x = 20 + off + c * cw + (cw - pw) / 2 + (Math.random() - .5) * cw * .3;
+      it.y = top + r * ch + (ch - ph) / 2 + (Math.random() - .5) * ch * .22;
+      it.r = it.base; bounds(it); put(it);
+    });
+  }
+
+  function bind(it) {
+    const el = it.el; let ox, oy, px, py, pt, moved;
+    el.addEventListener('pointerdown', e => {
+      e.preventDefault(); try { el.setPointerCapture(e.pointerId); } catch (_) {}
+      it.held = true; moved = 0; ox = e.clientX - it.x; oy = e.clientY - it.y; px = e.clientX; py = e.clientY; pt = performance.now();
+      it.vx = it.vy = 0; el.style.zIndex = ++z; el.classList.add('held');
+    });
+    el.addEventListener('pointermove', e => {
+      if (!it.held) return; const now = performance.now(), dt = Math.max(8, now - pt);
+      it.vx = (e.clientX - px) / dt * 16; it.vy = (e.clientY - py) / dt * 16; moved += Math.abs(e.clientX - px) + Math.abs(e.clientY - py);
+      px = e.clientX; py = e.clientY; pt = now;
+      it.x = e.clientX - ox; it.y = e.clientY - oy;
+      it.r += ((it.base * .4 + Math.max(-18, Math.min(18, it.vx * .9))) - it.r) * .25; put(it);
+    });
+    const up = () => {
+      if (!it.held) return; it.held = false; el.classList.remove('held');
+      const now = performance.now();
+      if (moved < 6) { if (now - it.lastTap < 420) { el.classList.toggle('flip'); it.lastTap = 0; } else it.lastTap = now; }
+      it.base = Math.max(-11, Math.min(11, it.base * .5 + it.vx * .4 + (Math.random() - .5) * 6));
+      glide(it);
+    };
+    el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+  }
+  function glide(it) {                      // a little slide and settle after letting go
+    if (it.held) return;
+    it.x += it.vx; it.y += it.vy; it.vx *= .86; it.vy *= .86; it.r += (it.base - it.r) * .2; bounds(it); put(it);
+    if (Math.abs(it.vx) + Math.abs(it.vy) > .15 || Math.abs(it.base - it.r) > .1) requestAnimationFrame(() => glide(it));
+  }
+
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => items.forEach(it => { bounds(it); put(it); }), 120); });
+  scatter();
+})();
+</script>
+</body>
+</html>

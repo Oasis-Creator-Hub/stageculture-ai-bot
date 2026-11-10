@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Lantern Window — Chapel of Saint Orrin-by-the-Weir</title>
+<meta name="description" content="An SVG stained-glass cathedral window with a rose and three lancets, leaded pane by pane. Carry the sun across it with your pointer or finger and watch the glass ignite.">
+<style>
+*{box-sizing:border-box;margin:0}
+:root{--mx:0;--my:.4}
+body{min-height:100vh;color:#d9cfbd;font-family:"Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L","Iowan Old Style",Georgia,serif;overflow-x:hidden;
+  background:
+   radial-gradient(70% 90% at 72% 40%,rgba(120,96,70,.20),transparent 70%),
+   repeating-linear-gradient(0deg,rgba(0,0,0,.42) 0 2px,transparent 2px 92px),
+   repeating-linear-gradient(90deg,rgba(0,0,0,.30) 0 2px,transparent 2px 214px),
+   linear-gradient(#1b1920,#0e0d12)}
+.nave{min-height:100vh;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);align-items:center;gap:clamp(1rem,4vw,4rem);padding:clamp(1rem,3vw,2.5rem) clamp(1.2rem,5vw,5rem);max-width:1400px;margin:0 auto}
+.words{max-width:30rem;justify-self:end;position:relative;z-index:2}
+.home{font-size:.72rem;letter-spacing:.3em;color:#8d8371;text-decoration:none;text-transform:uppercase}
+.home:hover{color:#f1c868}
+.eyebrow{font-variant:small-caps;letter-spacing:.24em;font-size:.95rem;color:#c7a04e;margin:clamp(1.5rem,6vh,4rem) 0 1rem}
+h1{font-weight:400;font-size:clamp(2.6rem,6.2vw,5.2rem);line-height:.98;letter-spacing:-.01em;color:#f2eadb}
+h1 i{color:#f1c868}
+.words p{font-size:1.1rem;line-height:1.65;margin-top:1.5rem;color:#b9af9d}
+dl{margin-top:2rem;border-top:1px solid #3a3640;display:grid;grid-template-columns:auto 1fr}
+dt,dd{padding:.6rem 0;border-bottom:1px solid #3a3640}
+dt{font-variant:small-caps;letter-spacing:.14em;color:#8d8371;padding-right:1.6rem}
+dd{font-style:italic;color:#e4dac7}
+.hint{margin-top:1.6rem;font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;color:#c7a04e;display:flex;align-items:center;gap:.7rem}
+.hint::before{content:"";width:12px;height:12px;border-radius:50%;background:#ffe9a8;box-shadow:0 0 14px 4px rgba(255,214,120,.7);animation:breathe 3s ease-in-out infinite}
+@keyframes breathe{50%{box-shadow:0 0 22px 9px rgba(255,214,120,.5)}}
+.bay{position:relative;justify-self:start;width:min(100%,62vh,560px)}
+.bay::before{content:"";position:absolute;inset:-9% -14%;border-radius:50% 50% 0 0;background:radial-gradient(closest-side at calc(50% + var(--mx)*18%) calc(8% + var(--my)*70%),rgba(255,206,120,.26),rgba(180,70,110,.10) 55%,transparent 75%);filter:blur(18px);pointer-events:none}
+#win{position:relative;display:block;width:100%;height:auto;touch-action:none;filter:drop-shadow(0 0 30px rgba(0,0,0,.9));cursor:crosshair}
+.cast{position:absolute;left:-36%;right:6%;top:92%;height:34%;pointer-events:none;mix-blend-mode:screen;filter:blur(26px);
+  opacity:calc(.22 + var(--my)*.5);transform:translateX(calc(var(--mx)*-70px)) skewX(calc(var(--mx)*-28deg + 24deg));
+  background:radial-gradient(30% 60% at 24% 50%,rgba(255,190,70,.75),transparent),radial-gradient(26% 55% at 50% 44%,rgba(210,40,70,.7),transparent),radial-gradient(28% 60% at 74% 55%,rgba(50,110,230,.75),transparent),radial-gradient(18% 40% at 60% 80%,rgba(60,190,120,.55),transparent)}
+#panes path{stroke:#0b0a0e;stroke-width:4;stroke-linejoin:round}
+.came{fill:none;stroke:#0b0a0e;stroke-width:10;stroke-linejoin:round}
+.came.hi{stroke:#3d3a42;stroke-width:1.4}
+@media(max-width:820px){.nave{grid-template-columns:1fr;justify-items:center}.words{justify-self:center}.bay{justify-self:center;width:min(100%,430px);margin-bottom:22vh}.eyebrow{margin-top:1.5rem}}
+@media(prefers-reduced-motion:reduce){.hint::before{animation:none}}
+</style>
+</head>
+<body>
+<main class="nave">
+  <section class="words">
+    <a class="home" href="index.html">← 100</a>
+    <p class="eyebrow">North transept · circa 1384</p>
+    <h1>The <i>Lantern</i> Window</h1>
+    <p>Pot-metal glass, leaded by a glazier who signed nothing but a small lamp scratched into the lowest pane. For six centuries the villagers of Saint Orrin-by-the-Weir have told the hour by which colour falls across the font.</p>
+    <dl><dt>Panes</dt><dd id="count">—</dd><dt>Lead came</dt><dd>sixty-one metres, recast after the flood of 1921</dd><dt>Best seen</dt><dd>a quarter past four, in October</dd></dl>
+    <p class="hint">Carry the sun across the glass</p>
+  </section>
+  <div class="bay">
+    <svg id="win" viewBox="0 0 600 900" role="img" aria-label="Stained glass window with a rose above three lancets">
+      <defs>
+        <clipPath id="arch"><path id="archP" d="M40 880V320C40 170 170 60 300 20C430 60 560 170 560 320V880Z"/></clipPath>
+        <clipPath id="lans"><path id="lanP" d=""/></clipPath>
+        <radialGradient id="hg"><stop offset="0" stop-color="#fff6d8" stop-opacity=".55"/><stop offset=".35" stop-color="#ffd98a" stop-opacity=".2"/><stop offset="1" stop-color="#ffd98a" stop-opacity="0"/></radialGradient>
+        <filter id="seed" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".035 .06" numOctaves="3" seed="4"/>
+          <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.5 -.5"/></filter>
+      </defs>
+      <path d="M22 898V320C22 160 160 40 300 0C440 40 578 160 578 320V898Z" fill="#2a2730" stroke="#111015" stroke-width="2"/>
+      <path d="M40 880V320C40 170 170 60 300 20C430 60 560 170 560 320V880Z" fill="#08070a"/>
+      <g id="panes" clip-path="url(#arch)"></g>
+      <rect x="40" y="20" width="520" height="860" clip-path="url(#arch)" filter="url(#seed)" opacity=".3" style="mix-blend-mode:multiply;pointer-events:none"/>
+      <circle id="halo" cx="300" cy="300" r="250" fill="url(#hg)" clip-path="url(#arch)" style="mix-blend-mode:screen;pointer-events:none"/>
+      <g id="lead" pointer-events="none"></g>
+    </svg>
+    <div class="cast" aria-hidden="true"></div>
+  </div>
+</main>
+<script>
+(()=>{
+const NS='http://www.w3.org/2000/svg',svg=document.getElementById('win'),G=document.getElementById('panes'),lead=document.getElementById('lead');
+let seed=1384;const rnd=()=>(seed=seed*16807%2147483647)/2147483647,jit=n=>(rnd()-.5)*n;
+const panes=[];
+function pane(d,h,s,l,cx,cy,parent){const e=document.createElementNS(NS,'path');e.setAttribute('d',d);(parent||G).appendChild(e);panes.push({e,h,s,l,cx,cy});return e}
+const poly=p=>'M'+p.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join('L')+'Z';
+const mid=p=>[p.reduce((a,q)=>a+q[0],0)/p.length,p.reduce((a,q)=>a+q[1],0)/p.length];
+// jittered quad mesh, some quads split on the diagonal
+function mesh(x0,y0,x1,y1,cols,rows,colour,parent){
+  const P=[];for(let j=0;j<=rows;j++){P[j]=[];for(let i=0;i<=cols;i++){const ex=i==0||i==cols,ey=j==0||j==rows;
+    P[j][i]=[x0+(x1-x0)*i/cols+(ex?0:jit((x1-x0)/cols*.55)),y0+(y1-y0)*j/rows+(ey?0:jit((y1-y0)/rows*.55))]}}
+  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const q=[P[j][i],P[j][i+1],P[j+1][i+1],P[j+1][i]];
+    const parts=rnd()<.38?(rnd()<.5?[[q[0],q[1],q[2]],[q[0],q[2],q[3]]]:[[q[0],q[1],q[3]],[q[1],q[2],q[3]]]):[q];
+    parts.forEach(p=>{const m=mid(p),c=colour(m[0],m[1]);pane(poly(p),c[0],c[1],c[2],m[0],m[1],parent)})}
+}
+// spandrels: deep night blues
+mesh(40,20,560,880,9,13,()=>rnd()<.12?[268+jit(14),45,30+jit(8)]:[222+jit(22),62+jit(14),27+jit(12)]);
+// three lancets, clipped exactly to their arches
+const LX=[[58,214],[222,378],[386,542]],lg=document.createElementNS(NS,'g');lg.setAttribute('clip-path','url(#lans)');G.appendChild(lg);
+const lanD=LX.map(([a,b])=>`M${a} 862V486Q${a} 436 ${(a+b)/2} 402Q${b} 436 ${b} 486V862Z`);
+document.getElementById('lanP').setAttribute('d',lanD.join(''));
+const warm=[[50,88,66],[36,90,56],[20,86,48],[354,76,40],[330,60,34],[286,46,34],[152,52,30]],cool=[[196,70,58],[205,78,46],[178,62,38],[152,56,34],[90,50,40],[44,84,54],[24,84,46]];
+LX.forEach(([a,b],k)=>mesh(a,400,b,862,4,11,(x,y)=>{if(rnd()<.1)return k==1?[208,74,44]:[352,74,40];
+  const band=(k==1?warm:cool),v=Math.min(band.length-1,Math.max(0,Math.floor((y-400)/462*band.length+jit(.9)))),c=band[v];return[c[0]+jit(10),c[1]+jit(10),c[2]+jit(10)]},lg));
+// medallions
+const diamond=(cx,cy,w,h,cols)=>{const t=[cx,cy-h],r=[cx+w,cy],b=[cx,cy+h],l=[cx-w,cy],c=[cx,cy];[[t,r,c],[r,b,c],[b,l,c],[l,t,c]].forEach((p,i)=>pane(poly(p),...cols[i],cx,cy+(i==0||i==3?-h/2:h/2)))};
+diamond(300,612,58,104,[[44,92,62],[30,90,52],[18,86,46],[38,92,58]]);
+pane('M300 556C326 596 322 640 300 664C278 640 274 596 300 556Z',52,96,82,300,612);
+[[136,640],[464,640]].forEach(([cx,cy])=>{for(let i=0;i<4;i++){const a0=i*Math.PI/2+Math.PI/4,a1=a0+Math.PI/2,r=46;
+    pane(`M${cx} ${cy}L${(cx+r*Math.cos(a0)).toFixed(1)} ${(cy+r*Math.sin(a0)).toFixed(1)}A${r} ${r} 0 0 1 ${(cx+r*Math.cos(a1)).toFixed(1)} ${(cy+r*Math.sin(a1)).toFixed(1)}Z`,i%2?352:44,84,i%2?42:56,cx+26*Math.cos(a0+.78),cy+26*Math.sin(a0+.78))}
+  pane(`M${cx-13} ${cy}a13 13 0 1 0 26 0a13 13 0 1 0 -26 0Z`,50,90,78,cx,cy)});
+// the rose: exact annular sectors
+const RC=[300,236],pt=(r,a)=>[(RC[0]+r*Math.cos(a)),(RC[1]+r*Math.sin(a))],fx=p=>p[0].toFixed(1)+' '+p[1].toFixed(1);
+pane(`M${RC[0]-142} ${RC[1]}a142 142 0 1 0 284 0a142 142 0 1 0 -284 0Z`,230,60,20,RC[0],RC[1]);
+function ring(r1,r2,n,off,colour){for(let i=0;i<n;i++){const a0=off+i*2*Math.PI/n,a1=a0+2*Math.PI/n,c=colour(i),m=pt((r1+r2)/2,(a0+a1)/2);
+  pane(`M${fx(pt(r1,a0))}L${fx(pt(r2,a0))}A${r2} ${r2} 0 0 1 ${fx(pt(r2,a1))}L${fx(pt(r1,a1))}A${r1} ${r1} 0 0 0 ${fx(pt(r1,a0))}Z`,c[0],c[1],c[2],m[0],m[1])}}
+ring(104,140,16,Math.PI/16,i=>[[212,76,40],[152,56,34],[212,76,40],[350,78,42]][i%4]);
+ring(66,104,16,0,i=>i%2?[272,50,40]:[200,78,50]);
+ring(26,66,8,Math.PI/8,i=>i%2?[352,82,44]:[34,92,54]);
+pane(`M${RC[0]-26} ${RC[1]}a26 26 0 1 0 52 0a26 26 0 1 0 -52 0Z`,50,96,74,RC[0],RC[1]);
+// structural lead
+const came=d=>['came','came hi'].forEach(c=>{const e=document.createElementNS(NS,'path');e.setAttribute('d',d);e.setAttribute('class',c);lead.appendChild(e)});
+came(lanD.join(''));came(`M${RC[0]-142} ${RC[1]}a142 142 0 1 0 284 0a142 142 0 1 0 -284 0Z`);came(document.getElementById('archP').getAttribute('d'));
+document.getElementById('count').textContent=panes.length+' pieces, no two alike';
+// light
+const halo=document.getElementById('halo'),root=document.documentElement.style,still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let L={x:300,y:250},T={x:300,y:250},lastMove=-1e9,dirty=true;
+function toSvg(e){const r=svg.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*600,y:(e.clientY-r.top)/r.height*900}}
+const aim=e=>{T=toSvg(e);lastMove=performance.now()};
+addEventListener('pointermove',aim,{passive:true});addEventListener('pointerdown',aim,{passive:true});
+function render(){
+  for(const p of panes){const dx=p.cx-L.x,dy=p.cy-L.y,g=Math.exp(-(dx*dx+dy*dy)/72000),far=Math.exp(-(dx*dx+dy*dy)/400000);
+    const l=Math.min(90,p.l*(.34+.36*far+1.05*g)),s=Math.min(100,p.s*(1.05-.2*g));
+    p.e.setAttribute('fill','hsl('+p.h.toFixed(0)+' '+s.toFixed(0)+'% '+l.toFixed(1)+'%)')}
+  halo.setAttribute('cx',L.x.toFixed(1));halo.setAttribute('cy',L.y.toFixed(1));
+  root.setProperty('--mx',Math.max(-1,Math.min(1,(L.x-300)/300)).toFixed(3));root.setProperty('--my',Math.max(0,Math.min(1,L.y/900)).toFixed(3));
+}
+function tick(now){
+  if(!still&&now-lastMove>3500){const t=now/1000;T={x:300+250*Math.sin(t*.31),y:400+300*Math.sin(t*.19+1)}}
+  const dx=T.x-L.x,dy=T.y-L.y;
+  if(Math.abs(dx)+Math.abs(dy)>.4||dirty){L.x+=dx*.09;L.y+=dy*.09;render();dirty=false}
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

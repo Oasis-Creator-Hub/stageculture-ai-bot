@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Hour of Small Lanterns — a firefly wood</title>
+<meta name="description" content="A night forest in parallax. Move slowly and the fireflies of Hollin Wood will gather round your hand.">
+<style>
+  html, body { margin: 0; height: 100%; background: #04090c; overflow: hidden; }
+  body { font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif; color: #d9e4d2; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
+  .vignette { position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(120% 90% at 60% 35%, transparent 45%, rgba(1,4,6,.78) 100%),
+                linear-gradient(to top, rgba(2,6,8,.88) 0%, rgba(2,6,8,.35) 34%, transparent 58%); }
+  .notes { position: fixed; left: clamp(20px, 6vw, 88px); bottom: clamp(26px, 8vh, 84px); width: min(30rem, calc(100vw - 40px)); pointer-events: none; }
+  .kicker { font: 600 .68rem/1 "Gill Sans", "Gill Sans MT", "Trebuchet MS", sans-serif; letter-spacing: .34em; text-transform: uppercase; color: #9fb58a; opacity: .85; }
+  .kicker i { display: inline-block; width: 2.4em; height: 1px; background: currentColor; vertical-align: middle; margin-right: 1em; }
+  h1 { font-weight: 400; font-style: italic; font-size: clamp(2.3rem, 6.4vw, 4.6rem); line-height: .98; margin: .32em 0 .38em; letter-spacing: -.012em; color: #eef3df; text-shadow: 0 0 40px rgba(190,230,120,.18); }
+  h1 span { display: block; padding-left: 1.1em; color: #d7f08e; }
+  .passage { position: relative; min-height: 6.6em; }
+  .passage p { position: absolute; inset: 0 auto auto 0; margin: 0; font-size: clamp(.98rem, 1.5vw, 1.12rem); line-height: 1.62; color: #b9c8b6; opacity: 0; transition: opacity 2.4s ease; max-width: 27rem; }
+  .passage p.on { opacity: 1; }
+  .tally { position: fixed; right: clamp(18px, 4vw, 54px); top: clamp(18px, 4vh, 44px); text-align: right; pointer-events: none;
+    font: 600 .64rem/1.7 "Gill Sans", "Gill Sans MT", "Trebuchet MS", sans-serif; letter-spacing: .28em; text-transform: uppercase; color: #7f957c; }
+  .tally b { display: block; font: italic 400 2.4rem/1 "Iowan Old Style", Palatino, Georgia, serif; letter-spacing: 0; color: #d7f08e; text-transform: none; }
+  .back { position: fixed; left: clamp(18px, 4vw, 54px); top: clamp(18px, 4vh, 44px); font: 600 .68rem/1 "Gill Sans", "Trebuchet MS", sans-serif; letter-spacing: .28em; color: #7f957c; text-decoration: none; padding: .5em 0; border-bottom: 1px solid rgba(127,149,124,.4); transition: color .3s; }
+  .back:hover, .back:focus-visible { color: #d7f08e; }
+  @media (max-width: 520px) { .tally b { font-size: 1.8rem; } .passage { min-height: 9em; } }
+</style>
+</head>
+<body>
+<canvas id="wood" aria-label="A dark forest at night with drifting fireflies"></canvas>
+<div class="vignette"></div>
+<a class="back" href="index.html">&larr; 100</a>
+<div class="tally"><b id="near">0</b>lanterns<br>keeping you company</div>
+<section class="notes">
+  <div class="kicker"><i></i>Field notes &middot; Hollin Wood &middot; late June</div>
+  <h1>The hour of <span>small lanterns</span></h1>
+  <div class="passage" id="passage">
+    <p class="on">Stand still long enough and the dark stops being empty. First one, low in the bracken. Then the whole understorey begins to breathe in green.</p>
+    <p>They are not drawn to noise. Move your hand slowly, as you would near a sleeping animal, and they will come to see what kind of warmth you are.</p>
+    <p>The old foresters called them wick-flies, and counted them the way other men count sheep &mdash; never reaching the end, never minding.</p>
+    <p>Somewhere above the canopy the moon is doing its large, cold work. Down here the light is small enough to hold a conversation with.</p>
+    <p>By midnight the dew will ground them. Until then, every signal is a question, and the wood is full of patient answers.</p>
+  </div>
+</section>
+<script>
+(() => {
+  const cv = document.getElementById('wood'), ctx = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W, H, dpr, layers = [], flies = [], stars = [], sprite;
+  const ptr = { x: 0, y: 0, active: false, sx: .5, sy: .5, tx: .5, ty: .5 };
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+  const FAR = [26, 58, 62], NEAR = [3, 8, 9];
+
+  function conifer(g, x, base, h, w) {
+    const n = 7 + (rnd() * 5 | 0), R = [], L = [];
+    for (let i = 1; i <= n; i++) {
+      const y = base - h + h * .9 * i / n, f = Math.pow(i / n, .85);
+      R.push([x + w * f * (.75 + rnd() * .5), y, x + w * f * .38, y - h * .012]);
+      L.push([x - w * f * (.75 + rnd() * .5), y, x - w * f * .38, y - h * .012]);
+    }
+    g.beginPath(); g.moveTo(x, base - h);
+    R.forEach(p => { g.lineTo(p[0], p[1]); g.lineTo(p[2], p[3]); });
+    g.lineTo(x, base - h * .08);
+    for (let i = n - 1; i >= 0; i--) { g.lineTo(L[i][2], L[i][3]); g.lineTo(L[i][0], L[i][1]); }
+    g.closePath(); g.fill();
+    g.fillRect(x - w * .07, base - h * .12, w * .14, h * .14);
+  }
+  function trunk(g, x, base, w, lean) {
+    g.beginPath();
+    g.moveTo(x - w * .7, base); g.quadraticCurveTo(x - w * .45, base * .5, x - w * .32 + lean, -20);
+    g.lineTo(x + w * .32 + lean, -20); g.quadraticCurveTo(x + w * .42, base * .5, x + w * .8, base);
+    g.closePath(); g.fill();
+    g.lineCap = 'round';
+    for (let b = 0; b < 3; b++) {
+      const by = base * (.12 + rnd() * .5), dir = rnd() < .5 ? -1 : 1, len = w * (1.2 + rnd() * 2);
+      g.lineWidth = w * (.07 + rnd() * .08); g.beginPath(); g.moveTo(x + lean * (1 - by / base), by);
+      g.quadraticCurveTo(x + dir * len * .5, by - len * .12, x + dir * len, by - len * (.35 + rnd() * .4)); g.stroke();
+    }
+  }
+  function buildLayer(i, total) {
+    const d = i / (total - 1), c = document.createElement('canvas');
+    const lw = Math.ceil(W * 1.36), g = c.getContext('2d');
+    c.width = lw * dpr; c.height = H * dpr; g.scale(dpr, dpr);
+    const col = `rgb(${mix(FAR, NEAR, Math.pow(d, .8))})`;
+    g.fillStyle = col; g.strokeStyle = col;
+    const ground = H * (.66 + d * .22), k1 = rnd() * 6, k2 = rnd() * 6;
+    const gy = x => ground + Math.sin(x / (W * .28) + k1) * H * .028 + Math.sin(x / (W * .09) + k2) * H * .01;
+    g.beginPath(); g.moveTo(0, H);
+    for (let x = 0; x <= lw; x += 12) g.lineTo(x, gy(x));
+    g.lineTo(lw, H); g.closePath(); g.fill();
+    const scale = .35 + d * 1.15, unit = Math.max(H, 520);
+    if (i < total - 1) {
+      const count = Math.round(lw / (58 + d * 150));
+      for (let t = 0; t < count; t++) {
+        const x = (t + rnd()) * lw / count, h = unit * (.36 + rnd() * .3) * scale;
+        conifer(g, x, gy(x) + 6, h, h * (.13 + rnd() * .06));
+      }
+    }
+    if (i >= total - 2) {
+      const count = i === total - 1 ? Math.max(3, Math.round(lw / 420)) : Math.round(lw / 520);
+      for (let t = 0; t < count; t++) {
+        const x = (t + .2 + rnd() * .6) * lw / count;
+        trunk(g, x, H, unit * (.035 + rnd() * .03) * scale, (rnd() - .5) * 60);
+      }
+    }
+    if (i >= total - 2) {
+      g.lineWidth = 1.4 + d;
+      for (let x = 0; x < lw; x += 5 + rnd() * 9) {
+        const y = gy(x), hh = 10 + rnd() * 38 * scale, bend = (rnd() - .5) * 26;
+        g.beginPath(); g.moveTo(x, y + 4); g.quadraticCurveTo(x + bend * .3, y - hh * .6, x + bend, y - hh); g.stroke();
+      }
+    }
+    return { c, d, lw };
+  }
+  function makeSprite() {
+    sprite = document.createElement('canvas'); sprite.width = sprite.height = 96;
+    const g = sprite.getContext('2d'), r = g.createRadialGradient(48, 48, 0, 48, 48, 48);
+    r.addColorStop(0, 'rgba(250,255,214,1)'); r.addColorStop(.12, 'rgba(214,246,120,.85)');
+    r.addColorStop(.4, 'rgba(150,214,70,.2)'); r.addColorStop(1, 'rgba(110,190,60,0)');
+    g.fillStyle = r; g.fillRect(0, 0, 96, 96);
+  }
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr;
+    seed = 7; layers = []; for (let i = 0; i < 5; i++) layers.push(buildLayer(i, 5));
+    stars = []; for (let i = 0; i < 70; i++) stars.push([rnd() * W, rnd() * H * .5, rnd() * 1.1 + .2, rnd()]);
+    const n = Math.max(36, Math.min(120, Math.round(W * H / 11000)));
+    while (flies.length < n) flies.push(newFly());
+    flies.length = n;
+    if (reduce) frame(0);
+  }
+  function newFly() {
+    return { x: Math.random() * (W || 800), y: (H || 600) * (.3 + Math.random() * .62), z: Math.random(),
+      a: Math.random() * 6.28, vx: 0, vy: 0, ph: Math.random() * 6.28, rate: .5 + Math.random() * 1.1,
+      ring: 26 + Math.random() * 90, spin: Math.random() < .5 ? -1 : 1 };
+  }
+  function drawFlies(t, lo, hi) {
+    ctx.globalCompositeOperation = 'lighter';
+    for (const f of flies) {
+      if (f.z < lo || f.z >= hi) continue;
+      const blink = Math.pow(Math.max(0, Math.sin(t * f.rate + f.ph)), 3) * .9 + .1;
+      const s = (10 + f.z * 30) * (.7 + blink * .6);
+      ctx.globalAlpha = blink * (.45 + f.z * .55);
+      ctx.drawImage(sprite, f.x - s / 2, f.y - s / 2, s, s);
+    }
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  }
+  let last = 0, nearEl = document.getElementById('near'), shown = -1;
+  function frame(ms) {
+    const t = ms / 1000, dt = Math.min(.05, t - last || .016); last = t;
+    if (!ptr.active) { ptr.tx = .5 + Math.sin(t * .11) * .22; ptr.ty = .5 + Math.cos(t * .07) * .2; }
+    ptr.sx += (ptr.tx - ptr.sx) * .04; ptr.sy += (ptr.ty - ptr.sy) * .04;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, '#07171d'); sky.addColorStop(.55, '#133038'); sky.addColorStop(1, '#0b1d20');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+    const mx = W * .72 - (ptr.sx - .5) * 14, my = H * .2;
+    const moon = ctx.createRadialGradient(mx, my, 0, mx, my, Math.max(W, H) * .5);
+    moon.addColorStop(0, 'rgba(214,236,222,.5)'); moon.addColorStop(.035, 'rgba(190,226,214,.3)');
+    moon.addColorStop(.2, 'rgba(90,150,150,.12)'); moon.addColorStop(1, 'rgba(40,90,100,0)');
+    ctx.fillStyle = moon; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#e9f4ea'; ctx.beginPath(); ctx.arc(mx, my, Math.min(W, H) * .028, 0, 7); ctx.fill();
+    for (const s of stars) { ctx.globalAlpha = .25 + .5 * Math.abs(Math.sin(t * .6 + s[3] * 9)); ctx.fillRect(s[0], s[1], s[2], s[2]); }
+    ctx.globalAlpha = 1;
+    let near = 0;
+    for (const f of flies) {
+      if (!reduce) {
+        f.a += (Math.random() - .5) * 1.6 * dt * 6;
+        let ax = Math.cos(f.a) * 9, ay = Math.sin(f.a) * 6;
+        if (ptr.active) {
+          const dx = ptr.x - f.x, dy = ptr.y - f.y, dist = Math.hypot(dx, dy) || 1;
+          if (dist < Math.max(W, H) * .5) {
+            const pull = Math.max(-26, Math.min(34, (dist - f.ring) * .3));
+            ax += dx / dist * pull + -dy / dist * 12 * f.spin; ay += dy / dist * pull + dx / dist * 12 * f.spin;
+          }
+          if (dist < 150) near++;
+        }
+        f.vx = (f.vx + ax * dt) * .985; f.vy = (f.vy + ay * dt) * .985;
+        f.x += f.vx * dt * 3; f.y += f.vy * dt * 3;
+        if (f.x < -30) f.x = W + 30; if (f.x > W + 30) f.x = -30;
+        if (f.y < H * .12) f.vy += 20 * dt; if (f.y > H * .97) f.vy -= 30 * dt;
+      }
+    }
+    layers.forEach((L, i) => {
+      const ox = -(L.lw - W) / 2 - (ptr.sx - .5) * (16 + L.d * 150), oy = -(ptr.sy - .5) * (4 + L.d * 26) + 8;
+      if (i === 2) drawFlies(t, 0, .34);
+      if (i === 4) drawFlies(t, .34, .72);
+      ctx.drawImage(L.c, ox, oy, L.lw, H);
+      if (i < 4) {
+        const fog = ctx.createLinearGradient(0, H * .4, 0, H);
+        fog.addColorStop(0, 'rgba(70,130,130,0)'); fog.addColorStop(.6, `rgba(84,142,136,${.13 - i * .02})`); fog.addColorStop(1, 'rgba(40,80,80,0)');
+        ctx.fillStyle = fog; ctx.fillRect(0, H * .4, W, H * .6);
+      }
+    });
+    drawFlies(t, .72, 2);
+    if (near !== shown) { shown = near; nearEl.textContent = near; }
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  const move = e => { ptr.x = e.clientX; ptr.y = e.clientY; ptr.tx = e.clientX / W; ptr.ty = e.clientY / H; ptr.active = true; if (reduce) frame(0); };
+  let leaveT;
+  addEventListener('pointermove', move); addEventListener('pointerdown', move);
+  addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') { clearTimeout(leaveT); leaveT = setTimeout(() => ptr.active = false, 2600); } });
+  document.addEventListener('pointerleave', () => ptr.active = false);
+  addEventListener('blur', () => ptr.active = false);
+  let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(resize, 120); });
+  const ps = [...document.querySelectorAll('#passage p')]; let pi = 0;
+  setInterval(() => { ps[pi].classList.remove('on'); pi = (pi + 1) % ps.length; ps[pi].classList.add('on'); }, 11000);
+  makeSprite(); resize();
+  if (!reduce) requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

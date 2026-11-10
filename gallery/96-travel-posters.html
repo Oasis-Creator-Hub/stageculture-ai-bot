@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wanderlust &amp; Sons — Bureau of Imaginary Travel</title>
+<meta name="description" content="A carousel of vintage flat-colour travel posters for places that do not exist: Port Saffron, Mount Ysolde, Kettle Sands, the Glass Lakes of Oru and the Nimbus Isles.">
+<style>
+:root{--wall:#e8dcc2;--ink:#2b2118;--acc:#b8402a;--pw:min(64vw,340px,calc(60svh * .714))}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--wall);color:var(--ink);font-family:"Futura","Avenir Next","Gill Sans","Century Gothic","Trebuchet MS",sans-serif;min-height:100svh;display:flex;flex-direction:column;overflow-x:hidden;
+  background-image:repeating-linear-gradient(90deg,rgba(43,33,24,.035) 0 2px,transparent 2px 58px),linear-gradient(#efe4cc,#dfd0b0)}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:18px clamp(16px,4vw,44px) 0;border-bottom:0}
+header a{color:var(--acc);text-decoration:none;font-size:12px;letter-spacing:.2em;font-weight:700}
+.brand{text-align:right}
+.brand b{display:block;font-size:clamp(17px,2.6vw,26px);letter-spacing:.16em;text-transform:uppercase}
+.brand span{font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:#7a6850}
+.rail{position:relative;flex:1 1 auto;min-height:calc(var(--pw) * 1.4 + 70px);display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab}
+.rail:active{cursor:grabbing}
+.rail::before{content:"";position:absolute;left:0;right:0;top:22px;height:3px;background:#8a7658;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.poster{position:absolute;width:var(--pw);aspect-ratio:300/420;transition:transform .7s cubic-bezier(.2,.8,.2,1),opacity .5s,filter .5s;background:#f6efdc;padding:calc(var(--pw) * .03);
+  box-shadow:0 2px 0 #fff inset,0 18px 30px -8px rgba(43,33,24,.45),0 2px 4px rgba(43,33,24,.3)}
+.poster::before{content:"";position:absolute;left:50%;top:-34px;width:2px;height:34px;background:#5c4c38}
+.poster::after{content:"";position:absolute;left:50%;top:-8px;width:12px;height:12px;margin-left:-5px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#b9a27a 50%,#6e5a3c)}
+.poster svg{display:block;width:100%;height:100%}
+.poster text{font-family:"Futura","Avenir Next Condensed","Gill Sans","Century Gothic","Trebuchet MS",sans-serif;font-weight:800}
+.nav{position:absolute;top:50%;z-index:20;width:46px;height:46px;margin-top:-23px;border-radius:50%;border:2px solid var(--ink);background:var(--wall);color:var(--ink);font-size:20px;cursor:pointer;display:grid;place-items:center;box-shadow:3px 3px 0 var(--ink)}
+.nav:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+#prev{left:clamp(8px,3vw,40px)}#next{right:clamp(8px,3vw,40px)}
+.stub{margin:0 auto 22px;width:min(92vw,640px);display:grid;grid-template-columns:1.5fr 1fr 1fr;background:#f6efdc;border:2px solid var(--ink);position:relative;box-shadow:5px 5px 0 var(--acc)}
+.stub>div{padding:10px 14px;border-left:2px dashed var(--ink)}.stub>div:first-child{border-left:0}
+.stub small{display:block;font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:#7a6850}
+.stub b{display:block;font-size:clamp(14px,2.2vw,19px);line-height:1.15;margin-top:2px}
+.stub p{grid-column:1/-1;margin:0;padding:9px 14px;border-top:2px solid var(--ink);font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:14px}
+.dots{display:flex;justify-content:center;gap:8px;margin:0 0 14px}
+.dots button{width:22px;height:6px;border:0;padding:0;background:#b9a27a;cursor:pointer}.dots button[aria-current=true]{background:var(--acc)}
+@media(max-width:520px){.stub{grid-template-columns:1fr 1fr}.stub>div:first-child{grid-column:1/-1;border-bottom:2px dashed var(--ink)}.stub>div:nth-child(2){border-left:0}.nav{top:auto;bottom:6px;margin:0}}
+@media(prefers-reduced-motion:reduce){.poster{transition:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 .18 0 0 0 0 .12 0 0 0 0 .06 0 0 0 .9 -.34"/></filter>
+  <radialGradient id="age" cx="50%" cy="45%" r="75%"><stop offset=".6" stop-color="#5a3a10" stop-opacity="0"/><stop offset="1" stop-color="#5a3a10" stop-opacity=".28"/></radialGradient>
+</defs></svg>
+<header><a href="index.html">← 100</a><div class="brand"><b>Wanderlust &amp; Sons</b><span>Bureau of Imaginary Travel · Est. never</span></div></header>
+<div class="rail" id="rail" aria-roledescription="carousel" aria-label="Travel posters">
+  <!-- 1 Port Saffron -->
+  <figure class="poster" style="margin:0"><svg viewBox="0 0 300 420" role="img" aria-label="Poster: Port Saffron, a golden harbour with a lighthouse">
+    <rect width="300" height="420" fill="#f0a23a"/><path d="M0,60h300v40H0z M0,140h300v30H0z" fill="#f4b455"/>
+    <circle cx="176" cy="168" r="74" fill="#fbe6a8"/><path d="M0,236h300v100H0z" fill="#1c6a72"/>
+    <path d="M102,244h148v5H102z M70,262h190v5H70z M120,282h120v5H120z" fill="#fbe6a8" opacity=".85"/>
+    <path d="M0,236 C30,196 70,190 96,214 C110,226 126,232 150,236Z" fill="#7a2a22"/>
+    <path d="M52,120 h18 l5,84 h-28z" fill="#fbe6a8"/><path d="M49,150h24l1,16H48z" fill="#c4452f"/><path d="M48,106h26v14H48z" fill="#7a2a22"/><path d="M52,106 l9,-14 9,14z" fill="#c4452f"/><path d="M74,110 L150,96 150,128Z" fill="#fff6d6" opacity=".55"/>
+    <path d="M206,236 l0,-40 26,40z M204,236 l0,-30 -18,30z" fill="#fbe6a8"/><path d="M182,238h54l-8,10h-38z" fill="#7a2a22"/>
+    <path d="M254,222 l0,-24 16,24z" fill="#fbe6a8"/><path d="M244,223h30l-5,7h-20z" fill="#7a2a22"/>
+    <path d="M0,336 V290 l30,-22 30,22 v-14 l34,-24 34,24 v20 l26,-18 26,18 v40Z" fill="#c4452f"/><path d="M0,336 V300 l30,-22 30,22 v36Z M94,336 v-50 l34,-10 v60Z" fill="#7a2a22"/>
+    <path d="M12,306h10v14H12z M38,306h10v14H38z M106,296h10v14h-10z M142,306h9v12h-9z M164,306h9v12h-9z" fill="#fbe6a8"/>
+    <rect y="336" width="300" height="84" fill="#fbe6a8"/><text x="150" y="382" text-anchor="middle" font-size="40" fill="#7a2a22" textLength="256" lengthAdjust="spacingAndGlyphs">PORT SAFFRON</text>
+    <text x="150" y="403" text-anchor="middle" font-size="10.5" fill="#1c6a72" textLength="220" lengthAdjust="spacing">WHERE THE TIDE COMES IN GOLD</text>
+    <text x="150" y="30" text-anchor="middle" font-size="9" fill="#7a2a22" textLength="200" lengthAdjust="spacing">SOUTHERLY STEAM PACKET CO.</text>
+    <rect width="300" height="420" fill="url(#age)"/><rect width="300" height="420" filter="url(#grain)" style="mix-blend-mode:multiply"/></svg></figure>
+  <!-- 2 Mount Ysolde -->
+  <figure class="poster" style="margin:0"><svg viewBox="0 0 300 420" role="img" aria-label="Poster: Mount Ysolde, a snow-capped peak with a funicular">
+    <rect width="300" height="420" fill="#1b2a5a"/><circle cx="232" cy="92" r="26" fill="#f6e7c1"/>
+    <g fill="#f6e7c1"><circle cx="40" cy="60" r="1.6"/><circle cx="92" cy="120" r="1.3"/><circle cx="140" cy="84" r="1.6"/><circle cx="270" cy="150" r="1.3"/><circle cx="24" cy="150" r="1.3"/><circle cx="188" cy="136" r="1.2"/><circle cx="66" cy="96" r="1"/></g>
+    <path d="M0,330 L70,190 120,260 176,140 250,270 300,214 V420H0Z" fill="#3a59a6"/>
+    <path d="M176,140 l-34,72 20,-12 14,18 16,-20 20,14z" fill="#f7c4c6"/><path d="M70,190 l-22,44 14,-8 10,10 10,-12 12,8z" fill="#f7c4c6"/>
+    <path d="M0,420 V300 L90,236 170,310 236,262 300,300 V420Z" fill="#6c8bd4"/>
+    <path d="M0,420 V352 L300,270 V420Z" fill="#111a3c"/><path d="M0,350 L300,268" stroke="#f6e7c1" stroke-width="2"/><path d="M20,345v14 M70,331v14 M120,317v14 M170,304v14 M220,290v14 M270,276v14" stroke="#f6e7c1" stroke-width="2"/>
+    <g transform="translate(150,302) rotate(-15.3)"><rect x="-30" y="-24" width="60" height="24" rx="3" fill="#e2542c"/><path d="M-24,-19h10v10h-10z M-9,-19h10v10H-9z M6,-19h10v10H6z" fill="#f6e7c1"/><rect x="-30" y="-27" width="60" height="4" fill="#f6e7c1"/></g>
+    <path d="M24,420 l16,-56 16,56z M58,420 l12,-40 12,40z M232,420 l14,-64 14,64z M262,420 l12,-44 12,44z M204,420 l10,-36 10,36z" fill="#0a1026"/>
+    <text x="150" y="42" text-anchor="middle" font-size="13" fill="#f7c4c6" textLength="120" lengthAdjust="spacing">ASCEND TO</text>
+    <text x="150" y="398" text-anchor="middle" font-size="36" fill="#f6e7c1" textLength="252" lengthAdjust="spacingAndGlyphs">MOUNT YSOLDE</text>
+    <text x="150" y="412" text-anchor="middle" font-size="8" fill="#f7c4c6" textLength="230" lengthAdjust="spacing">BY FUNICULAR · 2,914 METRES OF QUIET</text>
+    <rect width="300" height="420" fill="url(#age)"/><rect width="300" height="420" filter="url(#grain)" style="mix-blend-mode:multiply"/></svg></figure>
+  <!-- 3 Kettle Sands -->
+  <figure class="poster" style="margin:0"><svg viewBox="0 0 300 420" role="img" aria-label="Poster: Kettle Sands, a desert express crossing a viaduct beneath a blazing sun">
+    <rect width="300" height="420" fill="#f5d259"/>
+    <g fill="#f1bd45"><path d="M150,150 L-40,0 40,0Z M150,150 L110,0 190,0Z M150,150 L260,0 340,0Z M150,150 L-80,120 -80,40Z M150,150 L380,120 380,40Z M150,150 L-80,260 -80,190Z M150,150 L380,260 380,190Z"/></g>
+    <circle cx="150" cy="150" r="46" fill="#fff3c4"/><circle cx="150" cy="150" r="34" fill="#e8762c"/>
+    <path d="M0,250 V214 h26 v-28 h60 v20 h24 v44Z M190,250 v-52 h20 v-30 h50 v22 h40 V250Z" fill="#d05f3b"/><path d="M26,186 h60 v10 H26z M210,168 h50 v10 h-50z" fill="#9a3828"/>
+    <path d="M0,250h300v40H0z" fill="#e7a046"/>
+    <path d="M0,262 h300 v12 H0z" fill="#58213a"/><path d="M0,274 h300 v62 H0z" fill="#58213a"/>
+    <g fill="#e7a046"><path d="M14,336 v-34 a18,18 0 0 1 36,0 v34z M70,336 v-34 a18,18 0 0 1 36,0 v34z M126,336 v-34 a18,18 0 0 1 36,0 v34z M182,336 v-34 a18,18 0 0 1 36,0 v34z M238,336 v-34 a18,18 0 0 1 36,0 v34z"/></g>
+    <path d="M300,262 V240 H96 C70,240 52,250 44,262Z" fill="#35a79c"/><path d="M300,246 H104 v6 H300z" fill="#fff3c4"/><path d="M68,262 c4,-10 12,-15 24,-16 v16z" fill="#fff3c4"/>
+    <path d="M0,336h300v84H0z" fill="#9a3828"/><path d="M0,336 q60,-18 120,-4 t180,-6 v20 H0z" fill="#c9793a"/>
+    <path d="M250,336 v-40 q0,-7 6,-7 t6,7 v40z M240,320 v-12 q0,-5 4,-5 t4,5 v8 h4 v6z M264,314 h4 v-8 q0,-5 4,-5 t4,5 v14 h-12z" fill="#1f5a3e"/>
+    <text x="150" y="386" text-anchor="middle" font-size="38" fill="#fff3c4" textLength="250" lengthAdjust="spacingAndGlyphs">KETTLE SANDS</text>
+    <text x="150" y="405" text-anchor="middle" font-size="9.5" fill="#f5d259" textLength="236" lengthAdjust="spacing">THE DESERT EXPRESS · NIGHTLY FROM DUNMORE</text>
+    <text x="150" y="34" text-anchor="middle" font-size="11" fill="#9a3828" textLength="150" lengthAdjust="spacing">SEE IT SHIMMER</text>
+    <rect width="300" height="420" fill="url(#age)"/><rect width="300" height="420" filter="url(#grain)" style="mix-blend-mode:multiply"/></svg></figure>
+  <!-- 4 Glass Lakes -->
+  <figure class="poster" style="margin:0"><svg viewBox="0 0 300 420" role="img" aria-label="Poster: The Glass Lakes of Oru, green hills mirrored in still water">
+    <rect width="300" height="420" fill="#e3f1df"/><rect y="226" width="300" height="194" fill="#a5d9c8"/>
+    <circle cx="96" cy="150" r="36" fill="#f0695a"/><circle cx="96" cy="302" r="36" fill="#f0695a" opacity=".45"/>
+    <g id="hills"><path d="M0,226 V170 C40,130 80,150 110,186 C140,150 170,110 210,150 C240,180 270,160 300,138 V226Z" fill="#5fa68a"/>
+      <path d="M0,226 V200 C50,176 90,196 130,206 C170,180 230,170 300,196 V226Z" fill="#2c6b5b"/>
+      <path d="M186,226 l10,-40 10,40z M208,226 l8,-30 8,30z M40,226 l9,-34 9,34z M62,226 l7,-24 7,24z M250,226 l9,-36 9,36z" fill="#173f3b"/></g>
+    <use href="#hills" transform="translate(0,452) scale(1,-1)" opacity=".5"/>
+    <path d="M0,258h80v3H0z M130,276h170v3H130z M30,310h120v3H30z M190,330h110v3H190z M0,352h60v3H0z" fill="#e3f1df" opacity=".8"/>
+    <path d="M128,292 h64 q-8,12 -32,12 t-32,-12z" fill="#f0695a"/><path d="M160,292 v-22 M152,270 h16" stroke="#173f3b" stroke-width="2.5"/><circle cx="160" cy="266" r="5" fill="#173f3b"/><path d="M140,286 L186,300" stroke="#173f3b" stroke-width="2"/>
+    <text x="150" y="52" text-anchor="middle" font-size="12" fill="#2c6b5b" textLength="60" lengthAdjust="spacing">THE</text>
+    <text x="150" y="92" text-anchor="middle" font-size="40" fill="#173f3b" textLength="252" lengthAdjust="spacingAndGlyphs">GLASS LAKES</text>
+    <text x="150" y="112" text-anchor="middle" font-size="12" fill="#f0695a" textLength="90" lengthAdjust="spacing">OF ORU</text>
+    <text x="150" y="398" text-anchor="middle" font-size="11" fill="#173f3b" textLength="200" lengthAdjust="spacing">PADDLE THE SKY TWICE</text>
+    <rect width="300" height="420" fill="url(#age)"/><rect width="300" height="420" filter="url(#grain)" style="mix-blend-mode:multiply"/></svg></figure>
+  <!-- 5 Nimbus Isles -->
+  <figure class="poster" style="margin:0"><svg viewBox="0 0 300 420" role="img" aria-label="Poster: The Nimbus Isles, floating islands and an airship above the clouds">
+    <rect width="300" height="420" fill="#b6a0e2"/><rect y="150" width="300" height="90" fill="#d9b3dc"/><rect y="240" width="300" height="100" fill="#ffd0ae"/>
+    <g fill="#fff4e2"><path d="M-10,250 q20,-26 50,-12 q16,-28 50,-10 q30,-8 36,22z M180,214 q18,-22 44,-10 q20,-20 46,-2 q26,-4 30,12z M150,330 q24,-30 60,-14 q22,-24 56,-6 q30,-6 40,20z M-20,340 q30,-34 70,-16 q26,-20 60,0 q22,0 30,16z"/></g>
+    <path d="M70,150 h96 q-10,50 -48,96 q-38,-46 -48,-96z" fill="#57398a"/><path d="M62,150 q10,-22 34,-18 q14,-18 36,-6 q22,-6 34,24z" fill="#62c48c"/><path d="M96,132 v-22 l14,22z M124,128 v-16 l10,16z" fill="#2a7a55"/><path d="M150,152 v70" stroke="#fff4e2" stroke-width="3"/>
+    <path d="M206,250 h58 q-6,30 -29,56 q-23,-26 -29,-56z" fill="#57398a"/><path d="M200,250 q8,-16 24,-12 q10,-12 24,-4 q14,-2 20,16z" fill="#62c48c"/>
+    <path d="M20,96 h36 q-4,18 -18,34 q-14,-16 -18,-34z" fill="#57398a" opacity=".7"/><path d="M16,96 q6,-10 16,-8 q8,-8 18,0 q8,0 10,8z" fill="#62c48c" opacity=".8"/>
+    <g transform="translate(206,96)"><ellipse rx="62" ry="24" fill="#ff6a5f"/><path d="M-62,0 a62,24 0 0 1 124,0 q-62,-14 -124,0z" fill="#ff9a8a"/><path d="M50,-8 l26,-16 v48 l-26,-16z" fill="#2a1c5a"/><path d="M-18,24 h36 l-5,12 h-26z" fill="#2a1c5a"/><path d="M-12,24 v-4 M12,24 v-4" stroke="#2a1c5a" stroke-width="2"/></g>
+    <rect y="340" width="300" height="80" fill="#2a1c5a"/>
+    <text x="150" y="384" text-anchor="middle" font-size="38" fill="#fff4e2" textLength="250" lengthAdjust="spacingAndGlyphs">NIMBUS ISLES</text>
+    <text x="150" y="404" text-anchor="middle" font-size="10" fill="#ffd0ae" textLength="210" lengthAdjust="spacing">BY AIRSHIP, WEATHER PERMITTING</text>
+    <text x="150" y="32" text-anchor="middle" font-size="9" fill="#2a1c5a" textLength="190" lengthAdjust="spacing">UPPER ATMOSPHERE LINES</text>
+    <rect width="300" height="420" fill="url(#age)"/><rect width="300" height="420" filter="url(#grain)" style="mix-blend-mode:multiply"/></svg></figure>
+  <button class="nav" id="prev" type="button" aria-label="Previous poster">←</button><button class="nav" id="next" type="button" aria-label="Next poster">→</button>
+</div>
+<div class="dots" id="dots"></div>
+<div class="stub" aria-live="polite"><div><small>Destination</small><b id="i0"></b></div><div><small>Fare from</small><b id="i1"></b></div><div><small>Best season</small><b id="i2"></b></div><p id="i3"></p></div>
+<script>
+(function(){
+const INFO=[['Port Saffron','14 florins','The long dusk','A harbour town that smells of oranges and tar. The lighthouse keeper sells marmalade from the lamp room on Thursdays.'],
+['Mount Ysolde','22 florins','First snow','The funicular takes forty minutes and nobody speaks. At the top there is a bench, a bell, and no reception whatsoever.'],
+['Kettle Sands','9 florins','Any cool night','The express whistles like a boiling kettle as it crosses the viaduct. Bring a hat, a second hat, and something to trade for shade.'],
+['The Glass Lakes of Oru','17 florins','Windless May','Water so still the swans check their reflections for mistakes. Canoes are hired by the hour, silence is free.'],
+['The Nimbus Isles','31 florins','Between storms','Seven islands that have never agreed to come down. The airship docks at noon; the waterfalls end somewhere over the sea.']];
+const rail=document.getElementById('rail'),P=[...rail.querySelectorAll('.poster')],n=P.length,dots=document.getElementById('dots');
+let idx=0,dx=0,down=null;
+INFO.forEach((f,i)=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Show '+f[0]);b.onclick=()=>go(i);dots.appendChild(b)});
+function lay(){const pw=P[0].offsetWidth,gap=Math.min(pw*.86,rail.offsetWidth*.42);
+  P.forEach((p,i)=>{let d=((i-idx)%n+n+Math.floor(n/2))%n-Math.floor(n/2);const f=d+dx/gap,a=Math.abs(f);
+    p.style.transform='translateX('+(f*gap)+'px) translateY('+(a*14)+'px) scale('+Math.max(.6,1-.2*a)+') rotate('+(f*2.6)+'deg)';
+    p.style.zIndex=10-Math.round(a);p.style.opacity=a>2.2?0:1;p.style.filter=a<.5?'none':'saturate(.7) brightness(.86)';p.style.transitionDuration=down?'0s':'';
+    p.setAttribute('aria-hidden',d!==0)});
+  [...dots.children].forEach((b,i)=>b.setAttribute('aria-current',i===idx));
+  INFO[idx].forEach((t,k)=>document.getElementById('i'+k).textContent=t)}
+function go(i){idx=(i%n+n)%n;dx=0;lay()}
+document.getElementById('prev').onclick=()=>go(idx-1);document.getElementById('next').onclick=()=>go(idx+1);
+addEventListener('keydown',e=>{if(e.key==='ArrowLeft')go(idx-1);if(e.key==='ArrowRight')go(idx+1)});
+rail.addEventListener('pointerdown',e=>{if(e.target.closest('.nav'))return;down={x:e.clientX,t:e.target.closest('.poster')};rail.setPointerCapture(e.pointerId)});
+rail.addEventListener('pointermove',e=>{if(down){dx=e.clientX-down.x;lay()}});
+function up(){if(!down)return;const d=down;down=null;if(Math.abs(dx)>40)go(idx+(dx<0?1:-1));else{const i=P.indexOf(d.t);dx=0;if(i>=0&&i!==idx)go(i);else lay()}}
+rail.addEventListener('pointerup',up);rail.addEventListener('pointercancel',up);
+addEventListener('resize',lay);lay();
+})();
+</script>
+</body>
+</html>

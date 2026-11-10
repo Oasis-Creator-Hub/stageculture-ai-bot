@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fizzwhistle &amp; Plum — Purveyors of Wobble</title>
+<meta name="description" content="A glossy candy-coloured sweet shop: squishy jelly buttons, lollipops you can spin, and a jar of gumballs to fling about. Nothing here is good for your teeth.">
+<style>
+:root{--pink:#ff5c9a;--cherry:#ff3158;--mint:#5fe0bd;--lemon:#ffe25a;--grape:#9a6bff;--sky:#55c3ff;--cream:#fff5e9;--choc:#5a2a3a}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:ui-rounded,"Arial Rounded MT Bold","Nunito","Varela Round","Trebuchet MS",system-ui,sans-serif;color:var(--choc);background:var(--cream);
+  background-image:radial-gradient(circle,#ffd3e3 0 7px,transparent 8px),radial-gradient(circle,#c9f4e7 0 5px,transparent 6px);background-size:64px 64px,64px 64px;background-position:0 0,32px 32px;overflow-x:hidden}
+.awning{height:clamp(70px,13vw,120px);background:repeating-linear-gradient(90deg,var(--cherry) 0 44px,#fff 44px 88px);position:relative;box-shadow:0 8px 0 rgba(90,42,58,.12)}
+.awning::after{content:"";position:absolute;left:0;right:0;top:100%;height:26px;background:radial-gradient(circle at 22px 0,var(--cherry) 0 22px,transparent 23px),radial-gradient(circle at 66px 0,#fff 0 22px,transparent 23px);background-size:88px 26px;filter:drop-shadow(0 4px 0 rgba(90,42,58,.14))}
+.back{position:absolute;left:14px;top:12px;z-index:3;background:#fff;color:var(--cherry);text-decoration:none;font-weight:700;font-size:13px;padding:6px 12px;border-radius:99px;box-shadow:0 3px 0 rgba(90,42,58,.25)}
+header{text-align:center;padding:54px 18px 8px}
+h1{margin:0;font-size:clamp(38px,9vw,92px);line-height:.95;letter-spacing:-.02em;color:var(--pink);
+  text-shadow:0 2px 0 #fff,0 5px 0 #d93b7a,0 9px 0 rgba(90,42,58,.18)}
+h1 em{font-style:normal;color:var(--grape);text-shadow:0 2px 0 #fff,0 5px 0 #6c40d6,0 9px 0 rgba(90,42,58,.18)}
+.sub{margin:16px auto 0;max-width:34em;font-size:clamp(15px,2vw,19px)}
+main{max-width:1040px;margin:0 auto;padding:10px 16px 130px}
+section{margin-top:44px;background:rgba(255,255,255,.72);border:4px solid #fff;border-radius:34px;padding:clamp(18px,3.4vw,34px);box-shadow:0 10px 0 rgba(255,92,154,.18),0 22px 40px rgba(90,42,58,.1)}
+h2{margin:0 0 4px;font-size:clamp(23px,3.6vw,34px);color:var(--cherry)}
+h2+p{margin:0 0 22px;opacity:.85}
+.jellies{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:22px 16px}
+.jelly{--c:var(--pink);--d:#c92e6d;border:0;cursor:pointer;font:inherit;font-weight:700;color:#fff;font-size:16px;padding:26px 8px 22px;border-radius:44% 44% 30% 30%/60% 60% 26% 26%;position:relative;
+  background:radial-gradient(ellipse at 50% 108%,rgba(255,255,255,.35),transparent 55%),linear-gradient(var(--c),var(--d));
+  box-shadow:inset 0 -9px 14px rgba(0,0,0,.14),inset 0 6px 10px rgba(255,255,255,.45),0 9px 0 -2px color-mix(in srgb,var(--d) 55%,transparent),0 16px 18px rgba(90,42,58,.18);
+  text-shadow:0 2px 0 rgba(0,0,0,.18);transform-origin:50% 100%;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.jelly::before{content:"";position:absolute;left:18%;top:11%;width:34%;height:20%;border-radius:50%;background:rgba(255,255,255,.75);transform:rotate(-18deg);filter:blur(1px)}
+.jelly small{display:block;font-weight:400;font-size:12px;opacity:.92;margin-top:3px}
+.jelly:active{transform:scale(1.16,.74)}
+.jelly.wob{animation:wob .75s cubic-bezier(.3,1.6,.5,1)}
+@keyframes wob{0%{transform:scale(1.18,.72)}28%{transform:scale(.86,1.2)}50%{transform:scale(1.09,.92)}70%{transform:scale(.96,1.05)}86%{transform:scale(1.02,.98)}100%{transform:none}}
+.pops{display:flex;justify-content:space-around;flex-wrap:wrap;gap:20px}
+.pop{width:clamp(96px,24vw,170px);text-align:center;font-size:13px}
+.disc{position:relative;width:100%;aspect-ratio:1;border-radius:50%;cursor:grab;touch-action:none;box-shadow:0 10px 0 -3px rgba(90,42,58,.2),0 18px 22px rgba(90,42,58,.2)}
+.disc i{position:absolute;inset:0;border-radius:50%;border:5px solid #fff}
+.disc::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.85) 0 7%,rgba(255,255,255,.25) 18%,transparent 36%),radial-gradient(circle at 60% 80%,transparent 50%,rgba(0,0,0,.16));pointer-events:none}
+.stick{width:11px;height:clamp(70px,14vw,120px);margin:-4px auto 8px;border-radius:0 0 8px 8px;background:linear-gradient(90deg,#fff,#eadfd2 60%,#d6c6b4)}
+.pop b{display:block;font-size:15px}
+.jar{position:relative;border-radius:28px;overflow:hidden;background:linear-gradient(#e8f9ff,#fdeaf2);border:5px solid #fff;box-shadow:inset 0 0 0 2px rgba(85,195,255,.35),inset 0 -20px 40px rgba(255,92,154,.12)}
+.jar canvas{display:block;width:100%;height:clamp(260px,46vw,380px);touch-action:none;cursor:grab}
+.jar::after{content:"";position:absolute;left:3%;top:6%;width:7%;height:74%;border-radius:99px;background:linear-gradient(rgba(255,255,255,.8),rgba(255,255,255,.1));pointer-events:none}
+.row{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.pill{border:0;cursor:pointer;font:inherit;font-weight:700;color:#fff;padding:13px 22px;border-radius:99px;background:linear-gradient(var(--mint),#27b592);box-shadow:inset 0 4px 6px rgba(255,255,255,.5),0 6px 0 #1c8e72;transition:transform .12s,box-shadow .12s;touch-action:manipulation}
+.pill.b{background:linear-gradient(var(--sky),#2196dd);box-shadow:inset 0 4px 6px rgba(255,255,255,.5),0 6px 0 #1474b3}
+.pill:active{transform:translateY(5px) scale(1.05,.9);box-shadow:inset 0 4px 6px rgba(255,255,255,.5),0 1px 0 #1c8e72}
+.bag{position:fixed;right:14px;bottom:14px;z-index:4;max-width:min(300px,calc(100vw - 28px));background:#f3d9a6;color:#5b3b12;border-radius:6px 6px 18px 18px;padding:14px 18px 12px;font-size:14px;box-shadow:0 8px 0 rgba(90,42,58,.18);
+  clip-path:polygon(0 8px,5% 0,10% 8px,15% 0,20% 8px,25% 0,30% 8px,35% 0,40% 8px,45% 0,50% 8px,55% 0,60% 8px,65% 0,70% 8px,75% 0,80% 8px,85% 0,90% 8px,95% 0,100% 8px,100% 100%,0 100%)}
+.bag b{font-size:22px;display:block}
+.bag.hop{animation:hop .4s}
+@keyframes hop{40%{transform:translateY(-12px) rotate(-3deg)}}
+footer{text-align:center;font-size:13px;opacity:.75;margin-top:40px}
+@media(prefers-reduced-motion:reduce){.jelly.wob,.bag.hop{animation:none}}
+</style>
+</head>
+<body>
+<div class="awning"><a class="back" href="index.html">← 100</a></div>
+<header>
+  <h1>Fizzwhistle <em>&amp;</em> Plum</h1>
+  <p class="sub">Purveyors of wobble, fizz and general stickiness since last Tuesday. Please poke the merchandise. It likes it.</p>
+</header>
+<main>
+<section>
+  <h2>The Jelly Counter</h2>
+  <p>Each one hand-wobbled at dawn. Press firmly; they bounce back, unlike your dentist.</p>
+  <div class="jellies" id="jellies"></div>
+</section>
+<section>
+  <h2>Lollipops, Spun to Order</h2>
+  <p>Give one a flick. Our record is forty-one turns, set by a determined six-year-old.</p>
+  <div class="pops" id="pops"></div>
+</section>
+<section>
+  <h2>The Gumball Jar</h2>
+  <p>Grab one and throw it. Tap an empty spot and another falls out of the sky.</p>
+  <div class="jar"><canvas id="jar" aria-label="A jar of bouncing gumballs you can drag and throw"></canvas></div>
+  <div class="row"><button class="pill" id="shake" type="button">Shake the jar</button><button class="pill b" id="more" type="button">One more, please</button></div>
+</section>
+<footer>No sweets were harmed. Several were eaten.</footer>
+</main>
+<div class="bag" id="bag" aria-live="polite"><b>0 sweets</b><span>Your paper bag is empty and a bit sad.</span></div>
+<script>
+(function(){
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let count=0,actx=null;const bag=document.getElementById('bag');
+const SAY=[[1,'A sensible start.'],[4,'Now we are getting somewhere.'],[8,'The bag is making a rustling noise of approval.'],[14,'You may wish to hide these from someone.'],[22,'A second bag has been quietly fetched.'],[35,'We are legally required to offer you a carrot.'],[50,'Magnificent. Frankly heroic.']];
+function boop(f){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain(),t=actx.currentTime;
+  o.type='sine';o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*1.9,t+.09);g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.22);
+  o.connect(g).connect(actx.destination);o.start(t);o.stop(t+.24)}catch(e){}}
+function add(n){count+=n;let m='';for(const s of SAY)if(count>=s[0])m=s[1];bag.innerHTML='<b>'+count+(count===1?' sweet':' sweets')+'</b><span>'+m+'</span>';
+  bag.classList.remove('hop');void bag.offsetWidth;bag.classList.add('hop')}
+/* jellies */
+const J=[['Raspberry Wobble','a firm jiggle','#ff5c9a','#c92e6d',392],['Lime Giggle','sour, then sorry','#7fe36a','#2f9d3a',440],['Lemon Zap','wakes the ears','#ffd83d','#e09a10',494],
+['Blueberry Boing','mostly bounce','#55b8ff','#2468d6',523],['Grape Escape','runs off the spoon','#a57bff','#5f34c9',587],['Peach Fuzz','soft on Sundays','#ffab7a','#e2603a',659]];
+const jw=document.getElementById('jellies');
+J.forEach(j=>{const b=document.createElement('button');b.type='button';b.className='jelly';b.style.setProperty('--c',j[2]);b.style.setProperty('--d',j[3]);
+  b.innerHTML=j[0]+'<small>'+j[1]+'</small>';
+  b.addEventListener('click',()=>{b.classList.remove('wob');void b.offsetWidth;b.classList.add('wob');boop(j[4]);add(1)});jw.appendChild(b)});
+/* lollipops */
+const L=[['Strawberry Whirl','#ff3158','#fff'],['Mint Cyclone','#2fc7a0','#eafff8'],['Plum Dizzy','#9a6bff','#ffe25a']],spin=[];
+const pw=document.getElementById('pops');
+L.forEach((l,i)=>{const p=document.createElement('div');p.className='pop';
+  p.innerHTML='<div class="disc" role="button" tabindex="0" aria-label="Spin the '+l[0]+' lollipop"><i style="background:repeating-conic-gradient(from 0deg,'+l[1]+' 0 30deg,'+l[2]+' 30deg 60deg)"></i></div><div class="stick"></div><b>'+l[0]+'</b><span>0 turns</span>';
+  pw.appendChild(p);const d=p.querySelector('.disc'),s={el:d.firstChild,out:p.querySelector('span'),a:i*20,v:0,held:false,pa:0,total:0,best:0};spin.push(s);
+  const ang=e=>{const r=d.getBoundingClientRect();return Math.atan2(e.clientY-r.top-r.height/2,e.clientX-r.left-r.width/2)*180/Math.PI};
+  d.addEventListener('pointerdown',e=>{s.held=true;s.pa=ang(e);s.moved=0;s.v=0;d.setPointerCapture(e.pointerId)});
+  d.addEventListener('pointermove',e=>{if(!s.held)return;const a=ang(e);let da=a-s.pa;if(da>180)da-=360;if(da<-180)da+=360;s.pa=a;s.a+=da;s.moved+=Math.abs(da);s.v=s.v*.5+da*30;s.el.style.transform='rotate('+s.a+'deg)'});
+  const up=()=>{if(!s.held)return;s.held=false;if(s.moved<6)s.v=900+Math.random()*500;s.total=0;boop(300+i*90)};
+  d.addEventListener('pointerup',up);d.addEventListener('pointercancel',up);
+  d.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();s.v=1100;s.total=0}})});
+/* gumball jar */
+const cv=document.getElementById('jar'),ctx=cv.getContext('2d'),COL=['#ff3158','#ff5c9a','#ffd83d','#5fe0bd','#55b8ff','#9a6bff','#ff9a4a','#ffffff'];
+let W=0,H=0,dpr=1,balls=[],grab=null,px=0,py=0,spr={};
+function sprite(c){if(spr[c])return spr[c];const s=document.createElement('canvas');s.width=s.height=96;const g=s.getContext('2d');
+  let gr=g.createRadialGradient(36,32,4,48,48,46);gr.addColorStop(0,'#fff');gr.addColorStop(.18,c);gr.addColorStop(1,c);g.fillStyle=gr;g.beginPath();g.arc(48,48,46,0,7);g.fill();
+  gr=g.createRadialGradient(54,60,18,48,48,46);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(60,10,40,.3)');g.fillStyle=gr;g.beginPath();g.arc(48,48,46,0,7);g.fill();
+  g.fillStyle='rgba(255,255,255,.85)';g.beginPath();g.ellipse(33,27,11,6,-.6,0,7);g.fill();return spr[c]=s}
+function spawn(x,y){if(balls.length>=42)balls.shift();const r=13+Math.random()*10;balls.push({x:x==null?r+Math.random()*(W-2*r):x,y:y==null?-r:y,vx:(Math.random()-.5)*200,vy:0,r:r,c:COL[Math.random()*COL.length|0]})}
+function fit(){const r=cv.getBoundingClientRect();dpr=Math.min(window.devicePixelRatio||1,2);W=r.width;H=r.height;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+  for(const b of balls){b.x=Math.min(W-b.r,Math.max(b.r,b.x));b.y=Math.min(H-b.r,b.y)}}
+function phys(dt){for(const b of balls){if(b===grab){b.vx=(px-b.x)*18;b.vy=(py-b.y)*18}else b.vy+=1500*dt;b.x+=b.vx*dt;b.y+=b.vy*dt;
+    if(b.x<b.r){b.x=b.r;b.vx=Math.abs(b.vx)*.72}if(b.x>W-b.r){b.x=W-b.r;b.vx=-Math.abs(b.vx)*.72}
+    if(b.y>H-b.r){b.y=H-b.r;b.vy=-Math.abs(b.vy)*.68;b.vx*=.985;if(Math.abs(b.vy)<40)b.vy=0}if(b.y<b.r-200){b.y=b.r-200;b.vy=0}}
+  for(let i=0;i<balls.length;i++)for(let j=i+1;j<balls.length;j++){const a=balls[i],b=balls[j],dx=b.x-a.x,dy=b.y-a.y,m=a.r+b.r,d2=dx*dx+dy*dy;
+    if(d2<m*m&&d2>.01){const d=Math.sqrt(d2),nx=dx/d,ny=dy/d,o=(m-d)/2;a.x-=nx*o;a.y-=ny*o;b.x+=nx*o;b.y+=ny*o;
+      const rv=(b.vx-a.vx)*nx+(b.vy-a.vy)*ny;if(rv<0){const k=-(1.75)*rv/2;a.vx-=k*nx;a.vy-=k*ny;b.vx+=k*nx;b.vy+=k*ny}}}}
+function paint(){ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+  for(const b of balls){ctx.fillStyle='rgba(90,42,58,.12)';ctx.beginPath();ctx.ellipse(b.x,H-3,b.r*.9,4,0,0,7);ctx.fill()}
+  for(const b of balls)ctx.drawImage(sprite(b.c),b.x-b.r,b.y-b.r,b.r*2,b.r*2)}
+const pos=e=>{const r=cv.getBoundingClientRect();px=e.clientX-r.left;py=e.clientY-r.top};
+cv.addEventListener('pointerdown',e=>{pos(e);cv.setPointerCapture(e.pointerId);grab=null;for(const b of balls)if(Math.hypot(b.x-px,b.y-py)<b.r+8)grab=b;
+  if(!grab){spawn(px,py);boop(700);add(1)}});
+cv.addEventListener('pointermove',e=>{if(grab)pos(e)});
+const rel=()=>{grab=null};cv.addEventListener('pointerup',rel);cv.addEventListener('pointercancel',rel);
+document.getElementById('shake').addEventListener('click',()=>{for(const b of balls){b.vx+=(Math.random()-.5)*1400;b.vy-=500+Math.random()*900}boop(220)});
+document.getElementById('more').addEventListener('click',()=>{spawn();boop(620);add(1)});
+let last=0;
+function loop(t){const dt=Math.min(.032,(t-last)/1000||0);last=t;
+  for(const s of spin){if(!s.held&&Math.abs(s.v)>2){s.a+=s.v*dt;s.total+=Math.abs(s.v*dt);s.v*=Math.pow(reduce?.02:.42,dt);s.el.style.transform='rotate('+s.a+'deg)';
+      const n=Math.floor(s.total/360);if(n>s.best){s.best=n;if(n%5===0)add(1)}s.out.textContent=n+(n===1?' turn':' turns')+(s.best>n?' (best '+s.best+')':'')}}
+  if(!document.hidden){phys(dt/2);phys(dt/2);paint()}requestAnimationFrame(loop)}
+new ResizeObserver(fit).observe(cv);fit();for(let i=0;i<16;i++)spawn(null,Math.random()*H*.6);requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

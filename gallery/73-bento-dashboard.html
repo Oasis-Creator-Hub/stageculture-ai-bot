@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daybox — a bento dashboard for one small, well-kept day</title>
+<meta name="description" content="A crisp light-theme bento grid dashboard: live clock, habit rings, a scrubbable sparkline, focus timer, tasks, notes and a streak map, each with tidy micro-interactions.">
+<style>
+  :root{--bg:#eceef1;--tile:#fff;--ink:#0e1116;--mute:#727a86;--line:#e2e5ea;--blue:#2f55ff;--lime:#d6f25a;--peach:#ffd9c2;--coral:#ff6a4d;--r:26px}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;padding:18px;min-height:100vh}
+  header{max-width:1120px;margin:0 auto 14px;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mute)}
+  header b{color:var(--ink);font-weight:650;letter-spacing:-.01em;font-size:15px}
+  header b i{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--blue);margin-right:7px}
+  header a{color:var(--mute);text-decoration:none;border:1px solid var(--line);background:#fff;padding:5px 11px;border-radius:99px;transition:color .2s,border-color .2s}
+  header a:hover{color:var(--ink);border-color:var(--ink)}
+  .bento{max-width:1120px;margin:0 auto;display:grid;gap:14px;grid-template-columns:repeat(4,1fr);grid-auto-rows:minmax(150px,auto);
+    grid-template-areas:"hello hello clock rings" "spark spark focus rings" "tasks notes heat heat" "tasks week week week"}
+  .t{background:var(--tile);border-radius:var(--r);padding:20px;position:relative;overflow:hidden;border:1px solid rgba(14,17,22,.05);
+    transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s;min-width:0}
+  .t:hover{transform:translateY(-3px);box-shadow:0 14px 30px -18px rgba(14,17,22,.35)}
+  .k{font-size:11px;font-weight:650;letter-spacing:.09em;text-transform:uppercase;color:var(--mute);margin:0 0 10px;display:flex;justify-content:space-between;gap:8px}
+  .num{font-variant-numeric:tabular-nums;letter-spacing:-.04em;font-weight:600}
+  button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  /* hello */
+  .hello{grid-area:hello;background:var(--ink);color:#fff;display:flex;flex-direction:column;justify-content:space-between}
+  .hello .k{color:#8d95a3}
+  .hello h1{font-size:clamp(28px,4.2vw,46px);line-height:1.02;letter-spacing:-.045em;font-weight:600;margin:0;max-width:11em}
+  .hello h1 em{font-style:normal;color:var(--lime)}
+  .hello p{margin:14px 0 0;color:#aab1bd;font-size:14px}
+  .hello p b{color:#fff;font-weight:600}
+  .hello::after{content:"";position:absolute;right:-50px;top:-50px;width:170px;height:170px;border-radius:50%;border:26px solid var(--blue);opacity:.9}
+  /* clock */
+  .clock{grid-area:clock;display:flex;flex-direction:column}
+  .clock svg{flex:1;min-height:92px;max-height:150px;align-self:center;width:100%}
+  .hand{transform-origin:50px 50px;transition:transform .5s cubic-bezier(.4,2.2,.5,1)}
+  .clock .dig{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--mute);margin-top:6px}
+  .clock .dig span:first-child{font-size:20px;color:var(--ink)}
+  /* rings */
+  .rings{grid-area:rings;display:flex;flex-direction:column}
+  .rings svg{width:100%;max-width:210px;align-self:center;margin:2px 0 12px}
+  .rings circle.v{transition:stroke-dashoffset .8s cubic-bezier(.2,.8,.2,1);transform:rotate(-90deg);transform-origin:60px 60px;stroke-linecap:round}
+  .habit{display:grid;grid-template-columns:10px 1fr auto 30px;gap:9px;align-items:center;font-size:13.5px;padding:7px 0;border-top:1px solid var(--line)}
+  .habit i{width:10px;height:10px;border-radius:50%}
+  .habit span{color:var(--mute);font-variant-numeric:tabular-nums;font-size:12.5px}
+  .habit button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:17px;line-height:1;transition:transform .15s,background .2s,color .2s}
+  .habit button:hover{background:var(--ink);color:#fff}.habit button:active{transform:scale(.86)}
+  /* sparkline */
+  .spark{grid-area:spark;display:flex;flex-direction:column}
+  .spark .big{font-size:44px;line-height:1}
+  .spark .big small{font-size:14px;color:var(--mute);letter-spacing:0;font-weight:500;margin-left:6px}
+  .spark .delta{display:inline-block;background:var(--lime);font-size:12px;font-weight:650;border-radius:99px;padding:3px 9px;margin-left:8px;vertical-align:middle;letter-spacing:0}
+  .spark .plot{flex:1;min-height:76px;position:relative;margin:10px -6px -4px;touch-action:pan-y;cursor:crosshair}
+  .spark svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .tip{position:absolute;top:-4px;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:11.5px;padding:4px 8px;border-radius:8px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s}
+  /* focus */
+  .focus{grid-area:focus;background:var(--blue);color:#fff;display:flex;flex-direction:column;justify-content:space-between}
+  .focus .k{color:rgba(255,255,255,.7)}
+  .focus .time{font-size:clamp(40px,5vw,56px);line-height:1}
+  .focus .bar{height:6px;border-radius:9px;background:rgba(255,255,255,.25);overflow:hidden;margin:10px 0 12px}
+  .focus .bar i{display:block;height:100%;width:0;background:var(--lime);border-radius:9px;transition:width .4s linear}
+  .focus .ctl{display:flex;gap:8px}
+  .focus button{border:0;border-radius:99px;padding:9px 16px;font-size:13px;font-weight:650;background:#fff;color:var(--blue);transition:transform .15s}
+  .focus button.ghost{background:rgba(255,255,255,.18);color:#fff}.focus button:active{transform:scale(.94)}
+  /* tasks */
+  .tasks{grid-area:tasks}
+  .tasks ul{list-style:none;margin:0;padding:0}
+  .tasks li{border-top:1px solid var(--line)}
+  .tasks label{display:grid;grid-template-columns:22px 1fr;gap:11px;padding:11px 0;font-size:14px;line-height:1.35;cursor:pointer;align-items:start}
+  .tasks input{position:absolute;opacity:0}
+  .tasks .box{width:22px;height:22px;border-radius:8px;border:1.5px solid #c6cbd3;display:grid;place-items:center;transition:background .2s,border-color .2s,transform .25s cubic-bezier(.3,2,.5,1)}
+  .tasks .box svg{width:12px;height:12px;stroke:#fff;stroke-width:2.4;fill:none;stroke-dasharray:16;stroke-dashoffset:16;transition:stroke-dashoffset .25s .05s}
+  .tasks input:checked+.box{background:var(--ink);border-color:var(--ink);transform:scale(1.08)}
+  .tasks input:checked+.box svg{stroke-dashoffset:0}
+  .tasks input:focus-visible+.box{outline:2px solid var(--blue);outline-offset:2px}
+  .tasks .txt{transition:color .25s;background:linear-gradient(var(--mute),var(--mute)) no-repeat 0 55%/0 1.5px;transition:background-size .3s,color .3s}
+  .tasks input:checked~.txt{color:var(--mute);background-size:100% 1.5px}
+  .tasks .txt small{display:block;color:var(--mute);font-size:12px}
+  /* notes */
+  .notes{grid-area:notes;background:var(--peach);display:flex;flex-direction:column}
+  .notes .k{color:#9a5b3c}
+  .notes textarea{flex:1;border:0;background:transparent;resize:none;font:inherit;font-size:15px;line-height:1.5;color:#3a1f12;outline:none;min-height:96px;
+    background-image:repeating-linear-gradient(transparent 0 21.5px,rgba(154,91,60,.22) 21.5px 22.5px);line-height:22.5px;padding:0}
+  .notes .saved{font-size:11px;color:#9a5b3c;opacity:0;transition:opacity .3s}
+  /* heat */
+  .heat{grid-area:heat;background:var(--lime)}
+  .heat .k{color:#55651a}
+  .heat .wrap{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap}
+  .heat .big{font-size:54px;line-height:.9}.heat .big small{display:block;font-size:13px;letter-spacing:0;font-weight:500;color:#55651a;margin-top:6px}
+  .dots{display:grid;grid-template-columns:repeat(14,1fr);gap:5px;flex:1;min-width:190px}
+  .dots button{aspect-ratio:1;border-radius:30%;border:0;background:rgba(14,17,22,.1);padding:0;transition:transform .2s cubic-bezier(.3,2,.5,1),background .2s}
+  .dots button.on{background:var(--ink)}.dots button.today{outline:2px solid var(--ink);outline-offset:2px}
+  .dots button:hover{transform:scale(1.25)}
+  /* week */
+  .week{grid-area:week;display:grid;grid-template-columns:auto 1fr;gap:6px 22px;align-items:center}
+  .week .k{grid-column:1/-1;margin-bottom:2px}
+  .days{display:flex;gap:6px}
+  .days button{width:44px;padding:9px 0 8px;border-radius:16px;border:1px solid var(--line);background:#fff;font-size:11px;color:var(--mute);display:grid;gap:3px;transition:background .2s,color .2s,transform .2s}
+  .days button b{font-size:17px;color:var(--ink);font-weight:600;transition:color .2s}
+  .days button[aria-pressed=true]{background:var(--ink);color:#aab1bd;border-color:var(--ink);transform:translateY(-3px)}
+  .days button[aria-pressed=true] b{color:#fff}
+  .agenda{font-size:14px;line-height:1.45;min-width:0}
+  .agenda div{display:flex;gap:12px;padding:5px 0;animation:in .35s both}
+  .agenda time{color:var(--mute);font-variant-numeric:tabular-nums;width:44px;flex:none}
+  @keyframes in{from{opacity:0;transform:translateX(8px)}}
+  @media (max-width:900px){.bento{grid-template-columns:repeat(2,1fr);grid-template-areas:"hello hello" "clock rings" "focus rings" "spark spark" "tasks notes" "tasks heat" "week week"}
+    .week{grid-template-columns:1fr}.heat .wrap{gap:12px}}
+  @media (max-width:540px){body{padding:12px}.bento{gap:10px;grid-template-areas:"hello hello" "clock focus" "rings rings" "spark spark" "tasks tasks" "notes notes" "heat heat" "week week"}
+    .t{padding:16px;border-radius:22px}.days{justify-content:space-between}.days button{width:auto;flex:1}.focus .ctl{flex-wrap:wrap}.focus button{padding:8px 12px}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header><b><i></i>Daybox</b><a href="index.html">← 100</a></header>
+<main class="bento">
+  <section class="t hello"><p class="k"><span id="date"></span></p>
+    <div><h1 id="greet"></h1><p><b id="sumT"></b> tasks open · <b id="sumH"></b> of your rituals · next up <b>pottery at 18:30</b></p></div></section>
+
+  <section class="t clock"><p class="k">Local <span>Port Halloran</span></p>
+    <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="#f4f5f7"/><g id="ticks" stroke="#0e1116" stroke-linecap="round"></g>
+      <line id="hh" class="hand" x1="50" y1="54" x2="50" y2="26" stroke="#0e1116" stroke-width="4" stroke-linecap="round"/>
+      <line id="mh" class="hand" x1="50" y1="56" x2="50" y2="14" stroke="#0e1116" stroke-width="2.6" stroke-linecap="round"/>
+      <g id="sh" class="hand"><line x1="50" y1="60" x2="50" y2="12" stroke="#ff6a4d" stroke-width="1.1"/><circle cx="50" cy="50" r="3" fill="#ff6a4d"/></g></svg>
+    <div class="dig"><span class="num" id="dig">00:00</span><span id="zone">sunset 20:41</span></div></section>
+
+  <section class="t rings"><p class="k">Rituals <span id="ringPct"></span></p>
+    <svg viewBox="0 0 120 120" id="ringSvg" role="img" aria-label="Habit progress rings"></svg><div id="habits"></div></section>
+
+  <section class="t spark"><p class="k">Deep work · last 14 days <span>hours</span></p>
+    <div class="big num"><span id="spVal">4.6</span><small id="spDay">today</small><span class="delta">▲ 18% wk</span></div>
+    <div class="plot" id="plot"><svg id="spSvg" preserveAspectRatio="none"></svg><div class="tip" id="tip"></div></div></section>
+
+  <section class="t focus"><p class="k">Focus block <span id="fState">ready</span></p><div><div class="time num" id="fTime">25:00</div>
+    <div class="bar"><i id="fBar"></i></div><div class="ctl"><button id="fGo">Start</button><button class="ghost" id="fReset">Reset</button></div></div></section>
+
+  <section class="t tasks"><p class="k">Today <span id="taskCount"></span></p><ul id="taskList"></ul></section>
+
+  <section class="t notes"><p class="k">Scratchpad <span class="saved" id="saved">saved</span></p>
+    <textarea id="note" aria-label="Scratchpad note" spellcheck="false"></textarea></section>
+
+  <section class="t heat"><p class="k">Morning pages <span>tap a day to mark it</span></p>
+    <div class="wrap"><div class="big num"><span id="streak">0</span><small>day streak</small></div><div class="dots" id="dots"></div></div></section>
+
+  <section class="t week"><p class="k">This week</p><div class="days" id="days"></div><div class="agenda" id="agenda"></div></section>
+</main>
+<script>
+(function(){
+  const $=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg';
+  const now=new Date();
+  // greeting
+  const h=now.getHours(),part=h<5?'Still up':h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+  $('greet').innerHTML=part+', Ines. <em>Keep it small.</em>';
+  $('date').textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  // clock
+  let tk='';for(let i=0;i<60;i++){const a=i*6*Math.PI/180,big=i%5===0,r1=big?37:40.5,r2=42;
+    tk+='<line x1="'+(50+r1*Math.sin(a)).toFixed(2)+'" y1="'+(50-r1*Math.cos(a)).toFixed(2)+'" x2="'+(50+r2*Math.sin(a)).toFixed(2)+'" y2="'+(50-r2*Math.cos(a)).toFixed(2)+'" stroke-width="'+(big?1.6:.5)+'" opacity="'+(big?1:.4)+'"/>'}
+  $('ticks').innerHTML=tk;
+  let secs=0,first=true;
+  function clock(){const d=new Date(),s=d.getSeconds(),m=d.getMinutes(),hr=d.getHours();
+    if(first){secs=s;first=false}else secs++;            // monotonic so the hand never spins backwards at :00
+    $('sh').style.transform='rotate('+secs*6+'deg)';$('mh').style.transform='rotate('+(m*6+s*.1)+'deg)';$('hh').style.transform='rotate('+((hr%12)*30+m*.5)+'deg)';
+    $('dig').textContent=String(hr).padStart(2,'0')+':'+String(m).padStart(2,'0')}
+  clock();setInterval(clock,1000);
+  // habit rings
+  const habits=[{n:'Walk',u:'km',v:4,g:6,c:'#2f55ff',r:50},{n:'Read',u:'pages',v:20,g:30,c:'#ff6a4d',r:38,step:5},{n:'Water',u:'glasses',v:5,g:8,c:'#0e1116',r:26}];
+  const rs=$('ringSvg');
+  habits.forEach((hb,i)=>{const C=2*Math.PI*hb.r;
+    rs.insertAdjacentHTML('beforeend','<circle cx="60" cy="60" r="'+hb.r+'" fill="none" stroke="#eef0f3" stroke-width="9"/><circle class="v" id="rv'+i+'" cx="60" cy="60" r="'+hb.r+'" fill="none" stroke="'+hb.c+'" stroke-width="9" stroke-dasharray="'+C+'" stroke-dashoffset="'+C+'"/>');
+    const row=document.createElement('div');row.className='habit';
+    row.innerHTML='<i style="background:'+hb.c+'"></i><b style="font-weight:600">'+hb.n+'</b><span id="hv'+i+'"></span><button aria-label="Add to '+hb.n+'">+</button>';
+    row.querySelector('button').onclick=()=>{hb.v=Math.min(hb.g,hb.v+(hb.step||1));ringDraw()};$('habits').appendChild(row)});
+  rs.insertAdjacentHTML('beforeend','<text id="rc" x="60" y="64" text-anchor="middle" font-size="11" font-weight="700" fill="#0e1116"></text>');
+  function ringDraw(){let done=0,tot=0;habits.forEach((hb,i)=>{const C=2*Math.PI*hb.r,f=hb.v/hb.g;tot+=f;if(f>=1)done++;
+      $('rv'+i).style.strokeDashoffset=C*(1-f);$('hv'+i).textContent=hb.v+' / '+hb.g+' '+hb.u});
+    const pct=Math.round(tot/habits.length*100);$('ringPct').textContent=pct+'%';$('rc').textContent=done===3?'✓':pct;$('sumH').textContent=done+' of 3';}
+  requestAnimationFrame(()=>requestAnimationFrame(ringDraw));
+  // sparkline
+  const data=[2.1,3.4,2.8,4.2,3.9,1.2,0.8,3.1,4.4,3.8,5.2,4.1,2.6,4.6],plot=$('plot'),sv=$('spSvg');
+  const dayName=i=>{const d=new Date(now);d.setDate(d.getDate()-(13-i));return i===13?'today':d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric'})};
+  let pw=0,ph=0;const X=i=>8+i*(pw-16)/13,Y=v=>ph-8-(v/5.6)*(ph-22);
+  function spark(sel){
+    pw=plot.clientWidth;ph=plot.clientHeight;sv.setAttribute('viewBox','0 0 '+pw+' '+ph);
+    let d='M'+X(0)+' '+Y(data[0]);for(let i=1;i<14;i++){const mx=(X(i-1)+X(i))/2;d+='C'+mx+' '+Y(data[i-1])+' '+mx+' '+Y(data[i])+' '+X(i)+' '+Y(data[i])}
+    sv.innerHTML='<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f55ff" stop-opacity=".22"/><stop offset="1" stop-color="#2f55ff" stop-opacity="0"/></linearGradient></defs>'+
+      '<path d="'+d+'L'+X(13)+' '+ph+'L'+X(0)+' '+ph+'Z" fill="url(#g)"/><path d="'+d+'" fill="none" stroke="#2f55ff" stroke-width="2.4" stroke-linecap="round"/>'+
+      '<line id="spL" y1="0" y2="'+ph+'" stroke="#0e1116" stroke-dasharray="2 4" opacity=".35"/><circle id="spD" r="5.5" fill="#fff" stroke="#2f55ff" stroke-width="3"/>';
+    pick(sel)}
+  let cur=13;
+  function pick(i,show){cur=i;const x=X(i),y=Y(data[i]);$('spD').setAttribute('cx',x);$('spD').setAttribute('cy',y);$('spL').setAttribute('x1',x);$('spL').setAttribute('x2',x);
+    $('spVal').textContent=data[i].toFixed(1);$('spDay').textContent=dayName(i);const tip=$('tip');tip.textContent=dayName(i)+' · '+data[i].toFixed(1)+' h';
+    tip.style.left=Math.max(44,Math.min(pw-44,x))+'px';tip.style.opacity=show?1:0}
+  function scrub(e){const b=plot.getBoundingClientRect();pick(Math.max(0,Math.min(13,Math.round((e.clientX-b.left-8)/((pw-16)/13)))),true)}
+  plot.addEventListener('pointermove',scrub);plot.addEventListener('pointerdown',scrub);plot.addEventListener('pointerleave',()=>pick(13,false));
+  new ResizeObserver(()=>spark(cur)).observe(plot);
+  // focus timer
+  const TOTAL=25*60;let left=TOTAL,timer=null;
+  function fDraw(){$('fTime').textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');$('fBar').style.width=((TOTAL-left)/TOTAL*100)+'%'}
+  $('fGo').onclick=()=>{if(timer){clearInterval(timer);timer=null;$('fGo').textContent='Resume';$('fState').textContent='paused';return}
+    if(left<=0)left=TOTAL;$('fGo').textContent='Pause';$('fState').textContent='in session';
+    timer=setInterval(()=>{left--;fDraw();if(left<=0){clearInterval(timer);timer=null;$('fGo').textContent='Again';$('fState').textContent='done — stretch'}},1000)};
+  $('fReset').onclick=()=>{clearInterval(timer);timer=null;left=TOTAL;$('fGo').textContent='Start';$('fState').textContent='ready';fDraw()};fDraw();
+  // tasks
+  const tasks=[['Send Okafor the revised floor plan','before noon',1],['Repot the fig','it has been asking',0],['Call the bike shop about the rear wheel','closes 17:00',0],['Proof chapter four','22 pages',1],['Buy saffron & good rice','for Sunday',0]];
+  tasks.forEach((t,i)=>{const li=document.createElement('li');
+    li.innerHTML='<label><input type="checkbox"'+(t[2]?' checked':'')+'><span class="box"><svg viewBox="0 0 12 12"><path d="M2 6.5l2.8 2.8L10 3.5"/></svg></span><span><span class="txt">'+t[0]+'</span><span class="txt" style="background:none"><small>'+t[1]+'</small></span></span></label>';
+    li.querySelector('input').onchange=e=>{t[2]=e.target.checked?1:0;taskSum()};$('taskList').appendChild(li)});
+  function taskSum(){const open=tasks.filter(t=>!t[2]).length;$('taskCount').textContent=(tasks.length-open)+'/'+tasks.length;$('sumT').textContent=open||'No'}taskSum();
+  // notes
+  const note=$('note'),KEY='daybox-note';let saved='Glaze idea: celadon over the iron slip, wipe the rim.\n\nAsk Tomasz where he found those brass hinges.';
+  try{saved=localStorage.getItem(KEY)||saved}catch(e){}note.value=saved;let st;
+  note.addEventListener('input',()=>{clearTimeout(st);st=setTimeout(()=>{try{localStorage.setItem(KEY,note.value)}catch(e){}$('saved').style.opacity=1;setTimeout(()=>$('saved').style.opacity=0,1100)},500)});
+  // streak dots (28 days)
+  const marks=[1,1,0,1,1,1,1,0,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0];
+  marks.forEach((m,i)=>{const b=document.createElement('button');b.className=(m?'on':'')+(i===27?' today':'');b.setAttribute('aria-label','Day '+(i+1)+(i===27?' (today)':''));b.setAttribute('aria-pressed',!!m);
+    b.onclick=()=>{marks[i]=marks[i]?0:1;b.classList.toggle('on');b.setAttribute('aria-pressed',!!marks[i]);streak()};$('dots').appendChild(b)});
+  function streak(){let n=0,i=27;if(!marks[27])i=26;for(;i>=0&&marks[i];i--)n++;$('streak').textContent=n}streak();
+  // week
+  const plans=[[['08:00','Swim, slow lane'],['13:00','Lunch with Odile']],[['10:30','Studio review — Okafor house'],['19:00','Film club: something Hungarian']],[['09:00','Dentist, be brave'],['18:30','Pottery, wheel 3']],
+    [['All day','No meetings. Guard it.']],[['11:00','Print proofs arrive'],['16:00','Walk the canal with Mira']],[['09:30','Market: saffron, rice, lemons']],[['13:00','Sunday lunch for six'],['20:00','Plan the week, one page']]];
+  const mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));const todayI=(now.getDay()+6)%7;
+  'Mon Tue Wed Thu Fri Sat Sun'.split(' ').forEach((n,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);const b=document.createElement('button');
+    b.innerHTML=n+'<b>'+d.getDate()+'</b>';b.setAttribute('aria-pressed',i===todayI);b.onclick=()=>day(i);$('days').appendChild(b)});
+  function day(i){[...$('days').children].forEach((b,j)=>b.setAttribute('aria-pressed',i===j));
+    $('agenda').innerHTML=plans[i].map((p,k)=>'<div style="animation-delay:'+k*60+'ms"><time>'+p[0]+'</time><span>'+p[1]+'</span></div>').join('')}
+  day(todayI);
+})();
+</script>
+</body>
+</html>

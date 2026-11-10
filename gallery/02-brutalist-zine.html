@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CONCRETE MOUTH №7 — a zine against smoothness</title>
+<meta name="description" content="Concrete Mouth, issue seven: a raw brutalist typographic zine in black and acid yellow. Manifestos, bad reviews of good buildings, and a classifieds page. CSS only.">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--k:#0a0a0a;--y:#e6ff00;--b:6px;
+  --fat:Impact,Haettenschweiler,"Arial Narrow Bold","Franklin Gothic Bold","Helvetica Neue Condensed Bold","Arial Black",sans-serif;
+  --typ:"Courier New",Courier,"Nimbus Mono PS","Liberation Mono",monospace}
+html{background:var(--k)}
+body{font-family:var(--typ);font-weight:700;color:var(--k);overflow-x:hidden;font-size:15px;line-height:1.35}
+#flip{position:absolute;opacity:0;pointer-events:none}
+.sheet{--fg:var(--k);--bg:var(--y);background:var(--bg);color:var(--fg);border:var(--b) solid var(--fg);max-width:1280px;margin:0 auto}
+#flip:checked~.sheet{--fg:var(--y);--bg:var(--k)}
+a{color:inherit}
+/* marquee strips */
+.run{overflow:hidden;white-space:nowrap;border-bottom:var(--b) solid var(--fg);background:var(--fg);color:var(--bg);
+  font:400 clamp(1.1rem,3vw,2rem)/1 var(--fat);letter-spacing:.06em;text-transform:uppercase}
+.run div{display:inline-block;padding:.5em 0;animation:slide 26s linear infinite}
+.run.rev div{animation-direction:reverse;animation-duration:38s}
+.run.thin{font:700 .8rem/1 var(--typ);letter-spacing:.2em;background:var(--bg);color:var(--fg)}
+@keyframes slide{to{transform:translateX(-50%)}}
+/* masthead */
+.mast{position:relative;border-bottom:var(--b) solid var(--fg);padding:.6rem .8rem 0}
+.mast svg{display:block;width:100%;height:auto;fill:var(--fg)}
+.mast svg text{font-family:var(--fat);font-size:250px;text-transform:uppercase}
+.tag{position:absolute;right:4%;top:44%;background:var(--fg);color:var(--bg);padding:.5rem .9rem;transform:rotate(-7deg);
+  font:400 clamp(1rem,3.4vw,2.6rem)/1 var(--fat);border:var(--b) solid var(--bg);outline:var(--b) solid var(--fg)}
+.meta{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;border-bottom:var(--b) solid var(--fg);text-transform:uppercase;font-size:.78rem;letter-spacing:.08em}
+.meta>*{padding:.7rem .8rem;border-left:var(--b) solid var(--fg)}
+.meta>*:first-child{border-left:0}
+.meta label{cursor:pointer;background:var(--fg);color:var(--bg);display:flex;align-items:center;gap:.6rem;user-select:none}
+.meta label::before{content:"";width:1.1em;height:1.1em;border:3px solid var(--bg);flex:none}
+#flip:checked~.sheet .meta label::before{background:var(--bg)}
+#flip:focus-visible~.sheet .meta label{outline:4px dashed var(--bg);outline-offset:-8px}
+/* body grid */
+.grid{display:grid;grid-template-columns:repeat(12,1fr)}
+.box{border-bottom:var(--b) solid var(--fg);border-left:var(--b) solid var(--fg);padding:1.1rem 1rem 1.4rem;position:relative;min-width:0}
+.c12{grid-column:span 12;border-left:0}.c7{grid-column:span 7;border-left:0}.c5{grid-column:span 5}.c4{grid-column:span 4}
+.c4.first,.c8.first{border-left:0}.c8{grid-column:span 8}
+h2{font:400 clamp(2.6rem,8.5vw,7.4rem)/.82 var(--fat);text-transform:uppercase;letter-spacing:-.01em;margin:.2rem 0 1rem;overflow-wrap:anywhere}
+h3{font:400 clamp(1.7rem,4vw,3rem)/.9 var(--fat);text-transform:uppercase;margin-bottom:.7rem}
+.no{font:400 clamp(5rem,15vw,12rem)/.72 var(--fat);display:block;-webkit-text-stroke:4px var(--fg);color:transparent;margin-bottom:.5rem}
+.kick{display:inline-block;background:var(--fg);color:var(--bg);padding:.15rem .5rem;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.8rem}
+p{max-width:58ch;margin-bottom:.9rem}
+p.big{font-size:clamp(1.05rem,2.1vw,1.5rem);line-height:1.2;text-transform:uppercase}
+mark{background:var(--fg);color:var(--bg);padding:0 .2em}
+.inv{background:var(--fg);color:var(--bg)}
+.inv .no{-webkit-text-stroke-color:var(--bg)}
+.inv mark{background:var(--bg);color:var(--fg)}
+.hatch{background-image:repeating-linear-gradient(135deg,var(--fg) 0 6px,transparent 6px 18px)}
+.hatch>*{background:var(--bg);display:table;padding:.2rem .5rem;margin-bottom:.5rem}
+ol.rules{list-style:none;counter-reset:r}
+ol.rules li{counter-increment:r;display:grid;grid-template-columns:3.4rem 1fr;align-items:center;border-top:var(--b) solid var(--fg);
+  font:400 clamp(1.3rem,3.6vw,2.7rem)/.95 var(--fat);text-transform:uppercase;padding:.55rem 0;transition:padding .12s steps(2)}
+ol.rules li::before{content:counter(r,decimal-leading-zero);font:700 .9rem var(--typ)}
+ol.rules li:hover{background:var(--fg);color:var(--bg);padding-left:1rem}
+.toc{list-style:none;text-transform:uppercase;font-size:.86rem}
+.toc li{display:flex;gap:.5rem;align-items:baseline;padding:.42rem 0;border-bottom:3px dotted var(--fg)}
+.toc li span:first-child{flex:1}
+.toc li b{font:400 1.5rem/1 var(--fat)}
+.stars{font:400 clamp(2rem,6vw,4.4rem)/1 var(--fat);letter-spacing:.05em}
+.stars s{text-decoration:none;opacity:.22}
+.ads{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:var(--b);background:var(--fg);border:var(--b) solid var(--fg);margin-top:.6rem}
+.ads div{background:var(--bg);padding:.7rem;font-size:.76rem;text-transform:uppercase;transition:transform .1s steps(2)}
+.ads div:hover{transform:translate(-5px,-5px);box-shadow:5px 5px 0 var(--bg),10px 10px 0 var(--fg)}
+.ads b{display:block;font:400 1.5rem/1 var(--fat);margin-bottom:.3rem}
+.stamp{position:absolute;right:1rem;bottom:1rem;width:clamp(86px,13vw,140px);aspect-ratio:1;border-radius:50%;border:var(--b) solid currentColor;
+  display:grid;place-items:center;text-align:center;font:400 clamp(.85rem,1.8vw,1.35rem)/.95 var(--fat);text-transform:uppercase;transform:rotate(14deg);animation:thud 3.2s steps(1) infinite}
+@keyframes thud{0%,100%{transform:rotate(14deg)}50%{transform:rotate(9deg) scale(1.06)}}
+.bar{height:2.4rem;background:repeating-linear-gradient(90deg,var(--fg) 0 3px,transparent 3px 7px,var(--fg) 7px 9px,transparent 9px 16px,var(--fg) 16px 22px,transparent 22px 25px);margin:.8rem 0 .3rem;max-width:260px}
+footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.6rem 2rem;padding:.9rem 1rem;font-size:.74rem;text-transform:uppercase;letter-spacing:.1em}
+footer a{background:var(--fg);color:var(--bg);padding:.2rem .6rem;text-decoration:none}
+footer a:hover{outline:4px solid var(--fg);outline-offset:3px}
+@media(max-width:800px){.meta{grid-template-columns:1fr 1fr}.meta>*:nth-child(3){border-left:0}.meta>*:nth-child(n+3){border-top:var(--b) solid var(--fg)}
+  .c7,.c5,.c4,.c8{grid-column:span 12;border-left:0}:root{--b:5px}.mast svg text{stroke:var(--fg);stroke-width:2}}
+@media(prefers-reduced-motion:reduce){.run div,.stamp{animation:none}}
+</style>
+</head>
+<body>
+<input type="checkbox" id="flip" aria-label="Invert the colours">
+<div class="sheet">
+  <div class="run" aria-hidden="true"><div>No gloss ✶ No gradients ✶ No rounded corners ✶ Weight is a virtue ✶ Show the bolts ✶ Photocopy everything ✶ No gloss ✶ No gradients ✶ No rounded corners ✶ Weight is a virtue ✶ Show the bolts ✶ Photocopy everything ✶&nbsp;</div></div>
+  <header class="mast">
+    <svg viewBox="0 0 1000 430" role="img" aria-label="Concrete Mouth">
+      <text x="0" y="205" textLength="1000" lengthAdjust="spacingAndGlyphs">CONCRETE</text>
+      <text x="0" y="418" textLength="1000" lengthAdjust="spacingAndGlyphs">MOUTH</text>
+    </svg>
+    <div class="tag">№7 — THE LOAD-BEARING ISSUE</div>
+  </header>
+  <div class="meta">
+    <span>A zine against smoothness. Stapled by hand in the basement of the Ostwerk Print Co-op.</span>
+    <span>Winter / 48 pp.</span><span>Pay what it weighs</span>
+    <label for="flip">Flip the ink</label>
+  </div>
+
+  <main class="grid">
+    <article class="box c7">
+      <span class="kick">Editorial</span>
+      <h2>Stop sanding the world down.</h2>
+      <p class="big">Every surface you touch today was <mark>focus-grouped into a pebble.</mark> We would like our corners back.</p>
+      <p>This issue is about things that admit what they are made of. Stairwells that echo. Type that shouts because it has something to carry. A bus shelter that is, honestly, just four slabs and a decision. We photographed them badly on purpose, because good photographs lie.</p>
+      <p>If a page here is ugly, check whether it is also true. That is the only review we accept.</p>
+    </article>
+    <aside class="box c5 inv">
+      <span class="no">07</span>
+      <h3>In this slab</h3>
+      <ul class="toc">
+        <li><span>Ode to a car park, level −3</span><b>04</b></li>
+        <li><span>Eleven doors that mean it</span><b>11</b></li>
+        <li><span>Interview: the woman who pours stairs</span><b>18</b></li>
+        <li><span>Bad reviews of good buildings</span><b>27</b></li>
+        <li><span>How to kern with a breeze block</span><b>33</b></li>
+        <li><span>Classifieds / threats / love</span><b>44</b></li>
+      </ul>
+      <div class="stamp">Printed<br>crooked<br>on purpose</div>
+    </aside>
+
+    <section class="box c12">
+      <span class="kick">Manifesto — tear out, tape up</span>
+      <ol class="rules">
+        <li>Let the material say its own name.</li>
+        <li>If it holds weight, do not hide it.</li>
+        <li>One typeface. Make it sweat.</li>
+        <li>Decoration is a loan. Structure is cash.</li>
+        <li>A border is a promise. Keep it thick.</li>
+        <li>Never apologise for a right angle.</li>
+      </ol>
+    </section>
+
+    <article class="box c4 first hatch">
+      <h3>Bad reviews of good buildings</h3>
+      <p>“LOOKS LIKE A FILING CABINET FOR WEATHER.”</p>
+      <p>“I felt judged by the foyer.”</p>
+      <p>“Zero stars. It did not try to like me.”</p>
+    </article>
+    <article class="box c4">
+      <span class="kick">Rated</span>
+      <h3>Marrow Street substation</h3>
+      <div class="stars">■■■■<s>■</s></div>
+      <p>Hums in B-flat. No windows, no excuses. Loses one block for the hopeful little shrub somebody planted out front.</p>
+    </article>
+    <article class="box c4 inv">
+      <span class="kick">Overheard at the pour</span>
+      <p class="big">“You don't design a stair. You owe it to people's knees.”</p>
+      <p>— Ilse Brandtner, formwork carpenter, 31 years, page 18</p>
+    </article>
+
+    <section class="box c8 first">
+      <span class="kick">Classifieds</span>
+      <h3>Wanted, lost, offered</h3>
+      <div class="ads">
+        <div><b>WANTED</b>One (1) honest lintel. Will trade a box of serif letters, barely used.</div>
+        <div><b>LOST</b>Sense of proportion, near the new waterfront. Reward: none. Keep it.</div>
+        <div><b>FOR HIRE</b>Risograph, angry. Prints two colours and one of them is this one.</div>
+        <div><b>LOVE</b>To the stranger sketching the pump house Tuesday: your hatching is superb.</div>
+      </div>
+    </section>
+    <section class="box c4">
+      <span class="kick">Colophon</span>
+      <p>Set in whatever heavy grotesque your machine already owns. Two inks: night and warning. No images were retouched; several were dropped.</p>
+      <div class="bar" aria-hidden="true"></div>
+      <p>CM-07 / 0048 / OSTWERK</p>
+    </section>
+  </main>
+
+  <div class="run rev thin" aria-hidden="true"><div>next issue: scaffolding as a lifestyle /// send complaints in block capitals /// do not laminate /// next issue: scaffolding as a lifestyle /// send complaints in block capitals /// do not laminate /// next issue: scaffolding as a lifestyle /// send complaints in block capitals /// do not laminate ///&nbsp;</div></div>
+  <footer><span>Concrete Mouth is free where it is found.</span><span>No rights reserved. Steal it properly.</span><a href="index.html">← 100</a></footer>
+</div>
+</body>
+</html>

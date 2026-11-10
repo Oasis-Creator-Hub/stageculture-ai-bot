@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What the Rain Spells — a poem in falling glyphs</title>
+<meta name="description" content="A canvas of falling glyph rain that slowly resolves into the stanzas of an original poem, holds, and washes away again.">
+<style>
+  :root{ --ink:#080c14; --bone:#efe6d2; --verd:#5fb3a1; --coral:#ff7a59; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:var(--ink);overflow:hidden}
+  body{font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;color:var(--bone)}
+  canvas{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:pointer;touch-action:manipulation}
+  .veil{position:fixed;inset:0;pointer-events:none;
+    background:radial-gradient(120% 80% at 50% 45%,transparent 40%,rgba(4,6,12,.85) 100%),
+               linear-gradient(180deg,rgba(8,12,20,.9) 0,transparent 16%,transparent 82%,rgba(8,12,20,.95) 100%)}
+  header{position:fixed;top:0;left:0;right:0;padding:clamp(14px,3vw,30px) clamp(16px,4vw,44px);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;pointer-events:none}
+  h1{font-weight:400;font-style:italic;font-size:clamp(20px,3.2vw,38px);letter-spacing:.01em;line-height:1.05}
+  h1 small{display:block;font-style:normal;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:10.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--verd);margin-top:9px;opacity:.85}
+  .back{pointer-events:auto;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px;letter-spacing:.2em;color:var(--bone);text-decoration:none;opacity:.55;border-bottom:1px solid rgba(239,230,210,.3);padding-bottom:3px;white-space:nowrap}
+  .back:hover,.back:focus-visible{opacity:1;color:var(--coral);border-color:var(--coral)}
+  footer{position:fixed;left:0;right:0;bottom:0;padding:clamp(14px,3vw,28px) clamp(16px,4vw,44px);display:flex;justify-content:space-between;align-items:flex-end;gap:12px;pointer-events:none;
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;color:rgba(239,230,210,.55)}
+  .num{font-family:"Iowan Old Style",Palatino,Georgia,serif;font-style:italic;font-size:clamp(34px,6vw,64px);letter-spacing:0;color:var(--coral);line-height:.8;text-transform:none}
+  .num span{font-size:.36em;color:rgba(239,230,210,.5);margin-left:.4em;letter-spacing:.2em}
+  .phase{display:flex;align-items:center;gap:10px;text-align:right}
+  .phase i{width:7px;height:7px;border-radius:50%;background:var(--verd);box-shadow:0 0 10px var(--verd);display:inline-block}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+</style>
+</head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+<div class="veil"></div>
+<header>
+  <h1>What the Rain Spells<small>a poem that falls into place</small></h1>
+  <a class="back" href="index.html">← 100</a>
+</header>
+<footer>
+  <div class="num" id="num">I<span>/ IV</span></div>
+  <div class="phase"><span id="phase">gathering</span><i></i></div>
+</footer>
+<div class="sr" id="sr"></div>
+<script>
+(() => {
+  const POEM = [
+    ["rain has no alphabet,", "only the habit of falling", "until something below it", "learns how to read."],
+    ["each drop is a letter", "that forgot its word;", "the roof remembers", "and says them back, slowly."],
+    ["hold still. a sentence", "is assembling in the gutter,", "in the dark between", "one streetlight and the next."],
+    ["by morning it is gone:", "the page dry, the meaning", "carried off in the drains", "toward a sea that cannot spell."]
+  ];
+  const NUM = ["I", "II", "III", "IV"];
+  document.getElementById('sr').textContent = POEM.map(s => s.join(' / ')).join(' — ');
+  const GLYPHS = "abcdefghijklmnopqrstuvwxyzαβγδεζηθλμξπσφψω·:;'/|+~^°".split('');
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  const numEl = document.getElementById('num'), phaseEl = document.getElementById('phase');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W, H, dpr, cw, ch, fs, cols, rows, glyph, bright, lock, lockA, tgt, drops;
+  let stanza = 0, phase = 'rain', pt = 0, rainAmt = 1, targets = 0, locked = 0;
+  const rnd = n => Math.floor(Math.random() * n);
+
+  function layout() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cw = Math.min(W / 31, Math.max(11.5, Math.min(18, W / 64)));
+    ch = cw * 1.7; fs = cw / 0.6;
+    cols = Math.ceil(W / cw); rows = Math.ceil(H / ch) + 1;
+    const n = cols * rows;
+    glyph = new Uint8Array(n); bright = new Float32Array(n);
+    lock = new Uint8Array(n); lockA = new Float32Array(n); tgt = new Array(n).fill('');
+    for (let i = 0; i < n; i++) glyph[i] = rnd(GLYPHS.length);
+    drops = [];
+    for (let c = 0; c < cols; c++) {
+      drops.push(newDrop(c, true));
+      if (c % 3 === 0) drops.push(newDrop(c, true));
+    }
+    setTargets(phase === 'hold');
+  }
+  function newDrop(c, anywhere) {
+    return { c, y: anywhere ? -Math.random() * rows * 1.6 : -Math.random() * rows * 0.7 - 1, v: 7 + Math.random() * 13, last: -99 };
+  }
+  function setTargets(keepLocks) {
+    tgt.fill(''); if (!keepLocks) { lock.fill(0); lockA.fill(0); }
+    const lines = POEM[stanza];
+    const blockRows = lines.length * 2 - 1;
+    const r0 = Math.max(3, Math.round((rows - 1 - blockRows) / 2));
+    const longest = Math.max(...lines.map(l => l.length));
+    const c0 = Math.max(1, Math.floor((cols - longest) / 2));
+    targets = 0;
+    lines.forEach((ln, i) => {
+      const indent = i % 2 ? 2 : 0;
+      for (let k = 0; k < ln.length; k++) {
+        if (ln[k] === ' ') continue;
+        const c = Math.min(cols - 1, c0 + indent + k), r = r0 + i * 2;
+        if (r < rows) { tgt[r * cols + c] = ln[k]; targets++; if (keepLocks) { lock[r * cols + c] = 1; lockA[r * cols + c] = 1; } }
+      }
+    });
+    numEl.firstChild.nodeValue = NUM[stanza];
+  }
+  function setPhase(p) {
+    phase = p; pt = 0;
+    phaseEl.textContent = { rain: 'gathering', resolve: 'resolving', hold: 'legible', dissolve: 'washing out' }[p];
+  }
+  function nextPhase() {
+    if (phase === 'rain') setPhase('resolve');
+    else if (phase === 'resolve') { for (let i = 0; i < tgt.length; i++) if (tgt[i]) lock[i] = 1; setPhase('hold'); }
+    else if (phase === 'hold') setPhase('dissolve');
+    else { stanza = (stanza + 1) % POEM.length; setTargets(false); setPhase('rain'); }
+  }
+  function touch(i) {
+    bright[i] = 1; glyph[i] = rnd(GLYPHS.length);
+    if (!tgt[i]) return;
+    if (phase === 'resolve' && !lock[i] && Math.random() < Math.min(1, 0.12 + pt / 7)) lock[i] = 1;
+    else if (phase === 'dissolve' && lock[i] && Math.random() < Math.min(1, 0.2 + pt / 4)) lock[i] = 0;
+  }
+  function step(dt) {
+    pt += dt;
+    const wantRain = phase === 'hold' ? 0.22 : phase === 'resolve' ? 0.8 : 1;
+    rainAmt += (wantRain - rainAmt) * Math.min(1, dt * 1.5);
+    for (const d of drops) {
+      d.y += d.v * dt;
+      const r = Math.floor(d.y);
+      if (r !== d.last) {
+        for (let q = Math.max(0, d.last + 1); q <= r && q < rows; q++) touch(q * cols + d.c);
+        d.last = r;
+      }
+      if (d.y > rows + 2) Object.assign(d, newDrop(d.c, false));
+    }
+    const k = Math.exp(-dt * 1.5);
+    locked = 0;
+    for (let i = 0; i < bright.length; i++) {
+      bright[i] *= k;
+      if (lock[i]) { lockA[i] += (1 - lockA[i]) * Math.min(1, dt * 5); locked++; }
+      else if (lockA[i] > 0) lockA[i] = Math.max(0, lockA[i] - dt * 1.4);
+    }
+    // a few restless glyphs
+    for (let j = 0; j < 12; j++) glyph[rnd(glyph.length)] = rnd(GLYPHS.length);
+    if (phase === 'rain' && pt > 2.6) setPhase('resolve');
+    else if (phase === 'resolve') {
+      if (pt > 7.5) { // stragglers settle one by one
+        for (let j = 0; j < 3; j++) { const i = rnd(tgt.length); if (tgt[i]) lock[i] = 1; }
+        if (pt > 10) for (let i = 0; i < tgt.length; i++) if (tgt[i]) lock[i] = 1;
+      }
+      if (locked >= targets) setPhase('hold');
+    }
+    else if (phase === 'hold' && pt > 7) setPhase('dissolve');
+    else if (phase === 'dissolve' && (locked === 0 && pt > 2.2 || pt > 7)) nextPhase();
+  }
+  function draw() {
+    ctx.fillStyle = '#080c14'; ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const mono = 'ui-monospace,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace';
+    ctx.font = fs + 'px ' + mono;
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      const i = r * cols + c, b = bright[i] * rainAmt, a = lockA[i];
+      if (a > 0.5) continue;
+      if (b < 0.035) continue;
+      const head = bright[i] > 0.9;
+      ctx.fillStyle = head ? `rgba(255,214,190,${Math.min(1, b + .15)})` : `rgba(95,179,161,${b * 0.62 * (1 - a)})`;
+      ctx.fillText(GLYPHS[glyph[i]], c * cw + cw / 2, r * ch + ch / 2);
+    }
+    ctx.font = '600 ' + (fs * 1.04) + 'px ' + mono;
+    for (let i = 0; i < tgt.length; i++) {
+      const a = lockA[i]; if (a <= 0.02 || !tgt[i]) continue;
+      const c = i % cols, r = (i - c) / cols, x = c * cw + cw / 2, y = r * ch + ch / 2;
+      if (a < 0.96) { ctx.fillStyle = `rgba(255,122,89,${(1 - a) * 0.9})`; ctx.fillText(tgt[i], x, y - (1 - a) * ch * 0.5); }
+      ctx.fillStyle = `rgba(239,230,210,${a})`;
+      ctx.fillText(tgt[i], x, y);
+    }
+    // underline that grows with legibility
+    if (targets) {
+      const f = locked / targets, y = H - Math.max(58, H * 0.11);
+      ctx.fillStyle = 'rgba(239,230,210,.12)'; ctx.fillRect(W * .5 - 60, y, 120, 1);
+      ctx.fillStyle = 'rgba(255,122,89,.9)'; ctx.fillRect(W * .5 - 60, y, 120 * f, 1);
+    }
+  }
+  let last = 0;
+  function frame(t) {
+    const dt = Math.min(0.05, (t - last) / 1000 || 0.016); last = t;
+    step(dt); draw(); requestAnimationFrame(frame);
+  }
+  function still() { // reduced motion: a quiet, already-fallen page
+    for (let i = 0; i < bright.length; i++) bright[i] = Math.random() < 0.16 ? 0.15 + Math.random() * 0.4 : 0;
+    for (let i = 0; i < tgt.length; i++) { lock[i] = tgt[i] ? 1 : 0; lockA[i] = lock[i]; }
+    locked = targets; rainAmt = 1; phaseEl.textContent = 'tap for next stanza'; draw();
+  }
+  function advance() {
+    if (reduce) { stanza = (stanza + 1) % POEM.length; setTargets(false); still(); }
+    else nextPhase();
+  }
+  cv.addEventListener('click', advance);
+  addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); advance(); } });
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { layout(); if (reduce) still(); }, 120); });
+  layout();
+  if (reduce) still(); else requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

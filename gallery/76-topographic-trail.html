@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sheet 76 — a generated topographic trail guide</title>
+<meta name="description" content="A generative topographic quadrangle: contour lines traced by marching squares over fractal noise, a least-effort summit trail, and a scrubbable elevation profile.">
+<style>
+  :root{--paper:#f2eee0;--ink:#2a2824;--brown:#8b5a33;--trail:#c0204a;--blue:#3a7ea6;--rule:#bdb59e}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:#dcd6c3;color:var(--ink);font-family:Georgia,"Times New Roman",serif;padding:16px}
+  .cond{font-family:"Avenir Next Condensed","Roboto Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif;font-stretch:condensed;text-transform:uppercase;letter-spacing:.14em}
+  .sheet{max-width:1200px;margin:0 auto;background:var(--paper);padding:clamp(14px,2.4vw,30px);box-shadow:0 20px 40px -24px rgba(50,40,10,.6);position:relative;
+    background-image:linear-gradient(90deg,rgba(0,0,0,.035) 1px,transparent 1px);background-size:25% 100%}
+  header{display:grid;grid-template-columns:1fr auto;gap:8px 20px;align-items:end;border-bottom:2.5px solid var(--ink);padding-bottom:10px;margin-bottom:14px}
+  header .cond.small{font-size:10.5px;color:var(--brown);grid-column:1/-1;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  header a{color:var(--trail);text-decoration:none}
+  h1{font-family:"Avenir Next Condensed","Roboto Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif;font-stretch:condensed;font-weight:700;text-transform:uppercase;
+    font-size:clamp(26px,5vw,54px);letter-spacing:.04em;line-height:.95;margin:0}
+  header .meta{font-size:11px;text-align:right;line-height:1.6}
+  .lay{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:22px}
+  .mapbox{position:relative;border:1.5px solid var(--ink);aspect-ratio:4/3;background:#e6e2cf;overflow:hidden;cursor:crosshair;touch-action:pan-y}
+  .mapbox canvas{position:absolute;inset:0;width:100%;height:100%}
+  #dot{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#fff;border:3.5px solid var(--trail);box-shadow:0 0 0 5px rgba(192,32,74,.22);pointer-events:none;left:0;top:0;transition:opacity .2s}
+  .prof{margin-top:12px;border:1.5px solid var(--ink);background:rgba(255,255,255,.35);position:relative;height:150px;touch-action:pan-y;cursor:ew-resize}
+  .prof canvas{position:absolute;inset:0;width:100%;height:100%}
+  .prof .cap{position:absolute;left:10px;top:7px;font-size:10px;color:var(--brown);pointer-events:none}
+  #read{position:absolute;right:10px;top:6px;font-size:11px;pointer-events:none;background:var(--paper);padding:1px 6px;border:1px solid var(--rule)}
+  aside h2{font-size:22px;font-weight:400;font-style:italic;margin:0 0 4px;line-height:1.1}
+  aside .grade{display:inline-block;font-size:10px;background:var(--trail);color:#fff;padding:2px 7px;margin-bottom:10px}
+  .stats{display:grid;grid-template-columns:1fr 1fr;border-top:1.5px solid var(--ink);border-left:1px solid var(--rule);margin:6px 0 14px}
+  .stats div{border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:8px 10px}
+  .stats small{display:block;font-size:9.5px;color:var(--brown)}
+  .stats b{font-family:"Avenir Next Condensed","Roboto Condensed","Arial Narrow",Arial,sans-serif;font-size:24px;font-weight:700;letter-spacing:.01em}
+  .stats b i{font-style:normal;font-size:12px;font-weight:400;margin-left:3px}
+  ol{list-style:none;margin:0 0 14px;padding:0;counter-reset:w}
+  ol li{counter-increment:w;display:grid;grid-template-columns:24px 1fr;gap:9px;padding:8px 4px;border-bottom:1px dotted var(--rule);font-size:13.5px;line-height:1.4;cursor:pointer;transition:background .15s}
+  ol li:hover,ol li:focus-visible{background:rgba(192,32,74,.08);outline:none}
+  ol li::before{content:counter(w);width:22px;height:22px;border-radius:50%;border:1.5px solid var(--trail);color:var(--trail);display:grid;place-items:center;font:700 11px Arial,sans-serif;background:#fff}
+  ol li span{display:block;font-size:10px;color:var(--brown);margin-top:2px}
+  .note{font-size:12.5px;line-height:1.55;font-style:italic;color:#56503f;border-left:3px solid var(--brown);padding-left:10px;margin:0 0 14px}
+  button{font:inherit;cursor:pointer;width:100%;padding:11px;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);font-size:11.5px;transition:background .2s,color .2s}
+  button:hover{background:transparent;color:var(--ink)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:9.5px;color:#56503f;margin-top:10px}
+  .legend i{display:inline-block;width:22px;height:0;border-top:2px solid var(--brown);vertical-align:middle;margin-right:5px}
+  .legend i.t{border-top:2.5px dashed var(--trail)}.legend i.w{border-top:7px solid #b9d7e4}.legend i.x{border-top:1px solid var(--brown);opacity:.7}
+  @media (max-width:860px){.lay{grid-template-columns:1fr}header{grid-template-columns:1fr}header .meta{text-align:left}body{padding:8px}.prof{height:130px}}
+</style>
+</head>
+<body>
+<main class="sheet">
+  <header>
+    <div class="cond small"><span>Provisional survey · sheet 76 of 100</span><a href="index.html">← index of sheets</a></div>
+    <h1 id="quad">—</h1>
+    <div class="meta cond">1 : 25 000<br>Contour interval 40 m<br><span id="seedLbl"></span></div>
+  </header>
+  <div class="lay">
+    <div>
+      <div class="mapbox" id="mapbox"><canvas id="map" aria-label="Topographic contour map with marked trail"></canvas><div id="dot"></div></div>
+      <div class="prof" id="prof"><canvas id="pc" aria-label="Elevation profile of the trail"></canvas><span class="cap cond">Elevation profile · drag to walk it</span><span id="read" class="cond"></span></div>
+      <div class="legend cond"><span><i class="t"></i>Trail</span><span><i></i>Index contour 200 m</span><span><i class="x"></i>Contour 40 m</span><span><i class="w"></i>Water</span></div>
+    </div>
+    <aside>
+      <span class="grade cond" id="grade"></span>
+      <h2 id="tname"></h2>
+      <div class="stats cond">
+        <div><small>Distance, one way</small><b id="sDist"></b></div><div><small>Total ascent</small><b id="sAsc"></b></div>
+        <div><small>High point</small><b id="sHigh"></b></div><div><small>Allow</small><b id="sTime"></b></div>
+      </div>
+      <ol id="wps"></ol>
+      <p class="note" id="note"></p>
+      <button class="cond" id="again">Survey another quadrangle</button>
+    </aside>
+  </div>
+</main>
+<script>
+(function(){
+  const $=id=>document.getElementById(id),GX=128,GY=96,KM=8,ASP=.75;
+  const map=$('map'),mx=map.getContext('2d'),pc=$('pc'),px=pc.getContext('2d'),box=$('mapbox'),dot=$('dot');
+  let seed=7613,F=new Float32Array((GX+1)*(GY+1)),lo,hi,lake,trail=[],prof=[],total=0,wps=[],cur=0,names={};
+  function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  function build(){
+    const r=rng(seed),perm=new Float32Array(4096);for(let i=0;i<4096;i++)perm[i]=r();
+    const h=(i,j)=>perm[((i*73)^(j*151)+i*j*7)&4095],sm=t=>t*t*(3-2*t);
+    const n2=(x,y)=>{const i=Math.floor(x),j=Math.floor(y),u=sm(x-i),v=sm(y-j);return(h(i,j)*(1-u)+h(i+1,j)*u)*(1-v)+(h(i,j+1)*(1-u)+h(i+1,j+1)*u)*v};
+    const cx=.3+r()*.4,cy=(.3+r()*.4)*ASP,c2x=.15+r()*.7,c2y=(.15+r()*.7)*ASP;
+    lo=1e9;hi=-1e9;
+    for(let j=0;j<=GY;j++)for(let i=0;i<=GX;i++){const x=i/GX,y=j/GY*ASP;let a=.5,f=2.6,e=0;
+      for(let o=0;o<5;o++){e+=a*n2(x*f+o*17,y*f+o*31);a*=.5;f*=2.05}
+      const d=(x-cx)*(x-cx)+(y-cy)*(y-cy),d2=(x-c2x)*(x-c2x)+(y-c2y)*(y-c2y);
+      e=e*.62+.6*Math.exp(-d/.035)+.22*Math.exp(-d2/.02);
+      const m=420+e*1050;F[j*(GX+1)+i]=m;if(m<lo)lo=m;if(m>hi)hi=m}
+    lake=lo+(hi-lo)*.09;
+    const pk=['Mount Oshel','Harrow Peak','Corvane Tor','The Anvil','Mount Tessaly','Sable Horn','Greywether Pike'],lk=['Kettle Tarn','Lake Miren','Loon Water','Pale Tarn','Osprey Mere'],
+      tr=['Larchgate','Stonechat','Marrow Creek','Windless Col','Old Shepherd’s','Cinder Gap'];
+    names={peak:pk[Math.floor(r()*pk.length)],lake:lk[Math.floor(r()*lk.length)],trail:tr[Math.floor(r()*tr.length)]};
+    route();
+  }
+  const E=(x,y)=>{const fx=Math.max(0,Math.min(GX-.001,x*GX)),fy=Math.max(0,Math.min(GY-.001,y/ASP*GY)),i=fx|0,j=fy|0,u=fx-i,v=fy-j,k=j*(GX+1)+i;
+    return(F[k]*(1-u)+F[k+1]*u)*(1-v)+(F[k+GX+1]*(1-u)+F[k+GX+2]*u)*v};
+  function route(){   // least-effort path: Dijkstra over a coarse grid, cost grows with the square of slope
+    const NX=GX/2+1,NY=GY/2+1,N=NX*NY,el=k=>F[(2*((k/NX)|0))*(GX+1)+2*(k%NX)],cell=KM*1000/(NX-1);
+    let s=-1,e=-1,sl=1e9,eh=-1;
+    for(let k=0;k<N;k++){const i=k%NX,j=(k/NX)|0,v=el(k);if(i>3&&i<NX-4&&j>3&&j<NY-4&&v>eh){eh=v;e=k}
+      if((i===4||i===NX-5||j===4||j===NY-5)&&i>=4&&i<=NX-5&&j>=4&&j<=NY-5&&v>lake+25&&v<sl){sl=v;s=k}}
+    if(s<0)s=NX*5+5;
+    const dist=new Float64Array(N).fill(Infinity),prev=new Int32Array(N).fill(-1),heap=[[0,s]];dist[s]=0;
+    const push=n=>{heap.push(n);let i=heap.length-1;while(i>0){const p=(i-1)>>1;if(heap[p][0]<=heap[i][0])break;[heap[p],heap[i]]=[heap[i],heap[p]];i=p}};
+    const pop=()=>{const t=heap[0],l=heap.pop();if(heap.length){heap[0]=l;let i=0;for(;;){let a=2*i+1,b=a+1,m=i;if(a<heap.length&&heap[a][0]<heap[m][0])m=a;if(b<heap.length&&heap[b][0]<heap[m][0])m=b;if(m===i)break;[heap[m],heap[i]]=[heap[i],heap[m]];i=m}}return t};
+    while(heap.length){const[d,k]=pop();if(k===e)break;if(d>dist[k])continue;const i=k%NX,j=(k/NX)|0,h0=el(k);
+      for(let dj=-1;dj<=1;dj++)for(let di=-1;di<=1;di++){if(!di&&!dj)continue;const ni=i+di,nj=j+dj;if(ni<1||nj<1||ni>=NX-1||nj>=NY-1)continue;
+        const nk=nj*NX+ni,h1=el(nk),run=cell*Math.hypot(di,dj),sl2=(h1-h0)/run,c=run*(1+Math.pow(sl2*7,2))*(h1<lake+4?40:1),nd=d+c;
+        if(nd<dist[nk]){dist[nk]=nd;prev[nk]=k;push([nd,nk])}}}
+    let pts=[];for(let k=e;k>=0;k=prev[k])pts.push([(k%NX)/(NX-1),((k/NX)|0)/(NY-1)*ASP]);pts.reverse();
+    for(let it=0;it<3;it++){const q=[pts[0]];for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1];q.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75])}q.push(pts[pts.length-1]);pts=q}
+    trail=pts;prof=[];let d=0,asc=0,pe=null;
+    pts.forEach((p,i)=>{if(i)d+=Math.hypot(p[0]-pts[i-1][0],p[1]-pts[i-1][1])*KM;const z=E(p[0],p[1]);if(pe!==null&&z>pe)asc+=z-pe;pe=z;prof.push([d,z])});
+    total=d;
+    const lab=[['Trailhead','gravel pull-out, room for six cars'],['Footbridge','last reliable water; fill up'],['Treeline','the larches give out, the wind does not'],['False summit','do not celebrate here'],[names.peak,'cairn, brass bolt, and all of it below you']];
+    wps=[0,.3,.58,.86,1].map((f,i)=>{const k=Math.round(f*(pts.length-1));return{k,name:lab[i][0],txt:lab[i][1]}});
+    const hrs=total/4.5+asc/550,avg=asc/(total*10);
+    $('quad').textContent=names.peak+' Quadrangle';$('seedLbl').textContent='Plate № '+seed;
+    $('tname').textContent=names.trail+' Trail to '+names.peak;
+    $('grade').textContent=avg>11?'Strenuous · steep ground':avg>7?'Demanding · steady climb':'Moderate · long approach';
+    $('sDist').innerHTML=total.toFixed(1)+'<i>km</i>';$('sAsc').innerHTML=Math.round(asc)+'<i>m</i>';$('sHigh').innerHTML=Math.round(hi)+'<i>m</i>';
+    $('sTime').innerHTML=Math.floor(hrs)+'<i>h</i> '+String(Math.round(hrs%1*6)*10).padStart(2,'0')+'<i>min up</i>';
+    $('wps').innerHTML='';wps.forEach(w=>{const li=document.createElement('li');li.tabIndex=0;
+      li.innerHTML='<div>'+w.name+'<span class="cond">km '+prof[w.k][0].toFixed(1)+' · '+Math.round(prof[w.k][1])+' m — <em style="text-transform:none;letter-spacing:0;font-family:Georgia,serif">'+w.txt+'</em></span></div>';
+      li.onclick=li.onfocus=li.onmouseenter=()=>go(w.k);$('wps').appendChild(li)});
+    $('note').textContent='Mind the weather on the upper third: the contours crowd together above '+Math.round((lo+hi)/2/40)*40+' m and there is no shelter until you are back at the treeline. '+names.lake+' is colder than it looks.';
+  }
+  function tint(m){const stops=[[lake,[207,222,178]],[lo+(hi-lo)*.35,[226,228,186]],[lo+(hi-lo)*.6,[236,220,176]],[lo+(hi-lo)*.82,[232,208,178]],[hi,[250,248,244]]];
+    if(m<lake)return[185,215,228];for(let i=1;i<stops.length;i++)if(m<=stops[i][0]){const a=stops[i-1],b=stops[i],t=(m-a[0])/(b[0]-a[0]);return a[1].map((v,k)=>v+(b[1][k]-v)*t)}return stops[4][1]}
+  function draw(){
+    const b=box.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1),W=map.width=Math.round(b.width*dpr),H=map.height=Math.round(b.height*dpr);
+    const off=document.createElement('canvas');off.width=GX+1;off.height=GY+1;const ox=off.getContext('2d'),im=ox.createImageData(GX+1,GY+1);
+    for(let j=0;j<=GY;j++)for(let i=0;i<=GX;i++){const k=j*(GX+1)+i,m=F[k],c=tint(m),gx=F[k+(i<GX?1:0)]-F[k-(i>0?1:0)],gy=F[k+(j<GY?GX+1:0)]-F[k-(j>0?GX+1:0)];
+      const sh=m<lake?1:Math.max(.74,Math.min(1.14,1+(gx+gy)*.0045));im.data[k*4]=c[0]*sh;im.data[k*4+1]=c[1]*sh;im.data[k*4+2]=c[2]*sh;im.data[k*4+3]=255}
+    ox.putImageData(im,0,0);mx.imageSmoothingEnabled=true;mx.imageSmoothingQuality='high';
+    mx.drawImage(off,.5,.5,GX,GY,0,0,W,H);
+    const sx=W/GX,sy=H/GY,L=(a,b2,lv)=>(lv-a)/(b2-a);
+    function contour(lv){mx.beginPath();
+      for(let j=0;j<GY;j++)for(let i=0;i<GX;i++){const k=j*(GX+1)+i,a=F[k],b2=F[k+1],c=F[k+GX+2],d=F[k+GX+1],id=(a>lv?8:0)|(b2>lv?4:0)|(c>lv?2:0)|(d>lv?1:0);if(!id||id===15)continue;
+        const T=[(i+L(a,b2,lv))*sx,j*sy],R=[(i+1)*sx,(j+L(b2,c,lv))*sy],B=[(i+L(d,c,lv))*sx,(j+1)*sy],Lf=[i*sx,(j+L(a,d,lv))*sy];
+        const seg=(p,q)=>{mx.moveTo(p[0],p[1]);mx.lineTo(q[0],q[1])};
+        switch(id){case 1:case 14:seg(Lf,B);break;case 2:case 13:seg(B,R);break;case 3:case 12:seg(Lf,R);break;case 4:case 11:seg(T,R);break;
+          case 6:case 9:seg(T,B);break;case 7:case 8:seg(T,Lf);break;case 5:seg(T,Lf);seg(B,R);break;case 10:seg(T,R);seg(Lf,B);break}}
+      mx.stroke()}
+    mx.lineCap='round';
+    for(let lv=Math.ceil(lo/40)*40;lv<hi;lv+=40){if(lv<lake)continue;const idx=lv%200===0;mx.strokeStyle=idx?'rgba(122,74,38,.85)':'rgba(139,90,51,.5)';mx.lineWidth=(idx?1.25:.6)*dpr;contour(lv)}
+    mx.strokeStyle='#3a7ea6';mx.lineWidth=1.1*dpr;contour(lake);
+    // kilometre grid
+    mx.strokeStyle='rgba(40,70,110,.22)';mx.lineWidth=.6*dpr;mx.fillStyle='rgba(40,70,110,.75)';mx.font=(9*dpr)+'px Arial,sans-serif';mx.beginPath();
+    for(let k=1;k<KM;k++){const x=k/KM*W;mx.moveTo(x,0);mx.lineTo(x,H);mx.fillText(String(40+k),x+3*dpr,10*dpr);if(k<KM*ASP){const y=k/KM*W;mx.moveTo(0,y);mx.lineTo(W,y);mx.fillText(String(72-k),3*dpr,y-3*dpr)}}mx.stroke();
+    // trail: white casing, dashed colour
+    const tp=()=>{mx.beginPath();trail.forEach((p,i)=>{const x=p[0]*W,y=p[1]/ASP*H;i?mx.lineTo(x,y):mx.moveTo(x,y)})};
+    mx.lineJoin='round';tp();mx.strokeStyle='rgba(255,255,255,.75)';mx.lineWidth=4.5*dpr;mx.stroke();
+    tp();mx.setLineDash([6*dpr,4*dpr]);mx.strokeStyle='#c0204a';mx.lineWidth=2.1*dpr;mx.stroke();mx.setLineDash([]);
+    // labels
+    mx.textAlign='center';let lm=0;for(let k=1;k<F.length;k++)if(F[k]<F[lm])lm=k;
+    mx.font='italic '+(12*dpr)+'px Georgia,serif';mx.fillStyle='#2c6a90';const lxp=Math.max(50*dpr,Math.min(W-50*dpr,(lm%(GX+1))*sx));mx.fillText(names.lake,lxp,Math.max(14*dpr,Math.min(H-8*dpr,((lm/(GX+1))|0)*sy+4*dpr)));
+    wps.forEach((w,i)=>{const p=trail[w.k],x=p[0]*W,y=p[1]/ASP*H;
+      if(i===wps.length-1){mx.fillStyle='#2a2824';mx.beginPath();mx.moveTo(x,y-8*dpr);mx.lineTo(x+7*dpr,y+5*dpr);mx.lineTo(x-7*dpr,y+5*dpr);mx.fill();
+        mx.font='bold '+(11*dpr)+'px Arial,sans-serif';mx.lineWidth=3*dpr;mx.strokeStyle='rgba(255,255,255,.85)';const t=names.peak+' '+Math.round(hi)+' m',ty=y>30*dpr?y-13*dpr:y+19*dpr;mx.strokeText(t,Math.max(60*dpr,Math.min(W-60*dpr,x)),ty);mx.fillText(t,Math.max(60*dpr,Math.min(W-60*dpr,x)),ty);return}
+      mx.fillStyle='#fff';mx.strokeStyle='#c0204a';mx.lineWidth=1.6*dpr;mx.beginPath();mx.arc(x,y,7.5*dpr,0,7);mx.fill();mx.stroke();
+      mx.fillStyle='#c0204a';mx.font='bold '+(9.5*dpr)+'px Arial,sans-serif';mx.fillText(String(i+1),x,y+3.4*dpr)});
+    // scale bar + north arrow
+    const u=W/KM,bx=14*dpr,by=H-16*dpr;mx.fillStyle='rgba(242,238,224,.85)';mx.fillRect(bx-8*dpr,by-22*dpr,2*u+60*dpr,32*dpr);
+    mx.fillStyle='#2a2824';mx.fillRect(bx,by,u,4*dpr);mx.strokeStyle='#2a2824';mx.lineWidth=1*dpr;mx.strokeRect(bx,by,2*u,4*dpr);
+    mx.font=(9*dpr)+'px Arial,sans-serif';mx.textAlign='left';mx.fillText('0',bx,by-4*dpr);mx.fillText('1',bx+u-2*dpr,by-4*dpr);mx.fillText('2 km',bx+2*u-4*dpr,by-4*dpr);
+    const nx=bx+2*u+34*dpr;mx.beginPath();mx.moveTo(nx,by-18*dpr);mx.lineTo(nx+5*dpr,by+4*dpr);mx.lineTo(nx,by);mx.lineTo(nx-5*dpr,by+4*dpr);mx.fill();
+    profile();go(cur);
+  }
+  function profile(){
+    const b=$('prof').getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1),W=pc.width=Math.round(b.width*dpr),H=pc.height=Math.round(b.height*dpr);
+    const pl=42*dpr,pr=12*dpr,pt=26*dpr,pb=20*dpr,y0=Math.floor(lo/200)*200,y1=Math.ceil(hi/200)*200;
+    const X=d=>pl+d/total*(W-pl-pr),Y=z=>H-pb-(z-y0)/(y1-y0)*(H-pt-pb);
+    px.clearRect(0,0,W,H);px.font=(9*dpr)+'px Arial,sans-serif';px.fillStyle='#8b5a33';px.strokeStyle='rgba(139,90,51,.3)';px.lineWidth=.6*dpr;px.textAlign='right';
+    for(let z=y0;z<=y1;z+=200){px.beginPath();px.moveTo(pl,Y(z));px.lineTo(W-pr,Y(z));px.stroke();px.fillText(z,pl-5*dpr,Y(z)+3*dpr)}
+    px.textAlign='center';for(let k=0;k<=total;k++)px.fillText(k+(k?'':' km'),X(k),H-6*dpr);
+    px.beginPath();px.moveTo(X(0),H-pb);prof.forEach(p=>px.lineTo(X(p[0]),Y(p[1])));px.lineTo(X(total),H-pb);px.closePath();
+    const g=px.createLinearGradient(0,pt,0,H-pb);g.addColorStop(0,'rgba(192,32,74,.38)');g.addColorStop(1,'rgba(139,90,51,.08)');px.fillStyle=g;px.fill();
+    px.beginPath();prof.forEach((p,i)=>i?px.lineTo(X(p[0]),Y(p[1])):px.moveTo(X(p[0]),Y(p[1])));px.strokeStyle='#c0204a';px.lineWidth=1.8*dpr;px.stroke();
+    wps.forEach(w=>{const p=prof[w.k];px.fillStyle='#fff';px.strokeStyle='#c0204a';px.lineWidth=1.3*dpr;px.beginPath();px.arc(X(p[0]),Y(p[1]),3.4*dpr,0,7);px.fill();px.stroke()});
+    const p=prof[cur];px.strokeStyle='#2a2824';px.lineWidth=1*dpr;px.setLineDash([3*dpr,3*dpr]);px.beginPath();px.moveTo(X(p[0]),pt-6*dpr);px.lineTo(X(p[0]),H-pb);px.stroke();px.setLineDash([]);
+    px.fillStyle='#c0204a';px.beginPath();px.arc(X(p[0]),Y(p[1]),5*dpr,0,7);px.fill();
+    profile.inv=cx=>{const d=(cx*dpr-pl)/(W-pl-pr)*total;let k=0;while(k<prof.length-1&&prof[k][0]<d)k++;return k};
+  }
+  function go(k){cur=Math.max(0,Math.min(trail.length-1,k));const p=trail[cur];dot.style.left=p[0]*100+'%';dot.style.top=p[1]/ASP*100+'%';
+    const a=prof[Math.max(0,cur-3)],b=prof[Math.min(prof.length-1,cur+3)],gr=(b[1]-a[1])/((b[0]-a[0])*10||1);
+    $('read').textContent='km '+prof[cur][0].toFixed(2)+' · '+Math.round(prof[cur][1])+' m · grade '+(gr>=0?'+':'')+gr.toFixed(0)+'%';profile()}
+  function onProf(e){if(e.type==='pointermove'&&e.pointerType==='mouse'&&false)return;const b=$('prof').getBoundingClientRect();go(profile.inv(e.clientX-b.left))}
+  $('prof').addEventListener('pointermove',onProf);$('prof').addEventListener('pointerdown',onProf);
+  function onMap(e){const b=box.getBoundingClientRect(),x=(e.clientX-b.left)/b.width,y=(e.clientY-b.top)/b.height*ASP;let best=0,bd=9;
+    for(let k=0;k<trail.length;k++){const d=(trail[k][0]-x)**2+(trail[k][1]-y)**2;if(d<bd){bd=d;best=k}}go(best)}
+  box.addEventListener('pointermove',onMap);box.addEventListener('pointerdown',onMap);
+  $('again').onclick=()=>{seed=1000+Math.floor(Math.random()*9000);cur=0;build();draw()};
+  build();let rt;new ResizeObserver(()=>{clearTimeout(rt);rt=setTimeout(draw,60)}).observe(box);draw();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Helicase / Bench 04 — DNA Helix Lab</title>
+<meta name="description" content="A rotating pseudo-3D DNA double helix drawn on canvas with depth sorting, inside a clean biotech lab interface with a live sequence readout and base-pair inspector.">
+<style>
+  :root{--bg:#f4f7f8;--panel:#ffffff;--ink:#0f2530;--mute:#6f8792;--line:#dde6ea;--teal:#00a39a;--A:#ff6b5e;--T:#f5b83d;--G:#18b6a4;--C:#3f7fe0}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:"Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;font-size:14px;overflow-x:hidden;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:32px 32px;background-position:-1px -1px}
+  .app{display:grid;grid-template-columns:minmax(0,1fr) 340px;grid-template-rows:auto 1fr auto;min-height:100vh;gap:0}
+  header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px clamp(14px,3vw,28px);background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .id{display:flex;align-items:center;gap:12px}
+  .glyph{width:30px;height:30px;border-radius:8px;background:var(--ink);display:grid;place-items:center}
+  .glyph svg{width:18px;height:18px;stroke:#7df0e2;fill:none;stroke-width:2;stroke-linecap:round}
+  h1{font-size:15px;font-weight:600;letter-spacing:-.01em}
+  h1 span{color:var(--mute);font-weight:400}
+  .chips{display:flex;gap:8px;align-items:center;font:11px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:var(--mute);flex-wrap:wrap}
+  .chip{border:1px solid var(--line);border-radius:20px;padding:5px 10px;background:var(--bg);white-space:nowrap}
+  .chip.live::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--teal);margin-right:6px;animation:pulse 1.6s infinite}
+  @keyframes pulse{50%{opacity:.25}}
+  a.back{color:var(--mute);text-decoration:none;font:11px ui-monospace,Menlo,Consolas,monospace}
+  a.back:hover{color:var(--teal)}
+  .view{position:relative;min-height:420px;overflow:hidden}
+  .view canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab}
+  .view canvas:active{cursor:grabbing}
+  .corner{position:absolute;font:10px/1.6 ui-monospace,Menlo,Consolas,monospace;color:var(--mute);letter-spacing:.06em;pointer-events:none}
+  .corner.tl{left:clamp(14px,3vw,28px);top:18px}
+  .corner.bl{left:clamp(14px,3vw,28px);bottom:18px}
+  .corner b{color:var(--ink);font-weight:600}
+  .big{font:300 clamp(34px,5vw,60px)/1 "Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink);letter-spacing:-.04em;display:block;margin-top:6px}
+  aside{background:var(--panel);border-left:1px solid var(--line);padding:22px 22px 18px;display:flex;flex-direction:column;gap:22px}
+  h2{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);font-weight:600;margin-bottom:10px}
+  .pair{display:flex;align-items:center;gap:10px}
+  .base{width:54px;height:54px;border-radius:12px;display:grid;place-items:center;font:600 24px ui-monospace,Menlo,Consolas,monospace;color:#fff;transition:background .25s}
+  .bond{flex:1;height:54px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+  .bond i{height:2px;background:repeating-linear-gradient(90deg,var(--mute) 0 4px,transparent 4px 8px)}
+  .pairinfo{font:11px/1.7 ui-monospace,Menlo,Consolas,monospace;color:var(--mute);margin-top:10px}
+  .pairinfo b{color:var(--ink)}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .stat{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .stat b{display:block;font:300 24px/1.1 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:-.02em}
+  .stat span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+  .comp{display:flex;height:8px;border-radius:6px;overflow:hidden;margin-top:12px}
+  .comp i{transition:flex-basis .5s}
+  .legend{display:flex;justify-content:space-between;font:10px ui-monospace,Menlo,Consolas,monospace;color:var(--mute);margin-top:6px}
+  label{display:flex;justify-content:space-between;font-size:12px;color:var(--mute);margin:10px 0 4px}
+  label output{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--ink)}
+  input[type=range]{width:100%;accent-color:var(--teal);height:22px}
+  .btns{display:flex;gap:8px;margin-top:12px}
+  button{font:600 12px "Helvetica Neue",Helvetica,Arial,sans-serif;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:10px 12px;border-radius:8px;cursor:pointer;flex:1;transition:background .2s,border-color .2s}
+  button:hover{border-color:var(--teal)}
+  button.pri{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .seq{grid-column:1/-1;background:var(--ink);color:#8fb0bb;padding:14px clamp(14px,3vw,28px) 16px;font:13px/1.9 ui-monospace,"SF Mono",Menlo,Consolas,monospace;overflow:hidden}
+  .seq .row{display:flex;gap:14px;white-space:nowrap}
+  .seq .lab{color:#52707c;flex:none;width:2.4em}
+  .seq .tape{display:flex;overflow:hidden;flex:1;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+  .seq span.b{display:inline-block;width:1.25em;text-align:center;flex:none;cursor:pointer;border-radius:3px}
+  .seq span.b.sel{background:#fff;color:var(--ink)!important;font-weight:700}
+  .seq .ticks{color:#52707c;font-size:10px}
+  @media (max-width:860px){.app{grid-template-columns:1fr;grid-template-rows:auto 56vh auto auto}aside{border-left:0;border-top:1px solid var(--line)}}
+  @media (prefers-reduced-motion:reduce){.chip.live::before{animation:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="id"><span class="glyph"><svg viewBox="0 0 18 18"><path d="M4 1c0 8 10 8 10 16M14 1c0 8-10 8-10 16M6 5h6M6 13h6"/></svg></span>
+      <h1>Helicase <span>/ Bench 04 / sample ORL‑2217 “Marigold”</span></h1></div>
+    <div class="chips"><span class="chip live">sequencer live</span><span class="chip">B‑form · 10.5 bp/turn</span><a class="back" href="index.html">← 100</a></div>
+  </header>
+
+  <main class="view">
+    <canvas id="c" aria-label="Rotating DNA double helix. Drag to spin, click a base pair to inspect."></canvas>
+    <div class="corner tl">ROTATION<span class="big" id="deg">000°</span></div>
+    <div class="corner bl">DRAG TO SPIN · TAP A RUNG TO INSPECT<br>MAJOR GROOVE <b>22 Å</b> · MINOR GROOVE <b>12 Å</b> · RISE <b>3.4 Å</b></div>
+  </main>
+
+  <aside>
+    <section>
+      <h2>Selected base pair</h2>
+      <div class="pair"><div class="base" id="b1">A</div><div class="bond" id="bond"><i></i><i></i></div><div class="base" id="b2">T</div></div>
+      <p class="pairinfo" id="pinfo"></p>
+    </section>
+    <section>
+      <h2>Fragment</h2>
+      <div class="stats"><div class="stat"><b id="len">48</b><span>base pairs</span></div><div class="stat"><b id="gc">50%</b><span>GC content</span></div><div class="stat"><b id="tm">71°</b><span>melt temp</span></div><div class="stat"><b id="turns">4.6</b><span>turns</span></div></div>
+      <div class="comp" id="comp"></div><div class="legend"><span>A</span><span>T</span><span>G</span><span>C</span></div>
+    </section>
+    <section>
+      <h2>Stage</h2>
+      <label>Spin <output id="so">0.6×</output></label><input type="range" id="spin" min="0" max="20" value="6" aria-label="Spin speed">
+      <label>Twist <output id="to">34°</output></label><input type="range" id="twist" min="18" max="52" value="34" aria-label="Twist per base pair">
+      <div class="btns"><button id="mut" type="button">Point mutation</button><button id="new" class="pri" type="button">New sample</button></div>
+    </section>
+  </aside>
+
+  <div class="seq" aria-label="Sequence readout">
+    <div class="row"><span class="lab">5′</span><div class="tape" id="s1"></div><span class="lab">3′</span></div>
+    <div class="row"><span class="lab">3′</span><div class="tape" id="s2"></div><span class="lab">5′</span></div>
+  </div>
+</div>
+<script>
+(() => {
+  const $=id=>document.getElementById(id);
+  const COL={A:'#ff6b5e',T:'#f5b83d',G:'#18b6a4',C:'#3f7fe0'}, COMP={A:'T',T:'A',G:'C',C:'G'}, NAME={A:'Adenine',T:'Thymine',G:'Guanine',C:'Cytosine'};
+  const N=48; let seq=[], sel=12, rot=0, spin=.6, twist=34*Math.PI/180, tilt=.32;
+  const cv=$('c'), g=cv.getContext('2d'); let W=0,H=0;
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function sample(){ seq=[]; for(let i=0;i<N;i++) seq.push('ATGC'[Math.floor(Math.random()*4)]); tape(); stats(); select(sel); }
+  function tape(){
+    [['s1',b=>b],['s2',b=>COMP[b]]].forEach(([id,f])=>{ const el=$(id); el.innerHTML='';
+      seq.forEach((b,i)=>{ const s=document.createElement('span'); s.className='b'; s.textContent=f(b); s.style.color=COL[f(b)]; s.dataset.i=i; el.appendChild(s); }); });
+  }
+  function stats(){
+    const n={A:0,T:0,G:0,C:0}; seq.forEach(b=>{ n[b]++; n[COMP[b]]++; });
+    const gc=(n.G+n.C)/(2*N); $('gc').textContent=Math.round(gc*100)+'%'; $('len').textContent=N;
+    $('tm').textContent=Math.round(64.9+41*(gc*N-16.4)/N)+'°'; $('turns').textContent=(N*twist/(2*Math.PI)).toFixed(1);
+    $('comp').innerHTML='ATGC'.split('').map(b=>'<i style="background:'+COL[b]+';flex:0 0 '+(n[b]/(2*N)*100)+'%"></i>').join('');
+  }
+  function select(i){
+    sel=(i+N)%N; const a=seq[sel], b=COMP[a], strong=a==='G'||a==='C';
+    $('b1').textContent=a; $('b1').style.background=COL[a]; $('b2').textContent=b; $('b2').style.background=COL[b];
+    $('bond').innerHTML=strong?'<i></i><i></i><i></i>':'<i></i><i></i>';
+    $('pinfo').innerHTML='position <b>'+String(sel+1).padStart(3,'0')+'</b> / '+N+'<br><b>'+NAME[a]+'</b> — <b>'+NAME[b]+'</b><br>'+(strong?'3 hydrogen bonds · holds firm':'2 hydrogen bonds · opens first');
+    document.querySelectorAll('.seq .b').forEach(s=>s.classList.toggle('sel',+s.dataset.i===sel));
+    const t=$('s1').children[sel]; if(t){ const off=t.offsetLeft-$('s1').clientWidth/2; $('s1').scrollLeft=off; $('s2').scrollLeft=off; }
+  }
+  document.querySelector('.seq').addEventListener('click',e=>{ if(e.target.dataset.i) select(+e.target.dataset.i); });
+
+  function resize(){ const r=cv.getBoundingClientRect(), d=Math.min(devicePixelRatio||1,2); W=r.width; H=r.height; cv.width=W*d; cv.height=H*d; g.setTransform(d,0,0,d,0,0); select(sel); }
+  addEventListener('resize',resize);
+
+  // geometry: helix axis runs left→right, tilted; project with simple perspective
+  let picks=[];
+  function project(i,phase){
+    const sp=Math.min(W/(N+5),H/26), R=Math.min(H*.27,sp*7.5,130);
+    const a=i*twist+rot+phase, x0=(i-(N-1)/2)*sp, y0=Math.sin(a)*R, z=Math.cos(a)*R;
+    const ct=Math.cos(tilt), st=Math.sin(tilt), x=x0*ct-y0*st, y=x0*st+y0*ct, f=620/(620-z);
+    return {x:W/2+x*f, y:H/2+y*f, z, f, sp};
+  }
+  function draw(){
+    g.clearRect(0,0,W,H);
+    const items=[]; picks=[];
+    for(let i=0;i<N;i++){
+      const p1=project(i,0), p2=project(i,Math.PI*.78+Math.PI*.22);     // antiparallel partner (offset gives major/minor groove feel)
+      const q2=project(i,Math.PI*1.22);
+      const mx=(p1.x+q2.x)/2, my=(p1.y+q2.y)/2, mz=(p1.z+q2.z)/2;
+      items.push({k:'rung',z:mz-1,i,a:p1,b:q2,mx,my});
+      items.push({k:'ball',z:p1.z,i,p:p1,s:0}); items.push({k:'ball',z:q2.z,i,p:q2,s:1});
+      if(i<N-1){ const n1=project(i+1,0), n2=project(i+1,Math.PI*1.22);
+        items.push({k:'bone',z:(p1.z+n1.z)/2-.5,a:p1,b:n1}); items.push({k:'bone',z:(q2.z+n2.z)/2-.5,a:q2,b:n2}); }
+      picks.push({i,x:mx,y:my,ax:p1.x,ay:p1.y,bx:q2.x,by:q2.y});
+    }
+    items.sort((a,b)=>a.z-b.z);
+    const fog=z=>.32+.68*Math.max(0,Math.min(1,(z+130)/260));
+    for(const it of items){
+      if(it.k==='bone'){ g.globalAlpha=fog(it.z); g.strokeStyle='#0f2530'; g.lineWidth=Math.max(2,it.a.sp*.5*it.a.f); g.lineCap='round'; g.beginPath(); g.moveTo(it.a.x,it.a.y); g.lineTo(it.b.x,it.b.y); g.stroke(); }
+      else if(it.k==='rung'){ const b=seq[it.i], on=it.i===sel; g.globalAlpha=fog(it.z)*(on?1:.9); g.lineCap='butt'; g.lineWidth=Math.max(2,it.a.sp*(on?.62:.4));
+        g.strokeStyle=COL[b]; g.beginPath(); g.moveTo(it.a.x,it.a.y); g.lineTo(it.mx,it.my); g.stroke();
+        g.strokeStyle=COL[COMP[b]]; g.beginPath(); g.moveTo(it.mx,it.my); g.lineTo(it.b.x,it.b.y); g.stroke();
+        g.fillStyle='#f4f7f8'; g.beginPath(); g.arc(it.mx,it.my,Math.max(1,it.a.sp*.1),0,7); g.fill(); }
+      else { const r=Math.max(2.5,it.p.sp*.48*it.p.f), on=it.i===sel; g.globalAlpha=1;
+        const sh=fog(it.z), gr=g.createRadialGradient(it.p.x-r*.35,it.p.y-r*.4,r*.1,it.p.x,it.p.y,r);
+        const l=Math.round(18+sh*14); gr.addColorStop(0,'hsl(196,40%,'+(l+38)+'%)'); gr.addColorStop(1,'hsl(198,52%,'+l+'%)');
+        g.fillStyle=gr; g.beginPath(); g.arc(it.p.x,it.p.y,r,0,7); g.fill();
+        if(sh<.99){ g.globalAlpha=(1-sh)*.55; g.fillStyle='#f4f7f8'; g.beginPath(); g.arc(it.p.x,it.p.y,r,0,7); g.fill(); g.globalAlpha=1; }
+        if(on){ g.strokeStyle='#00a39a'; g.lineWidth=2; g.beginPath(); g.arc(it.p.x,it.p.y,r+4,0,7); g.stroke(); } }
+    }
+    g.globalAlpha=1;
+    // callout for selected pair
+    const s=picks[sel]; if(s){ const b=seq[sel], ly=s.y<H/2?Math.max(s.ay,s.by)+44:Math.min(s.ay,s.by)-44;
+      g.strokeStyle='#0f2530'; g.lineWidth=1; g.setLineDash([3,3]); g.beginPath(); g.moveTo(s.x,s.y); g.lineTo(s.x,ly); g.stroke(); g.setLineDash([]);
+      g.font='600 11px ui-monospace,Menlo,Consolas,monospace'; const txt=String(sel+1).padStart(3,'0')+'  '+b+'·'+COMP[b], tw=g.measureText(txt).width+16;
+      const bx=Math.max(6,Math.min(W-tw-6,s.x-tw/2)); g.fillStyle='#0f2530'; g.beginPath(); if(g.roundRect) g.roundRect(bx,ly-11,tw,22,6); else g.rect(bx,ly-11,tw,22); g.fill();
+      g.fillStyle='#fff'; g.textBaseline='middle'; g.fillText(txt,bx+8,ly+.5); }
+    $('deg').textContent=String(Math.round(((rot*180/Math.PI)%360+360)%360)).padStart(3,'0')+'°';
+  }
+  let last=0, drag=null, vel=0;
+  function frame(ts){ const dt=Math.min(.05,(ts-last)/1000||0); last=ts;
+    if(!drag){ rot+=(reduce?0:spin)*dt*1.4+vel; vel*=.93; }
+    draw(); requestAnimationFrame(frame); }
+  cv.addEventListener('pointerdown',e=>{ drag={x:e.clientX,y:e.clientY,moved:0,r:rot}; vel=0; try{cv.setPointerCapture(e.pointerId)}catch(_){} });
+  cv.addEventListener('pointermove',e=>{ if(!drag) return; const dx=e.clientX-drag.x, dy=e.clientY-drag.y; drag.moved=Math.max(drag.moved,Math.abs(dx)+Math.abs(dy)); const nr=drag.r+dy*.012+dx*.006; vel=nr-rot; rot=nr; });
+  const end=e=>{ if(!drag) return; if(drag.moved<6){ vel=0; const r=cv.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top; let best=-1, bd=40*40;
+      const dseg=(p,ax,ay,bx,by)=>{ const vx=bx-ax, vy=by-ay, t=Math.max(0,Math.min(1,((x-ax)*vx+(y-ay)*vy)/(vx*vx+vy*vy||1))); return (x-ax-vx*t)**2+(y-ay-vy*t)**2; };
+      picks.forEach(p=>{ const d=dseg(p,p.ax,p.ay,p.bx,p.by); if(d<bd){ bd=d; best=p.i; } }); if(best>=0) select(best); }
+    drag=null; };
+  cv.addEventListener('pointerup',end); cv.addEventListener('pointercancel',()=>drag=null);
+  addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT') return; if(e.key==='ArrowRight') select(sel+1); if(e.key==='ArrowLeft') select(sel-1); });
+  $('spin').addEventListener('input',e=>{ spin=e.target.value/10; $('so').textContent=spin.toFixed(1)+'×'; });
+  $('twist').addEventListener('input',e=>{ twist=e.target.value*Math.PI/180; $('to').textContent=e.target.value+'°'; stats(); });
+  $('mut').addEventListener('click',()=>{ const o=seq[sel]; let n; do{ n='ATGC'[Math.floor(Math.random()*4)]; }while(n===o); seq[sel]=n; tape(); stats(); select(sel); });
+  $('new').addEventListener('click',()=>{ sel=Math.floor(Math.random()*N); sample(); });
+  sample(); resize(); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

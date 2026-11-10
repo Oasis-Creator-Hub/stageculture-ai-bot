@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rosette Bureau — Spirograph Studio</title>
+<meta name="description" content="A drafting-table spirograph studio: set the gear teeth and pen offset, then watch layered ink rosettes draw themselves on graph paper.">
+<style>
+  :root{--paper:#f4f1e4;--grid:#9fc4c0;--ink:#1d2b3a;--red:#c8372d;--pencil:#6b6f73;--label:#fbf8ee}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{background:#d9d3bf;color:var(--ink);font-family:"Courier New",Courier,"Nimbus Mono PS",monospace;
+    background-image:linear-gradient(120deg,#ddd7c4,#cfc8b1)}
+  a.back{position:fixed;top:10px;right:14px;z-index:5;font-size:12px;color:var(--red);text-decoration:none;
+    border:1.5px solid var(--red);padding:3px 8px;border-radius:2px;transform:rotate(3deg);background:rgba(244,241,228,.8);letter-spacing:.1em}
+  .desk{max-width:1180px;margin:0 auto;padding:22px 16px 30px;display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start}
+  /* the sheet */
+  .sheet{position:relative;background-color:var(--paper);aspect-ratio:1/1;max-height:calc(100vh - 52px);width:100%;justify-self:center;
+    box-shadow:0 1px 0 #fff inset,0 18px 40px -18px rgba(40,30,10,.55),0 2px 4px rgba(40,30,10,.25);
+    background-image:
+      linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),
+      linear-gradient(rgba(159,196,192,.38) 1px,transparent 1px),linear-gradient(90deg,rgba(159,196,192,.38) 1px,transparent 1px);
+    background-size:50px 50px,50px 50px,10px 10px,10px 10px;background-position:center}
+  .sheet::before{content:"";position:absolute;inset:0 auto 0 34px;width:1.5px;background:rgba(200,55,45,.55)}
+  .sheet canvas{position:absolute;inset:0;width:100%;height:100%}
+  #ink{mix-blend-mode:multiply}
+  .stamp{position:absolute;right:14px;bottom:12px;font-size:10px;letter-spacing:.14em;color:var(--pencil);text-align:right;line-height:1.5;pointer-events:none}
+  .stamp b{color:var(--red);font-weight:400}
+  .tape{position:absolute;width:86px;height:24px;background:rgba(236,214,140,.72);top:-10px;left:50%;margin-left:-43px;transform:rotate(-2deg);box-shadow:0 1px 2px rgba(0,0,0,.15)}
+  /* the label / controls */
+  .card{background:var(--label);border:1.5px solid var(--ink);padding:18px 18px 16px;position:relative;
+    box-shadow:5px 5px 0 rgba(29,43,58,.18)}
+  .card h1{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-weight:400;font-size:34px;line-height:.95;margin:0 0 4px;letter-spacing:-.01em}
+  .card h1 span{display:block;font-family:"Courier New",monospace;font-style:normal;font-size:10.5px;letter-spacing:.32em;color:var(--red);margin-bottom:8px}
+  .card p.lede{font-size:11.5px;line-height:1.55;margin:8px 0 14px;color:#3b4652;border-bottom:1px dashed var(--ink);padding-bottom:12px}
+  .row{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin-bottom:11px;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+  .row output{font-weight:700;color:var(--red)}
+  .row input{grid-column:1/-1}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;margin:0;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border:1.5px solid var(--ink);
+    background:repeating-linear-gradient(90deg,var(--ink) 0 1px,transparent 1px 8px) var(--paper)}
+  input[type=range]::-moz-range-track{height:6px;border:1.5px solid var(--ink);background:repeating-linear-gradient(90deg,var(--ink) 0 1px,transparent 1px 8px) var(--paper)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:22px;margin-top:-9px;background:var(--red);border:1.5px solid var(--ink);border-radius:1px}
+  input[type=range]::-moz-range-thumb{width:12px;height:20px;background:var(--red);border:1.5px solid var(--ink);border-radius:1px}
+  .inks{display:flex;gap:8px;margin:4px 0 14px;flex-wrap:wrap}
+  .inks button{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--ink);background:var(--c);cursor:pointer;padding:0;position:relative}
+  .inks button[aria-pressed=true]{outline:2px solid var(--ink);outline-offset:3px}
+  .seg{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--ink);margin-bottom:12px}
+  .seg button{border:0;background:transparent;font:inherit;font-size:11px;letter-spacing:.1em;padding:7px 0;cursor:pointer;color:var(--ink);text-transform:uppercase}
+  .seg button[aria-pressed=true]{background:var(--ink);color:var(--label)}
+  .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .btns button{font:inherit;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;padding:10px 6px;border:1.5px solid var(--ink);
+    background:var(--label);color:var(--ink);cursor:pointer;transition:transform .08s,box-shadow .08s;box-shadow:3px 3px 0 var(--ink)}
+  .btns button:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+  .btns button.go{grid-column:1/-1;background:var(--red);color:#fff8ea;font-weight:700;font-size:13px}
+  .spec{margin:14px 0 0;font-size:10.5px;line-height:1.7;color:#3b4652;border-top:1px dashed var(--ink);padding-top:10px}
+  .spec b{color:var(--ink)}
+  @media (max-width:820px){.desk{grid-template-columns:1fr;padding-top:44px}.sheet{order:-1;max-height:none}
+    .sheet{background-size:40px 40px,40px 40px,8px 8px,8px 8px}}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← 100</a>
+<main class="desk">
+  <section class="card" aria-label="Gear settings">
+    <h1><span>ROSETTE BUREAU · PLATE 71</span>Spirograph<br>Studio</h1>
+    <p class="lede">Pin the ring, seat a wheel, choose a hole for the pen. Every layer is one unbroken line that closes on itself.</p>
+    <div class="row"><label for="R">Ring teeth</label><output id="oR"></output><input id="R" type="range" min="60" max="150" value="105"></div>
+    <div class="row"><label for="r">Wheel teeth</label><output id="or"></output><input id="r" type="range" min="12" max="96" value="64"></div>
+    <div class="row"><label for="d">Pen hole offset</label><output id="od"></output><input id="d" type="range" min="5" max="120" value="78"></div>
+    <div class="row"><label for="s">Hand speed</label><output id="os"></output><input id="s" type="range" min="1" max="12" value="5"></div>
+    <div class="seg" role="group" aria-label="Wheel position">
+      <button id="in" aria-pressed="true">Wheel inside</button><button id="out" aria-pressed="false">Wheel outside</button>
+    </div>
+    <div class="inks" id="inks" role="group" aria-label="Ink colour"></div>
+    <div class="btns">
+      <button class="go" id="draw">Draw layer</button>
+      <button id="rand">Shuffle gears</button><button id="undo">Lift last</button>
+      <button id="clear" style="grid-column:1/-1">Fresh sheet</button>
+    </div>
+    <p class="spec" id="spec"></p>
+  </section>
+  <section class="sheet" id="sheet" aria-label="Drawing sheet">
+    <canvas id="ink"></canvas><canvas id="gear"></canvas>
+    <div class="tape"></div>
+    <div class="stamp">SCALE 1:1 · <b id="count">0 LAYERS</b><br>DRAWN BY HAND, MORE OR LESS</div>
+  </section>
+</main>
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const sheet=$('sheet'),ink=$('ink'),gear=$('gear'),ix=ink.getContext('2d'),gx=gear.getContext('2d');
+  const INKS=['#1f3f8f','#c8372d','#0f7a6b','#7b2f8c','#d98a12','#1d2b3a'];
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W=0,H=0,dpr=1,rad=0,color=INKS[0],outside=false,layers=[],active=null,raf=0;
+  const gcd=(a,b)=>b?gcd(b,a%b):a;
+
+  INKS.forEach((c,i)=>{const b=document.createElement('button');b.style.setProperty('--c',c);b.setAttribute('aria-label','Ink '+(i+1));
+    b.setAttribute('aria-pressed',i===0);b.onclick=()=>{color=c;[...$('inks').children].forEach(x=>x.setAttribute('aria-pressed',x===b));preview()};$('inks').appendChild(b)});
+
+  function cfg(){return{R:+$('R').value,r:+$('r').value,d:+$('d').value/100,out:outside,color}}
+  function scale(L){return rad/(L.out?L.R+L.r*(1+Math.max(1,L.d)):Math.max(L.R,L.R-L.r+L.d*L.r))}
+  function pt(L,t){const k=L.out?L.R+L.r:L.R-L.r,q=k/L.r,s=scale(L),d=L.d*L.r,sg=L.out?-1:1;
+    return[W/2+s*(k*Math.cos(t)+sg*d*Math.cos(q*t)),H/2+s*(k*Math.sin(t)-d*Math.sin(q*t))]}
+  function total(L){return Math.PI*2*L.r/gcd(L.R,L.r)}
+  function stroke(L,t0,t1){const q=(L.out?L.R+L.r:L.R-L.r)/L.r,st=Math.min(.03,.07/q);
+    ix.strokeStyle=L.color;ix.lineWidth=1.25*dpr;ix.globalAlpha=.82;ix.lineJoin=ix.lineCap='round';
+    ix.beginPath();let p=pt(L,t0);ix.moveTo(p[0],p[1]);
+    for(let t=t0+st;t<t1;t+=st){p=pt(L,t);ix.lineTo(p[0],p[1])}
+    p=pt(L,t1);ix.lineTo(p[0],p[1]);ix.stroke();ix.globalAlpha=1}
+  function redraw(){ix.clearRect(0,0,W,H);layers.forEach(L=>stroke(L,0,L.t))}
+  function drawGears(L,t,ghost){
+    gx.clearRect(0,0,W,H);if(!L)return;
+    const s=scale(L),k=L.out?L.R+L.r:L.R-L.r,cx=W/2+s*k*Math.cos(t),cy=H/2+s*k*Math.sin(t),p=pt(L,t);
+    gx.lineWidth=1*dpr;gx.strokeStyle='rgba(29,43,58,'+(ghost?.28:.5)+')';
+    gx.setLineDash([2*dpr,3*dpr]);gx.beginPath();gx.arc(W/2,H/2,s*L.R,0,7);gx.stroke();
+    gx.setLineDash([]);gx.beginPath();gx.arc(W/2,H/2,s*L.R+(L.out?-5:5)*dpr,0,7);gx.stroke();
+    gx.fillStyle='rgba(120,160,190,'+(ghost?.07:.13)+')';gx.beginPath();gx.arc(cx,cy,s*L.r,0,7);gx.fill();
+    gx.setLineDash([2*dpr,3*dpr]);gx.stroke();gx.setLineDash([]);
+    // spokes show the wheel turning
+    const q=k/L.r,a=-q*t*(L.out?-1:1)+(L.out?Math.PI:0);
+    gx.beginPath();for(let i=0;i<3;i++){const b=(L.out?q*t+Math.PI:-q*t)+i*Math.PI*2/3;gx.moveTo(cx,cy);gx.lineTo(cx+Math.cos(b)*s*L.r*.92,cy+Math.sin(b)*s*L.r*.92)}
+    gx.strokeStyle='rgba(29,43,58,.18)';gx.stroke();
+    gx.strokeStyle='rgba(29,43,58,.55)';gx.beginPath();gx.moveTo(cx,cy);gx.lineTo(p[0],p[1]);gx.stroke();
+    gx.fillStyle='#1d2b3a';gx.beginPath();gx.arc(cx,cy,2.2*dpr,0,7);gx.fill();
+    gx.fillStyle=L.color;gx.beginPath();gx.arc(p[0],p[1],(ghost?3.2:4.2)*dpr,0,7);gx.fill();
+    gx.strokeStyle='#fff';gx.lineWidth=1.2*dpr;gx.stroke();
+  }
+  function preview(){readout();if(!active)drawGears(cfg(),0,true)}
+  function readout(){
+    const c=cfg(),g=gcd(c.R,c.r);
+    $('oR').textContent=c.R;$('or').textContent=c.r;$('od').textContent=Math.round(c.d*100)+'%';$('os').textContent='×'+$('s').value;
+    $('spec').innerHTML='<b>'+(c.R/g)+'</b> lobes · closes after <b>'+(c.r/g)+'</b> turn'+(c.r/g>1?'s':'')+' of the ring<br>ratio '+c.R+':'+c.r+(g>1?' = '+(c.R/g)+':'+(c.r/g):' (coprime — the long way round)');
+    $('count').textContent=layers.length+(layers.length===1?' LAYER':' LAYERS');
+  }
+  function tick(){
+    raf=0;if(!active)return;
+    const L=active,T=total(L),t1=Math.min(T,L.t+(+$('s').value)*.055);
+    stroke(L,L.t,t1);L.t=t1;drawGears(L,t1,false);
+    if(t1>=T){finish()}else raf=requestAnimationFrame(tick);
+  }
+  function finish(){
+    if(!active)return;const L=active,T=total(L);
+    if(L.t<T){stroke(L,L.t,T);L.t=T}
+    active=null;$('draw').textContent='Draw layer';preview();
+  }
+  function start(c){
+    if(active)finish();
+    const L=Object.assign({t:0},c||cfg());layers.push(L);active=L;readout();
+    if(reduce){finish();return}
+    $('draw').textContent='Finish stroke';if(!raf)raf=requestAnimationFrame(tick);
+  }
+  $('draw').onclick=()=>{active?finish():start()};
+  $('undo').onclick=()=>{if(active){active=null;$('draw').textContent='Draw layer'}layers.pop();redraw();preview()};
+  $('clear').onclick=()=>{active=null;layers=[];$('draw').textContent='Draw layer';redraw();preview()};
+  $('rand').onclick=()=>{
+    const R=60+Math.floor(Math.random()*19)*5,cands=[];for(let r=12;r<=96;r++){const t=r/gcd(R,r);if(t>=3&&t<=24&&r<R-8)cands.push(r)}
+    $('R').value=R;$('r').value=cands[Math.floor(Math.random()*cands.length)]||40;$('d').value=35+Math.floor(Math.random()*75);
+    const b=$('inks').children[Math.floor(Math.random()*INKS.length)];b.click();preview();
+  };
+  $('in').onclick=()=>{outside=false;$('in').setAttribute('aria-pressed',true);$('out').setAttribute('aria-pressed',false);preview()};
+  $('out').onclick=()=>{outside=true;$('out').setAttribute('aria-pressed',true);$('in').setAttribute('aria-pressed',false);preview()};
+  ['R','r','d','s'].forEach(id=>$(id).addEventListener('input',preview));
+
+  function resize(){
+    const b=sheet.getBoundingClientRect();dpr=Math.min(2,window.devicePixelRatio||1);
+    W=Math.round(b.width*dpr);H=Math.round(b.height*dpr);
+    [ink,gear].forEach(c=>{c.width=W;c.height=H});rad=Math.min(W,H)*.445;
+    redraw();if(active)drawGears(active,active.t,false);else preview();
+  }
+  new ResizeObserver(resize).observe(sheet);resize();
+  // an opening study so the sheet is never blank
+  [{R:105,r:45,d:.9,out:false,color:INKS[2]},{R:96,r:60,d:.55,out:false,color:INKS[4]}].forEach(L=>{L.t=total(L);layers.push(L)});
+  redraw();start({R:105,r:64,d:.78,out:false,color:INKS[0]});
+})();
+</script>
+</body>
+</html>

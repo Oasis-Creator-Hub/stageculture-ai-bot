@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skerry Yoke — a fair-isle band designer</title>
+<meta name="description" content="Paint stitches on a knitting chart rendered as real knit V-stitches and watch your fair-isle band repeat across a jumper yoke.">
+<style>
+  :root { --oat: #efe5d2; --ink: #3a2c26; --berry: #a52f3b; --line: #cdbfa6; }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: var(--ink); font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    background-color: var(--oat);
+    background-image: repeating-linear-gradient(0deg, rgba(120,90,50,.045) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(120,90,50,.04) 0 1px, transparent 1px 3px); }
+  .leaflet { max-width: 1080px; margin: 0 auto; padding: clamp(18px, 4vw, 48px) clamp(14px, 4vw, 40px) 56px; }
+  header { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 12px 24px; border-bottom: 3px double var(--ink); padding-bottom: 14px; }
+  .maker { font: 700 .68rem/1.2 "Rockwell", "Roboto Slab", "Courier New", serif; letter-spacing: .3em; text-transform: uppercase; color: var(--berry); }
+  h1 { margin: .12em 0 0; font: 700 clamp(2rem, 6.4vw, 3.9rem)/.95 "Rockwell", "Roboto Slab", "Bookman Old Style", Georgia, serif; letter-spacing: -.02em; }
+  h1 em { font-family: Georgia, serif; font-weight: 400; color: var(--berry); }
+  .no { text-align: right; font: 700 .7rem/1.5 "Rockwell", "Roboto Slab", serif; letter-spacing: .2em; text-transform: uppercase; }
+  .no a { color: inherit; text-decoration: none; border-bottom: 1px solid currentColor; }
+  .no a:hover { color: var(--berry); }
+  .work { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: clamp(18px, 4vw, 48px); margin-top: clamp(18px, 3vw, 34px); align-items: start; }
+  .chartwrap { background: #fbf6ea; border: 1px solid var(--line); border-radius: 14px; padding: 14px 14px 10px; box-shadow: 0 14px 30px -18px rgba(70,40,10,.6); }
+  .chartwrap canvas, .band canvas { display: block; width: 100%; border-radius: 6px; }
+  #chart { touch-action: none; cursor: cell; }
+  .chartwrap small { display: flex; justify-content: space-between; margin-top: 8px; font: 700 .62rem/1 "Rockwell", "Roboto Slab", serif; letter-spacing: .22em; text-transform: uppercase; color: #8a7760; }
+  h2 { margin: 0 0 .7em; font: 700 .72rem/1 "Rockwell", "Roboto Slab", serif; letter-spacing: .28em; text-transform: uppercase; }
+  h2::before { content: "\2726  "; color: var(--berry); }
+  .yarns { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-bottom: 22px; }
+  .yarn { border: 0; background: none; padding: 6px 0 0; cursor: pointer; font: italic .82rem/1.2 Georgia, serif; color: var(--ink); text-align: center; }
+  .yarn i { display: block; width: min(100%, 58px); aspect-ratio: 1; margin: 0 auto 6px; border-radius: 50%;
+    background: repeating-linear-gradient(48deg, rgba(255,255,255,.2) 0 2px, transparent 2px 5px), repeating-linear-gradient(-32deg, rgba(0,0,0,.16) 0 2px, transparent 2px 6px), radial-gradient(circle at 35% 30%, rgba(255,255,255,.35), transparent 55%), var(--c);
+    box-shadow: inset -4px -6px 10px rgba(0,0,0,.28), 0 3px 5px rgba(60,30,0,.3); transition: transform .2s; }
+  .yarn:hover i { transform: translateY(-3px) rotate(-8deg); }
+  .yarn[aria-pressed="true"] i { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .yarn:focus-visible, .tools button:focus-visible { outline: 2px dashed var(--berry); outline-offset: 3px; }
+  .tools { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+  .tools button { font: 700 .68rem/1 "Rockwell", "Roboto Slab", serif; letter-spacing: .14em; text-transform: uppercase; padding: .8em 1em; border: 1.5px solid var(--ink); border-radius: 99px; background: transparent; color: var(--ink); cursor: pointer; transition: background .2s, color .2s; }
+  .tools button:hover, .tools button[aria-pressed="true"] { background: var(--ink); color: var(--oat); }
+  .notes { border-top: 1px dashed var(--ink); padding-top: 16px; font-size: .98rem; line-height: 1.6; }
+  .notes p { margin: 0 0 .8em; }
+  .gauge { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 0 18px; padding: 0; list-style: none; }
+  .gauge li { background: #fbf6ea; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font: 700 .6rem/1.3 "Rockwell", "Roboto Slab", serif; letter-spacing: .16em; text-transform: uppercase; color: #8a7760; }
+  .gauge b { display: block; font: 700 1.5rem/1.1 "Rockwell", "Roboto Slab", serif; letter-spacing: 0; color: var(--ink); }
+  .gauge li.warn b { color: var(--berry); }
+  .band { margin-top: clamp(22px, 4vw, 40px); }
+  .band canvas { border-radius: 14px; box-shadow: 0 18px 34px -18px rgba(70,40,10,.7); }
+  @media (max-width: 760px) { .work { grid-template-columns: 1fr; } header { grid-template-columns: 1fr; } .no { text-align: left; } }
+</style>
+</head>
+<body>
+<div class="leaflet">
+  <header>
+    <div><div class="maker">Skerry Wool Co. &middot; Leaflet No. 84</div><h1>Yoke band, <em>your way</em></h1></div>
+    <div class="no"><a href="index.html">&larr; 100</a><br>12-stitch repeat</div>
+  </header>
+  <div class="work">
+    <div class="chartwrap">
+      <canvas id="chart" aria-label="Knitting chart, 12 stitches by 17 rows. Click or drag to paint stitches."></canvas>
+      <small><span>&larr; knit this way</span><span>12 sts &times; 17 rows</span></small>
+    </div>
+    <div>
+      <h2>Yarn basket</h2>
+      <div class="yarns" id="yarns"></div>
+      <h2>Needle case</h2>
+      <div class="tools">
+        <button id="mirror" aria-pressed="true">Mirror</button>
+        <button data-p="diamond">Lerwick diamond</button>
+        <button data-p="zigzag">Peerie zigzag</button>
+        <button data-p="hearts">Sweethearts</button>
+        <button id="clear">Unravel</button>
+      </div>
+      <ul class="gauge">
+        <li id="gFloat"><b>0</b>longest float</li>
+        <li id="gRows"><b>0</b>rows over two colours</li>
+        <li><b id="gSts">0</b>contrast stitches</li>
+      </ul>
+      <div class="notes">
+        <p>Pick a ball, then click or drag across the chart. Every stitch you paint repeats round the yoke below, the way it will on the needles.</p>
+        <p><i>Granny Isbister&rsquo;s rule:</i> two colours to a row, and never carry a strand further than five stitches without catching it &mdash; little fingers find long floats.</p>
+      </div>
+    </div>
+  </div>
+  <div class="band">
+    <h2>Round the yoke</h2>
+    <canvas id="band" aria-label="Preview of the pattern repeating across knitted fabric"></canvas>
+  </div>
+</div>
+<script>
+(() => {
+  const COLS = 12, ROWS = 17;
+  const YARN = [['Oat', '#eadfc8'], ['Rowanberry', '#a52f3b'], ['Peat moss', '#2f5a48'], ['Gorse', '#d79f1e'], ['Harbour', '#273a63']];
+  const chart = document.getElementById('chart'), band = document.getElementById('band');
+  const cg = chart.getContext('2d'), bg = band.getContext('2d');
+  let grid = [], cur = 1, mirror = true, hover = null, cw, ch;
+  const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16), f = v => Math.max(0, Math.min(255, Math.round(k < 0 ? v * (1 + k) : v + (255 - v) * k))); return `rgb(${f(n >> 16)},${f(n >> 8 & 255)},${f(n & 255)})`; };
+  const TONES = YARN.map(([, c]) => ({ base: c, dark: shade(c, -.42), mid: shade(c, -.16), light: shade(c, .28) }));
+
+  const PRESETS = {
+    diamond: (x, y) => {
+      if (y === 0 || y === 16) return 4; if (y === 1 || y === 15) return x % 2 ? 0 : 3; if (y === 2 || y === 14) return 1;
+      const d = Math.abs(x - 5.5) + Math.abs(y - 8);
+      if (d < 1.6) return 3; if (d < 3.6) return 1; if (d < 4.6) return 0; if (d < 5.6) return 2;
+      if ((x === 0 || x === 11) && Math.abs(y - 8) < 2) return 4; if ((x === 1 || x === 10) && y === 8) return 4; return 0;
+    },
+    zigzag: (x, y) => { if (y === 8) return x % 2 ? 0 : 4; const yy = y < 8 ? y : 16 - y; return [1, 1, 0, 3, 0, 2, 2, 0][(yy + Math.abs(x % 6 - 3)) % 8]; },
+    hearts: (x, y) => {
+      const H = ['.##.##.', '#######', '#######', '.#####.', '..###..', '...#...'];
+      if (y === 0 || y === 16) return 4; if (y === 8) return x % 2 ? 3 : 0;
+      if (y >= 2 && y <= 7 && H[y - 2][x - 2] === '#') return 1;
+      if (y >= 9 && y <= 14 && H[y - 9][(x + 6) % 12 - 2] === '#') return 2; return 0;
+    }
+  };
+  const load = name => { grid = []; for (let y = 0; y < ROWS; y++) { grid.push([]); for (let x = 0; x < COLS; x++) grid[y].push(PRESETS[name] ? PRESETS[name](x, y) : 0); } render(); };
+
+  // one knit stitch: two plump legs meeting in a V, lit from the top-left
+  function stitch(g, x, y, w, h, t) {
+    g.lineCap = 'round';
+    const leg = (sx, lw, col, dx, dy) => {
+      g.strokeStyle = col; g.lineWidth = lw; g.beginPath();
+      g.moveTo(x + w * .5 + sx * w * .04 + dx, y + h * 1.04 + dy);
+      g.quadraticCurveTo(x + w * .5 + sx * w * .3 + dx, y + h * .55 + dy, x + w * .5 + sx * w * .31 + dx, y - h * .14 + dy);
+      g.stroke();
+    };
+    for (const sx of [-1, 1]) {
+      leg(sx, w * .4, t.dark, 0, h * .05);
+      leg(sx, w * .34, sx < 0 ? t.base : t.mid, 0, 0);
+      leg(sx, w * .07, t.light, -w * .07, -h * .02);
+      leg(sx, w * .035, t.dark, w * .05, 0);
+    }
+  }
+  function fabric(g, cols, rows, w, h, at, ox = 0, oy = 0) {
+    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) { g.fillStyle = TONES[at(x, y)].dark; g.fillRect(ox + x * w, oy + y * h, w + 1, h + 1); }
+    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) stitch(g, ox + x * w, oy + y * h, w, h, TONES[at(x, y)]);
+  }
+  function size(c, g, hCss) {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2), wCss = c.clientWidth;
+    c.style.height = hCss(wCss) + 'px'; c.width = Math.round(wCss * dpr); c.height = Math.round(hCss(wCss) * dpr);
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); return wCss;
+  }
+  function render() {
+    const w = size(chart, cg, w => Math.round(w / COLS * .8 * ROWS));
+    cw = w / COLS; ch = cw * .8;
+    fabric(cg, COLS, ROWS, cw, ch, (x, y) => grid[y][x]);
+    cg.strokeStyle = 'rgba(40,25,10,.16)'; cg.lineWidth = 1; cg.beginPath();
+    for (let x = 1; x < COLS; x++) { cg.moveTo(Math.round(x * cw) + .5, 0); cg.lineTo(Math.round(x * cw) + .5, ROWS * ch); }
+    for (let y = 1; y < ROWS; y++) { cg.moveTo(0, Math.round(y * ch) + .5); cg.lineTo(w, Math.round(y * ch) + .5); }
+    cg.stroke();
+    if (hover) { cg.strokeStyle = '#fff'; cg.lineWidth = 2.5; cg.strokeRect(hover[0] * cw + 1.5, hover[1] * ch + 1.5, cw - 3, ch - 3); cg.strokeStyle = '#3a2c26'; cg.lineWidth = 1; cg.strokeRect(hover[0] * cw + .5, hover[1] * ch + .5, cw - 1, ch - 1); }
+    // yoke preview: plain rounds, the band, plain rounds, then 2x2 rib
+    const bwCss = band.clientWidth, sw = bwCss < 520 ? 9 : 13, sh = sw * .8, PAD = 5, RIB = 7, total = PAD * 2 + ROWS + RIB;
+    size(band, bg, () => Math.round(total * sh));
+    const bcols = Math.ceil(bwCss / sw) + 1;
+    fabric(bg, bcols, total - RIB, sw, sh, (x, y) => (y < PAD || y >= PAD + ROWS) ? 0 : grid[y - PAD][x % COLS]);
+    const ry = (total - RIB) * sh;
+    for (let x = 0; x < bcols; x++) {
+      const purl = x % 4 > 1;
+      bg.fillStyle = purl ? shade(YARN[4][1], -.5) : TONES[4].dark; bg.fillRect(x * sw, ry, sw + 1, RIB * sh + 2);
+      if (!purl) for (let y = 0; y < RIB; y++) stitch(bg, x * sw, ry + y * sh, sw, sh, TONES[4]);
+      else for (let y = 0; y < RIB; y++) { bg.strokeStyle = shade(YARN[4][1], -.25); bg.lineWidth = sh * .3; bg.lineCap = 'round'; bg.beginPath(); bg.moveTo(x * sw + sw * .2, ry + y * sh + sh * .5); bg.lineTo(x * sw + sw * .8, ry + y * sh + sh * .5); bg.stroke(); }
+    }
+    const v = bg.createLinearGradient(0, 0, 0, total * sh);
+    v.addColorStop(0, 'rgba(255,250,235,.28)'); v.addColorStop(.3, 'rgba(255,250,235,0)'); v.addColorStop(.75, 'rgba(40,20,0,0)'); v.addColorStop(1, 'rgba(40,20,0,.32)');
+    bg.fillStyle = v; bg.fillRect(0, 0, bwCss, total * sh);
+    gauges();
+  }
+  function gauges() {
+    let longest = 0, over = 0, sts = 0;
+    for (const row of grid) {
+      const kinds = new Set(row); if (kinds.size > 2) over++;
+      row.forEach(c => { if (c) sts++; });
+      if (kinds.size > 1) { let run = 1; for (let x = 1; x < COLS * 2; x++) { if (row[x % COLS] === row[(x - 1) % COLS]) run++; else run = 1; longest = Math.max(longest, Math.min(run, COLS)); } }
+    }
+    const f = document.getElementById('gFloat'), r = document.getElementById('gRows');
+    f.firstChild.textContent = longest + ' st' + (longest === 1 ? '' : 's'); f.classList.toggle('warn', longest > 5);
+    r.firstChild.textContent = over; r.classList.toggle('warn', over > 0);
+    document.getElementById('gSts').textContent = sts;
+  }
+  const cellAt = e => { const b = chart.getBoundingClientRect(), x = Math.floor((e.clientX - b.left) / b.width * COLS), y = Math.floor((e.clientY - b.top) / b.height * ROWS); return x >= 0 && x < COLS && y >= 0 && y < ROWS ? [x, y] : null; };
+  let painting = false;
+  const paint = c => { if (!c) return; grid[c[1]][c[0]] = cur; if (mirror) grid[c[1]][COLS - 1 - c[0]] = cur; };
+  chart.addEventListener('pointerdown', e => { painting = true; chart.setPointerCapture(e.pointerId); hover = cellAt(e); paint(hover); render(); });
+  chart.addEventListener('pointermove', e => { const c = cellAt(e); if (painting) paint(c); if (painting || String(c) !== String(hover)) { hover = c; render(); } });
+  const stop = () => { painting = false; };
+  chart.addEventListener('pointerup', stop); chart.addEventListener('pointercancel', stop);
+  chart.addEventListener('pointerleave', () => { if (!painting) { hover = null; render(); } });
+
+  const yarns = document.getElementById('yarns');
+  YARN.forEach(([name, c], i) => {
+    const b = document.createElement('button'); b.className = 'yarn'; b.style.setProperty('--c', c); b.setAttribute('aria-pressed', i === cur);
+    b.innerHTML = `<i></i>${name}`; yarns.appendChild(b);
+    b.addEventListener('click', () => { cur = i; [...yarns.children].forEach((o, k) => o.setAttribute('aria-pressed', k === i)); });
+  });
+  document.querySelectorAll('[data-p]').forEach(b => b.addEventListener('click', () => load(b.dataset.p)));
+  document.getElementById('clear').addEventListener('click', () => load('none'));
+  document.getElementById('mirror').addEventListener('click', e => { mirror = !mirror; e.currentTarget.setAttribute('aria-pressed', mirror); });
+  let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(render, 100); });
+  load('diamond');
+})();
+</script>
+</body>
+</html>

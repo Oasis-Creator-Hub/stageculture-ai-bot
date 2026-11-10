@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perpetual Tea-Tide Engine Mk. IV — General Arrangement</title>
+<meta name="description" content="A cyanotype engineering blueprint of an impossible machine. The linework draws itself, the gears turn, and the callouts explain nothing reassuring.">
+<style>
+  :root{--b0:#0c2f6b;--b1:#123f8c;--ln:#e6f1ff;--dim:#9fc3f5;--hi:#ffe27a}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;padding:clamp(8px,2vw,28px);color:var(--ln);
+    font-family:"Lucida Console","Menlo","Consolas","DejaVu Sans Mono","Courier New",monospace;text-transform:uppercase;letter-spacing:.08em;
+    background:#071a3d}
+  .sheet{position:relative;max-width:1320px;margin:0 auto;padding:clamp(10px,1.6vw,22px);
+    background:
+      radial-gradient(ellipse at 12% 8%,rgba(120,170,255,.22),transparent 45%),
+      radial-gradient(ellipse at 90% 96%,rgba(3,14,44,.55),transparent 50%),
+      linear-gradient(rgba(190,215,255,.13) 1px,transparent 1px) 0 0/100px 100px,
+      linear-gradient(90deg,rgba(190,215,255,.13) 1px,transparent 1px) 0 0/100px 100px,
+      linear-gradient(rgba(190,215,255,.06) 1px,transparent 1px) 0 0/20px 20px,
+      linear-gradient(90deg,rgba(190,215,255,.06) 1px,transparent 1px) 0 0/20px 20px,
+      linear-gradient(160deg,var(--b1),var(--b0));
+    box-shadow:0 0 0 1px #2b5db3,0 30px 70px rgba(0,0,0,.6)}
+  .sheet::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;mix-blend-mode:soft-light;background:#888;filter:url(#grain)}
+  .frame{position:relative;border:2px solid var(--ln);outline:1px solid var(--ln);outline-offset:-7px;padding:clamp(10px,1.6vw,20px)}
+  .top{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap;font-size:clamp(9px,1vw,11.5px);padding:2px 4px 8px;border-bottom:1px solid var(--dim)}
+  .top a{color:var(--ln);text-decoration:none;border:1px solid var(--ln);padding:3px 8px}
+  .top a:hover,.top a:focus-visible{background:var(--ln);color:var(--b0);outline:none}
+  .top b{font-weight:400;color:var(--hi)}
+  svg#dwg{display:block;width:100%;height:auto;margin:6px 0}
+  #dwg *{vector-effect:none}
+  #dwg .d,#dwg .f{fill:none;stroke:var(--ln);stroke-width:1.7;stroke-linejoin:round}
+  #dwg .thin{stroke-width:.9;stroke:var(--dim)}
+  #dwg .cl{stroke-dasharray:16 5 3 5;stroke-width:.9;stroke:var(--dim)}
+  #dwg .hid{stroke-dasharray:7 6;stroke-width:1;stroke:var(--dim)}
+  #dwg .rv{stroke-dasharray:.1 11;stroke-linecap:round;stroke-width:3.4}
+  #dwg .drip{stroke-dasharray:2 16;stroke-linecap:round;stroke-width:3;animation:drip 1.6s linear infinite}
+  @keyframes drip{to{stroke-dashoffset:-18}}
+  #dwg text{fill:var(--ln);stroke:none;font-size:13px;letter-spacing:.1em}
+  #dwg text.sm{font-size:10.5px;fill:var(--dim)}
+  #dwg .bal circle{fill:var(--b1)}
+  #dwg .bal text{font-size:14px;text-anchor:middle;letter-spacing:0}
+  #dwg .bal{cursor:pointer}
+  #dwg .part.hl .d,#dwg .part.hl .f,#dwg .bal.hl *{stroke:var(--hi)}
+  #dwg .bal.hl text{fill:var(--hi);stroke:none}
+  #dwg .part .d{transition:stroke .2s}
+  .d{stroke-dasharray:1;stroke-dashoffset:1}
+  .f{opacity:0}
+  .go .d{animation:draw 1.5s cubic-bezier(.6,0,.25,1) forwards;animation-delay:calc(var(--i) * 46ms)}
+  .go .f{animation:fade .9s ease forwards;animation-delay:calc(var(--i) * 46ms)}
+  .go .f.drip{animation:fade .9s ease forwards,drip 1.6s linear infinite;animation-delay:calc(var(--i) * 46ms),0s}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @keyframes fade{to{opacity:1}}
+
+  .bottom{display:grid;grid-template-columns:1fr 1.25fr 1.15fr;gap:0;border-top:2px solid var(--ln);font-size:clamp(9px,.95vw,11px);line-height:1.55}
+  .bottom > div{padding:10px 12px}
+  .bottom > div + div{border-left:1px solid var(--ln)}
+  h2{font-size:1em;font-weight:400;margin:0 0 6px;color:var(--hi);letter-spacing:.2em}
+  ol{margin:0;padding:0;list-style:none;counter-reset:n}
+  ol li{counter-increment:n;padding:2px 4px 2px 2.6em;position:relative;cursor:default;border:1px solid transparent}
+  ol li::before{content:counter(n);position:absolute;left:2px;top:2px;width:1.7em;height:1.7em;border:1px solid var(--ln);border-radius:50%;display:grid;place-items:center;letter-spacing:0;font-size:.95em}
+  #legend li{cursor:pointer}
+  #legend li.hl,#legend li:focus-visible{color:var(--hi);outline:none;border-color:var(--hi)}
+  #legend li.hl::before,#legend li:focus-visible::before{border-color:var(--hi)}
+  .tb{display:grid;grid-template-columns:1fr 1fr;padding:0 !important}
+  .tb > div{padding:6px 10px;border-bottom:1px solid var(--ln)}
+  .tb > div:nth-child(odd):not(.wide){border-right:1px solid var(--ln)}
+  .tb .wide{grid-column:1 / -1}
+  .tb small{display:block;font-size:.78em;color:var(--dim);letter-spacing:.2em}
+  .tb .big{font-size:clamp(13px,1.7vw,20px);letter-spacing:.06em;line-height:1.15;color:#fff}
+  .tb > div:nth-last-child(-n+2){border-bottom:0}
+  button{font:inherit;text-transform:inherit;letter-spacing:.16em;color:var(--b0);background:var(--ln);border:0;padding:7px 12px;cursor:pointer}
+  button:hover,button:focus-visible{background:var(--hi);outline:none}
+  @media (max-width:860px){
+    .bottom{grid-template-columns:1fr}.bottom > div + div{border-left:0;border-top:1px solid var(--ln)}
+    #dwg .d,#dwg .f{stroke-width:2.6}#dwg .thin,#dwg .cl,#dwg .hid{stroke-width:1.8}
+    #dwg text{font-size:20px}#dwg text.sm{font-size:17px}#dwg .bal text{font-size:22px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .d{stroke-dashoffset:0}.f{opacity:1}.go .d,.go .f,#dwg .drip,.go .f.drip{animation:none}
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.4 -.45"/><feComposite in2="SourceGraphic" operator="in"/></filter></svg>
+<main class="sheet"><div class="frame">
+  <div class="top"><a href="index.html">← 100</a><span>Fig. 1 — General arrangement · elevation, facing Wednesday</span><span>Do not scale · <b>do not operate</b></span></div>
+  <svg id="dwg" viewBox="0 0 1200 720" role="img" aria-label="Blueprint elevation of an impossible steam machine with gears, a boiler, a Penrose truss, a crossed belt and a teacup"></svg>
+  <div class="bottom">
+    <div><h2>General notes</h2>
+      <ol><li>All dimensions approximate unless measured, in which case wrong.</li><li>Truss (item 5) to be assembled in a room with no corners.</li><li>Tolerances: generous. Fits: sulking.</li><li>Machine shall not be run in the presence of philosophers or cats.</li></ol></div>
+    <div><h2>Parts list — tap to locate</h2>
+      <ol id="legend">
+        <li tabindex="0" data-p="1">Grand flywheel of regret — turns only when unobserved</li>
+        <li tabindex="0" data-p="2">Idler pinions of mild opinion (pair)</li>
+        <li tabindex="0" data-p="3">Tuesday intake hopper, afternoons only</li>
+        <li tabindex="0" data-p="4">Boiler, Assam-fired, 2 sugars max. pressure</li>
+        <li tabindex="0" data-p="5">Impossible truss — rigid in three dimensions, pick two</li>
+        <li tabindex="0" data-p="6">Möbius drive belt — lubricate the other side</li>
+        <li tabindex="0" data-p="7">Hesitation governor</li>
+        <li tabindex="0" data-p="8">Output: one (1) cup, eventually</li>
+        <li tabindex="0" data-p="9">Sighing cylinder &amp; connecting rod</li>
+      </ol></div>
+    <div class="tb">
+      <div class="wide"><small>Title</small><span class="big">Perpetual Tea-Tide Engine, Mk. IV</span></div>
+      <div><small>Drawn</small>O. Pellwright</div><div><small>Checked</small>Nobody, twice</div>
+      <div><small>Scale</small>1 : Whimsy</div><div><small>Sheet</small>3 of 2</div>
+      <div><small>Dwg. no.</small>TT-0404-∞ rev. Q</div><div><button type="button" id="redraw">Redraw ↻</button></div>
+    </div>
+  </div>
+</div></main>
+
+<script>
+(() => {
+  const svg = document.getElementById('dwg'), reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const f = n => n.toFixed(1);
+  function teeth(cx, cy, r, n){
+    const p = Math.PI * 2 / n, ro = r + 7, ri = r - 6; let d = '';
+    for (let i = 0; i < n; i++){ const a = i * p;
+      [[ri, 0], [ri, .22], [ro, .34], [ro, .66], [ri, .78]].forEach(([rr, k], j) => { d += (i + j ? 'L' : 'M') + f(cx + Math.cos(a + k * p) * rr) + ' ' + f(cy + Math.sin(a + k * p) * rr); }); }
+    return `<path class="d" d="${d}Z"/>`;
+  }
+  function spokes(cx, cy, r0, r1, n){ let d = '';
+    for (let i = 0; i < n; i++){ const a = i / n * Math.PI * 2; d += `M${f(cx + Math.cos(a) * r0)} ${f(cy + Math.sin(a) * r0)}L${f(cx + Math.cos(a) * r1)} ${f(cy + Math.sin(a) * r1)}`; }
+    return `<path class="d" d="${d}"/>`; }
+  const G1 = {x: 330, y: 410, r: 140, n: 28}, G2 = {x: 493.8, y: 295.3, r: 60, n: 12}, G3 = {x: 576.1, y: 342.8, r: 35, n: 7};
+  const P1 = {x: 610, y: 566, r: 38}, P2 = {x: 1010, y: 520, r: 50};
+  const bal = (n, bx, by, tx, ty) => `<g class="f bal" data-p="${n}"><line class="thin" x1="${bx}" y1="${by}" x2="${tx}" y2="${ty}"/><circle cx="${bx}" cy="${by}" r="15"/><text x="${bx}" y="${by + 5}">${n}</text></g>`;
+
+  // ground + hatching
+  let hatch = ''; for (let x = 56; x < 1150; x += 20) hatch += `M${x} 640l-11 13`;
+  let h = `<line class="d" x1="40" y1="640" x2="1160" y2="640"/><path class="f thin" d="${hatch}"/>`;
+
+  // 9 — cylinder, piston, connecting rod
+  h += `<g class="part" id="p9"><rect class="d" x="48" y="385" width="124" height="50" rx="4"/><path class="d" d="M48 378v64M172 396v-14h10v56h-10v-14"/>
+    <path class="d" d="M72 435L60 640M148 435l12 205M66 540h88M63 590h94M66 540l91 50M154 540l-91 50"/>
+    <rect class="d" id="ph" y="391" width="12" height="38"/><line class="d" id="pr" y1="410" y2="410"/><line class="d" id="cr"/><circle class="d" id="pc" r="6" cy="410"/><circle class="d" id="cp" r="5"/></g>`;
+  // 1 — flywheel
+  h += `<g class="part" id="p1"><path class="d" d="M330 410L262 640M330 410l68 230M280 578h100M246 640h168"/>
+    <g id="g1">${teeth(G1.x, G1.y, G1.r, G1.n)}<circle class="d" cx="330" cy="410" r="118"/><circle class="d" cx="330" cy="410" r="24"/>${spokes(330, 410, 24, 118, 6)}<circle class="f hid" cx="330" cy="410" r="52"/></g>
+    <circle class="d" cx="330" cy="410" r="7"/><path class="f cl" d="M160 410h340M330 240v340"/></g>`;
+  // 2 — idlers on a backplate
+  h += `<g class="part" id="p2"><rect class="f hid" x="418" y="214" width="214" height="184" rx="10"/>
+    <g id="g2">${teeth(G2.x, G2.y, G2.r, G2.n)}<circle class="d" cx="${G2.x}" cy="${G2.y}" r="40"/>${spokes(G2.x, G2.y, 10, 40, 4)}<circle class="d" cx="${G2.x}" cy="${G2.y}" r="10"/></g>
+    <g id="g3">${teeth(G3.x, G3.y, G3.r, G3.n)}<circle class="d" cx="${G3.x}" cy="${G3.y}" r="9"/><path class="d" d="M${G3.x - 20} ${G3.y}h40"/></g></g>`;
+  // 3 — hopper
+  h += `<g class="part" id="p3"><path class="d" d="M440 100h108l-36 66v60h-36v-60z"/><path class="d" d="M430 100h128M476 166h36"/>
+    <path class="f thin" d="M470 50v34m-5-9l5 9 5-9M518 42v42m-5-9l5 9 5-9"/><text class="f sm" x="548" y="66">Tuesdays in</text></g>`;
+  // 4 — boiler
+  h += `<g class="part" id="p4"><rect class="d" x="700" y="230" width="160" height="240" rx="26"/><path class="d" d="M740 230c0-40 80-40 80 0"/>
+    <path class="d" d="M700 268h160M700 434h160"/><path class="f rv" d="M708 276h146M708 426h146"/>
+    <path class="d" d="M766 203V122h28v81M756 122h48"/><path class="d" d="M780 112c-16-16 14-26 0-44s14-24 2-40"/>
+    <circle class="d" cx="780" cy="330" r="30"/><path class="f thin" d="M758 318l5 3M766 308l4 5M780 304v6M794 308l-4 5M802 318l-5 3"/><line class="d" id="needle" x1="780" y1="330" x2="780" y2="308"/>
+    <rect class="d" x="832" y="296" width="10" height="100" rx="5"/><rect class="d" x="745" y="380" width="70" height="40" rx="6"/><path class="d" d="M772 400h16"/>
+    <path class="d" d="M722 470l-16 170M838 470l16 170M690 640h32M838 640h32"/>
+    <path class="d" d="M621 335h79M621 351h79M646 330v26M676 330v26"/><path class="d" d="M860 272h71M860 288h66M886 267v26"/>
+    <text class="f sm" x="806" y="60">Steam (decorative)</text></g>`;
+  // 7 — pendulum governor
+  h += `<g class="part" id="p7"><g id="pend"><line class="d" x1="661" y1="356" x2="661" y2="455"/><circle class="d" cx="661" cy="468" r="13"/></g><circle class="d" cx="661" cy="353" r="4"/>
+    <path class="f cl" d="M632.7 484.5A137 137 0 0 0 689.3 484.5"/><text class="f sm" x="696" y="502">±14° of doubt</text></g>`;
+  // 5 — Penrose truss (barycentric construction on a 5-unit lattice)
+  const A = [1010, 140], B = [1105, 305], C = [915, 305], N = 5;
+  const bc = (x, y, z) => f((x * A[0] + y * B[0] + z * C[0]) / N) + ' ' + f((x * A[1] + y * B[1] + z * C[1]) / N);
+  h += `<g class="part" id="p5"><path class="d" d="M${bc(4,1,0)}L${bc(4,0,1)}L${bc(1,0,4)}L${bc(0,1,4)}L${bc(0,4,1)}L${bc(1,4,0)}Z"/>
+    <path class="d" d="M${bc(3,1,1)}L${bc(1,3,1)}L${bc(1,1,3)}Z"/>
+    <path class="d" d="M${bc(1,1,3)}L${bc(1,0,4)}"/><path class="d" d="M${bc(3,1,1)}L${bc(4,1,0)}"/><path class="d" d="M${bc(1,3,1)}L${bc(0,4,1)}"/>
+    <line class="d" x1="1010" y1="305" x2="1010" y2="470"/></g>`;
+  // 6 — crossed (Möbius) belt between two pulleys
+  const dx = P2.x - P1.x, dy = P2.y - P1.y, dist = Math.hypot(dx, dy), phi = Math.atan2(dy, dx), al = Math.acos((P1.r + P2.r) / dist);
+  const tp = (p, a) => f(p.x + Math.cos(a) * p.r) + ' ' + f(p.y + Math.sin(a) * p.r);
+  h += `<g class="part" id="p6"><circle class="d" cx="${P1.x}" cy="${P1.y}" r="${P1.r}"/><circle class="d" cx="${P2.x}" cy="${P2.y}" r="${P2.r}"/>
+    <g id="q1"><path class="d" d="M${P1.x - 26} ${P1.y}h52M${P1.x} ${P1.y - 26}v52"/></g><g id="q2"><path class="d" d="M${P2.x - 36} ${P2.y}h72M${P2.x} ${P2.y - 36}v72"/></g>
+    <circle class="d" cx="${P1.x}" cy="${P1.y}" r="6"/><circle class="d" cx="${P2.x}" cy="${P2.y}" r="7"/>
+    <path class="d" d="M${tp(P1, phi + al)}L${tp(P2, phi + al + Math.PI)}"/><path class="d" d="M${tp(P1, phi - al)}L${tp(P2, phi - al + Math.PI)}"/>
+    <path class="d" d="M${P1.x} ${P1.y}l-22 74M${P1.x} ${P1.y}l22 74"/><path class="f cl" d="M${G3.x} ${G3.y}L${P1.x} ${P1.y}"/>
+    <circle class="f thin" cx="${f(P1.x + dx * P1.r / (P1.r + P2.r))}" cy="${f(P1.y + dy * P1.r / (P1.r + P2.r))}" r="12"/><text class="f sm" x="${f(P1.x + dx * .43 + 18)}" y="${f(P1.y + dy * .43 - 16)}">½ twist</text></g>`;
+  // 8 — the cup
+  h += `<g class="part" id="p8"><line class="f drip" x1="1088" y1="312" x2="1088" y2="584"/><path class="d" d="M1060 590h56c0 26-10 32-28 32s-28-6-28-32z"/><path class="d" d="M1116 596c15-2 15 17-3 17"/>
+    <path class="d" d="M1046 624c12 7 72 7 84 0M1036 630h104M1052 630v10M1124 630v10"/><path class="d" d="M1078 580c-6-8 6-12 0-20M1096 582c-6-8 6-12 0-20"/></g>`;
+  // dimensions
+  h += `<g><path class="f thin" d="M183 652v36M477 652v36M183 678h294M183 678l11-4v8zM477 678l-11-4v8z"/><text class="f sm" x="330" y="702" text-anchor="middle">Ø 9 ft 4 in (when dry)</text>
+    <path class="f thin" d="M1146 140h34M1146 640h34M1172 140v500M1172 140l-4 11h8zM1172 640l-4-11h8z"/><text class="f sm" transform="translate(1190 390) rotate(-90)" text-anchor="middle">One fathom, give or take</text>
+    <text class="f" x="48" y="60">Elevation A–A′</text><text class="f sm" x="48" y="80">Viewed from the side that exists</text></g>`;
+  h += bal(1, 214, 232, 252, 300) + bal(2, 600, 196, 536, 256) + bal(3, 396, 92, 446, 112) + bal(4, 912, 420, 860, 400) + bal(5, 1140, 178, 1080, 222)
+     + bal(6, 800, 612, 786, 562) + bal(7, 716, 440, 674, 462) + bal(8, 1150, 560, 1118, 588) + bal(9, 92, 338, 108, 385);
+  svg.innerHTML = h;
+  svg.querySelectorAll('.d,.f').forEach((el, i) => { el.style.setProperty('--i', i); if (el.classList.contains('d')) el.setAttribute('pathLength', '1'); });
+
+  const $ = id => document.getElementById(id), rot = (el, deg, p) => el.setAttribute('transform', `rotate(${f(deg)} ${p.x} ${p.y})`);
+  let th = .6;
+  function pose(t){
+    const deg = th * 180 / Math.PI;
+    rot($('g1'), deg, G1); rot($('g2'), -deg * G1.n / G2.n + 8, G2); rot($('g3'), deg * G1.n / G3.n, G3); rot($('q1'), deg * 3, P1); rot($('q2'), -deg * 3 * P1.r / P2.r, P2);
+    const cx = G1.x + Math.cos(th) * 52, cy = G1.y + Math.sin(th) * 52, px = cx - Math.sqrt(150 * 150 - (cy - 410) ** 2);
+    $('cp').setAttribute('cx', f(cx)); $('cp').setAttribute('cy', f(cy)); $('pc').setAttribute('cx', f(px));
+    const cr = $('cr'); cr.setAttribute('x1', f(cx)); cr.setAttribute('y1', f(cy)); cr.setAttribute('x2', f(px)); cr.setAttribute('y2', 410);
+    const pr = $('pr'); pr.setAttribute('x1', f(px)); pr.setAttribute('x2', f(px - 72)); $('ph').setAttribute('x', f(px - 84));
+    rot($('pend'), Math.sin(t * .0021) * 14, {x: 661, y: 353});
+    $('needle').setAttribute('transform', `rotate(${f(20 + Math.sin(t * .003) * 26 + Math.sin(t * .011) * 5)} 780 330)`);
+  }
+  let prev = 0;
+  function loop(t){ const k = Math.min(3, (t - prev) / 16.7); prev = t; th += .011 * k; pose(t); requestAnimationFrame(loop); }
+  pose(0);
+  const go = () => { svg.classList.remove('go'); void svg.getBoundingClientRect(); svg.classList.add('go'); };
+  go(); if (!reduce) requestAnimationFrame(t => { prev = t; loop(t); });
+  $('redraw').addEventListener('click', go);
+
+  // legend ↔ drawing cross-highlighting
+  const items = [...document.querySelectorAll('#legend li')];
+  function mark(n, on){ const p = $('p' + n); if (p) p.classList.toggle('hl', on);
+    svg.querySelectorAll('.bal[data-p="' + n + '"]').forEach(b => b.classList.toggle('hl', on));
+    items.forEach(li => { if (li.dataset.p === String(n)) li.classList.toggle('hl', on); }); }
+  let pinned = null;
+  const pin = n => { if (pinned) mark(pinned, false); pinned = pinned === n ? null : n; if (pinned) mark(pinned, true); };
+  items.forEach(li => { const n = li.dataset.p;
+    li.addEventListener('mouseenter', () => mark(n, true)); li.addEventListener('mouseleave', () => { if (pinned !== n) mark(n, false); });
+    li.addEventListener('click', () => pin(n)); li.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); pin(n); } }); });
+  svg.querySelectorAll('.bal').forEach(b => { const n = b.dataset.p;
+    b.addEventListener('mouseenter', () => mark(n, true)); b.addEventListener('mouseleave', () => { if (pinned !== n) mark(n, false); });
+    b.addEventListener('click', () => pin(n)); });
+})();
+</script>
+</body>
+</html>

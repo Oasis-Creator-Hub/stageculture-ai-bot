@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verveine de Lune — Élixir Botanique (Art Nouveau Poster)</title>
+<meta name="description" content="An Art Nouveau lithograph poster for a fictional botanical liqueur: whiplash stems, a floral SVG frame, olive, gold and rose, with ornamental lettering.">
+<style>
+:root{--paper:#ece2c4;--olive:#5d6431;--deep:#2f3519;--gold:#b8923a;--goldlt:#e2c675;--rose:#c9837a;--rosedk:#9c5550;--ink:#3a2e1c;--wall:#39401f}
+:root.nuit{--paper:#1f2a2b;--olive:#8fa06a;--deep:#0f1716;--gold:#d2ad55;--goldlt:#f3dc94;--rose:#d99a94;--rosedk:#a8625f;--ink:#eadfbe;--wall:#131b1b}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--wall);color:var(--paper);font-family:"Palatino Linotype","Book Antiqua",Palatino,"URW Palladio L",Georgia,serif;transition:background .8s;
+  background-image:radial-gradient(ellipse 22px 34px at 50% 0,rgba(184,146,58,.16) 0 60%,transparent 62%),radial-gradient(ellipse 22px 34px at 0 50%,rgba(184,146,58,.1) 0 60%,transparent 62%),radial-gradient(ellipse 22px 34px at 100% 50%,rgba(184,146,58,.1) 0 60%,transparent 62%);
+  background-size:88px 110px}
+.wrap{max-width:1180px;margin:0 auto;padding:clamp(14px,4vw,56px);display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:clamp(24px,5vw,72px);align-items:center;min-height:100vh}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}}
+.poster{display:block;width:100%;height:auto;box-shadow:0 2px 0 #1a1d0d,0 30px 70px rgba(0,0,0,.6);border-radius:2px}
+.poster *{transition:fill .8s,stroke .8s}
+.stem{fill:none;stroke:var(--olive);stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:grow 3.2s cubic-bezier(.5,0,.2,1) forwards}
+.stem.t{stroke:var(--gold);animation-delay:1.2s}
+@keyframes grow{to{stroke-dashoffset:0}}
+.bloom{transform-box:fill-box;transform-origin:50% 50%;opacity:0;animation:open 1.6s 2.2s ease-out forwards,sway 7s 3.8s ease-in-out infinite alternate}
+.bloom.b2{animation-delay:2.6s,4.2s}.bloom.b3{animation-delay:3s,4.6s}
+@keyframes open{from{opacity:0;scale:.2;rotate:-50deg}to{opacity:1;scale:1;rotate:0deg}}
+@keyframes sway{from{rotate:-5deg}to{rotate:6deg}}
+.leaf{opacity:0;animation:fade 1.4s 1.9s forwards}
+@keyframes fade{to{opacity:1}}
+.halo{transform-origin:300px 340px;animation:turn 140s linear infinite}
+@keyframes turn{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.stem,.bloom,.leaf,.halo{animation:none!important;stroke-dashoffset:0;opacity:1}}
+.copy{max-width:520px}
+.kicker{font-variant:small-caps;letter-spacing:.34em;color:var(--goldlt);font-size:13px}
+h1{font-weight:400;font-size:clamp(40px,6.5vw,76px);line-height:.95;margin:.25em 0 .2em;font-style:italic;color:var(--paper)}
+:root.nuit h1,:root.nuit .copy p,:root.nuit li{color:#eadfbe}
+h1 span{display:block;font-style:normal;font-variant:small-caps;letter-spacing:.14em;font-size:.36em;color:var(--rose);margin-top:.5em}
+.copy p{font-size:clamp(16px,1.5vw,19px);line-height:1.65;color:#e4dbc0;margin:0 0 1.2em}
+.copy p:first-letter{font-size:3.1em;float:left;line-height:.82;padding:.06em .1em 0 0;color:var(--goldlt);font-style:italic}
+.rule{height:26px;margin:22px 0;color:var(--gold)}
+ul{list-style:none;padding:0;margin:0 0 26px;display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--gold);border-radius:60px 60px 4px 4px/40px 40px 4px 4px}
+li{padding:22px 10px 16px;text-align:center;font-size:14px;line-height:1.4;color:#e4dbc0}
+li+li{border-left:1px solid var(--gold)}
+li b{display:block;font-variant:small-caps;letter-spacing:.18em;color:var(--goldlt);font-weight:400;font-size:13px;margin-bottom:4px}
+button{font:inherit;font-variant:small-caps;letter-spacing:.2em;font-size:14px;color:var(--goldlt);background:none;border:1px solid var(--gold);border-radius:30px 4px 30px 4px;padding:12px 26px;cursor:pointer;transition:background .3s,color .3s}
+button:hover,button:focus-visible{background:var(--gold);color:#221c0c;outline:none}
+a.back{position:fixed;top:12px;right:16px;color:var(--goldlt);text-decoration:none;font-variant:small-caps;letter-spacing:.2em;font-size:13px;z-index:5;opacity:.8}
+a.back:hover{opacity:1}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← 100</a>
+<div class="wrap">
+<svg class="poster" viewBox="0 0 600 900" role="img" aria-label="Art Nouveau poster: a green bottle in a golden halo, wreathed by whiplash stems and rose blossoms, lettered Verveine de Lune">
+  <defs>
+    <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 .25  0 0 0 0 .2  0 0 0 0 .1  0 0 0 .22 0"/></filter>
+    <linearGradient id="glass" x1="0" x2="1"><stop offset="0" stop-color="#2b3a1c"/><stop offset=".3" stop-color="#6f8140"/><stop offset=".55" stop-color="#3c4c22"/><stop offset="1" stop-color="#1c2611"/></linearGradient>
+    <path id="arc" d="M96 340A204 204 0 0 1 504 340"/>
+    <path id="petal" d="M0 0C-14-10-20-34 0-52 20-34 14-10 0 0Z"/>
+    <path id="lf" d="M0 0C18-22 20-62 0-96-20-62-18-22 0 0ZM0 0V-88" />
+    <g id="flower">
+      <g fill="var(--rose)" stroke="var(--rosedk)" stroke-width="1.6">
+        <use href="#petal"/><use href="#petal" transform="rotate(72)"/><use href="#petal" transform="rotate(144)"/><use href="#petal" transform="rotate(216)"/><use href="#petal" transform="rotate(288)"/>
+      </g>
+      <g fill="none" stroke="var(--rosedk)" stroke-width="1"><path d="M0-8V-40M0-8L-36-14M0-8L36-14M0-8L-22 32M0-8L22 32" opacity=".5" transform="translate(0 8)"/></g>
+      <circle r="9" fill="var(--goldlt)" stroke="var(--gold)" stroke-width="2"/><circle r="3" fill="var(--rosedk)"/>
+    </g>
+    <g id="side">
+      <path class="stem" pathLength="1" stroke-width="7" d="M92 872C10 760 170 660 78 540S150 350 62 236"/>
+      <path class="stem" pathLength="1" stroke-width="5" d="M92 872C190 780 70 700 150 610S226 500 176 452"/>
+      <path class="stem" pathLength="1" stroke-width="4" d="M78 540C20 500 22 420 60 398S118 420 96 450 52 452 60 428"/>
+      <path class="stem t" pathLength="1" stroke-width="2.5" d="M62 236C40 180 70 120 130 104S214 130 196 168 138 190 136 158 168 138 174 156"/>
+      <path class="stem t" pathLength="1" stroke-width="2.5" d="M150 610C196 640 222 700 190 742S118 752 126 716 168 702 166 726"/>
+      <g class="leaf" fill="var(--olive)" stroke="var(--deep)" stroke-width="1.4">
+        <use href="#lf" transform="translate(70 742) rotate(-52) scale(.9)"/><use href="#lf" transform="translate(118 648) rotate(58) scale(.8)"/>
+        <use href="#lf" transform="translate(96 480) rotate(-74) scale(.75)"/><use href="#lf" transform="translate(110 330) rotate(48) scale(.85)"/>
+        <use href="#lf" transform="translate(160 590) rotate(96) scale(.6)"/><use href="#lf" transform="translate(72 268) rotate(-30) scale(.6)"/>
+      </g>
+      <g transform="translate(62 226)"><use class="bloom" href="#flower" transform="scale(1.15)"/></g>
+      <g transform="translate(176 446)"><use class="bloom b2" href="#flower" transform="scale(.82)"/></g>
+      <g transform="translate(60 428)"><use class="bloom b3" href="#flower" transform="scale(.5)"/></g>
+    </g>
+  </defs>
+  <rect width="600" height="900" fill="var(--paper)"/>
+  <rect x="18" y="18" width="564" height="864" fill="none" stroke="var(--gold)" stroke-width="5"/>
+  <rect x="28" y="28" width="544" height="844" fill="none" stroke="var(--olive)" stroke-width="1.5"/>
+  <!-- halo -->
+  <circle cx="300" cy="340" r="176" fill="var(--olive)" opacity=".2"/>
+  <g class="halo" fill="none" stroke="var(--gold)">
+    <circle cx="300" cy="340" r="176" stroke-width="3"/>
+    <circle cx="300" cy="340" r="160" stroke-width="12" stroke-dasharray="2 18.94" stroke-linecap="round"/>
+    <circle cx="300" cy="340" r="143" stroke-width="1.5"/>
+    <g id="rays" stroke-width="1.2" opacity=".7"></g>
+  </g>
+  <circle cx="300" cy="340" r="96" fill="var(--paper)" stroke="var(--gold)" stroke-width="2"/>
+  <path d="M356 300A64 64 0 1 1 300 262 50 50 0 1 0 356 300Z" fill="var(--goldlt)" stroke="var(--gold)" stroke-width="1.5" opacity=".85" transform="rotate(-18 300 340)"/>
+  <!-- lettering -->
+  <text font-family="'Palatino Linotype','Book Antiqua',Palatino,Georgia,serif" font-size="43" letter-spacing="5" fill="var(--deep)" stroke="var(--gold)" stroke-width=".8" paint-order="stroke" text-anchor="middle"><textPath href="#arc" startOffset="50%">VERVEINE · DE · LUNE</textPath></text>
+  <text x="300" y="74" text-anchor="middle" font-size="15" letter-spacing="7" fill="var(--rosedk)" font-family="Georgia,serif">MAISON AUBRAC-SOREL</text>
+  <path d="M190 88C230 80 260 96 300 88S370 80 410 88" fill="none" stroke="var(--gold)" stroke-width="1.5"/>
+  <!-- bottle -->
+  <g>
+    <ellipse cx="300" cy="652" rx="78" ry="9" fill="var(--deep)" opacity=".25"/>
+    <path d="M286 236h28v70c0 26 44 40 44 96v224c0 14-10 24-24 24h-68c-14 0-24-10-24-24V402c0-56 44-70 44-96Z" fill="url(#glass)" stroke="var(--deep)" stroke-width="3"/>
+    <rect x="281" y="222" width="38" height="20" rx="4" fill="var(--gold)" stroke="var(--deep)" stroke-width="2.5"/>
+    <path d="M292 248v60c0 22-36 40-38 90v210" fill="none" stroke="#dfe8b8" stroke-width="5" stroke-linecap="round" opacity=".35"/>
+    <path d="M248 452q52-26 104 0v120q-52 22-104 0Z" fill="var(--paper)" stroke="var(--gold)" stroke-width="2.5"/>
+    <path d="M318 494a24 24 0 1 1-22-16 18 18 0 1 0 22 16Z" fill="var(--gold)"/>
+    <text x="300" y="552" text-anchor="middle" font-size="12" letter-spacing="3" fill="var(--deep)" font-family="Georgia,serif">Nº 40</text>
+    <path d="M262 566q38 12 76 0" fill="none" stroke="var(--rose)" stroke-width="2"/>
+  </g>
+  <use href="#side"/><use href="#side" transform="translate(600 0) scale(-1 1)"/>
+  <!-- cartouche -->
+  <path d="M150 700q150-34 300 0v136q-150 26-300 0Z" fill="var(--deep)" stroke="var(--gold)" stroke-width="3"/>
+  <path d="M160 708q140-30 280 0v120q-140 22-280 0Z" fill="none" stroke="var(--gold)" stroke-width="1" opacity=".7"/>
+  <text x="300" y="752" text-anchor="middle" font-size="31" letter-spacing="4" fill="var(--goldlt)" font-family="'Palatino Linotype','Book Antiqua',Palatino,Georgia,serif">ÉLIXIR BOTANIQUE</text>
+  <text x="300" y="784" text-anchor="middle" font-size="19" font-style="italic" fill="var(--rose)" font-family="Georgia,serif">aux quarante herbes de minuit</text>
+  <text x="300" y="814" text-anchor="middle" font-size="11" letter-spacing="4" fill="var(--paper)" font-family="Georgia,serif" style="fill:#ece2c4">DISTILLÉ À SAINT-ORME · 43% VOL</text>
+  <rect width="600" height="900" filter="url(#grain)" opacity=".55" pointer-events="none"/>
+</svg>
+<div class="copy">
+  <div class="kicker">Lithographie en six couleurs · 1897</div>
+  <h1>Verveine de Lune<span>the liqueur one drinks after the lamps are lit</span></h1>
+  <p>Gathered by the sisters Aubrac-Sorel on the chalk slopes above Saint-Orme, forty herbs are cut only between moonrise and the first bell. Lemon verbena leads; gentian, hyssop and the pale rose of the hedgerows follow in a slow procession, steeped ninety nights in oak the colour of honey.</p>
+  <svg class="rule" viewBox="0 0 400 26" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M0 13C60 13 80 2 120 13S170 24 200 13 260 2 290 13 340 13 400 13" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="200" cy="13" r="4" fill="currentColor"/></svg>
+  <ul>
+    <li><b>Au nez</b>crushed verbena, cut hay, a struck match</li>
+    <li><b>En bouche</b>bitter orange, wild honey, green almond</li>
+    <li><b>La fin</b>cool, long, faintly of rain on stone</li>
+  </ul>
+  <button id="ed" aria-pressed="false">Voir l’édition de nuit</button>
+</div>
+</div>
+<script>
+(function(){
+  var g=document.getElementById('rays'),s='';
+  for(var i=0;i<48;i++){var a=i/48*Math.PI*2,c=Math.cos(a),n=Math.sin(a),r1=100,r2=i%2?132:141;
+    s+='<line x1="'+(300+c*r1).toFixed(1)+'" y1="'+(340+n*r1).toFixed(1)+'" x2="'+(300+c*r2).toFixed(1)+'" y2="'+(340+n*r2).toFixed(1)+'"/>';}
+  g.innerHTML=s;
+  var b=document.getElementById('ed');
+  b.onclick=function(){var on=document.documentElement.classList.toggle('nuit');b.setAttribute('aria-pressed',on);b.textContent=on?'Revenir à l’édition de jour':'Voir l’édition de nuit'};
+})();
+</script>
+</body>
+</html>

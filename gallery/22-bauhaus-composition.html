@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>werkhaus lindau — school of form, colour and making</title>
+<meta name="description" content="A Bauhaus-style prospectus for an invented school: primary colours, circles, triangles and squares in animated balanced compositions, set in geometric lowercase.">
+<style>
+  :root { --red:#d7301f; --blue:#1d4fa3; --yellow:#f2b705; --black:#141414; --paper:#efe8d8; --grey:#b9b2a2; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--paper); color:var(--black); overflow-x:hidden;
+    font-family:"Futura","Century Gothic","Avant Garde","URW Gothic","Avenir Next",Avenir,"Trebuchet MS",sans-serif;
+    text-transform:lowercase; letter-spacing:.01em; }
+  a { color:inherit; }
+  .back { position:fixed; z-index:9; top:0; left:0; background:var(--black); color:var(--paper); text-decoration:none;
+    font-size:12px; padding:9px 12px; letter-spacing:.12em; }
+  .back:hover { background:var(--red); }
+
+  .plate { display:grid; grid-template-columns: minmax(0,5fr) minmax(0,7fr); min-height:100vh; border-bottom:10px solid var(--black); }
+  .txt { padding:clamp(56px,9vh,110px) clamp(20px,4vw,60px) 40px; display:flex; flex-direction:column; border-right:10px solid var(--black); position:relative; }
+  .no { font-size:13px; letter-spacing:.3em; display:flex; gap:14px; align-items:center; }
+  .no::before { content:""; width:46px; height:10px; background:var(--red); }
+  h1 { font-weight:700; font-size:clamp(54px,9.6vw,150px); line-height:.82; letter-spacing:-.045em; margin:.3em 0 .15em -.04em; }
+  h1 span { display:block; color:var(--red); }
+  .lede { font-size:clamp(16px,1.6vw,21px); line-height:1.4; max-width:30ch; margin-bottom:auto; }
+  .bars { display:grid; grid-template-columns:3fr 1fr 2fr; height:22px; margin:36px 0 18px; }
+  .bars i:nth-child(1){ background:var(--blue);} .bars i:nth-child(2){ background:var(--yellow);} .bars i:nth-child(3){ background:var(--black);}
+  .meta { display:grid; grid-template-columns:1fr 1fr; gap:14px 20px; font-size:13px; line-height:1.4; }
+  .meta b { display:block; font-size:10px; letter-spacing:.26em; font-weight:400; opacity:.6; margin-bottom:3px; }
+
+  .stage { position:relative; overflow:hidden; background:var(--paper); min-height:62vh; }
+  .stage svg { position:absolute; inset:0; width:100%; height:100%; display:block; }
+  .hint { position:absolute; right:16px; bottom:14px; font-size:11px; letter-spacing:.24em; writing-mode:vertical-rl; opacity:.6; }
+
+  /* animated balanced composition */
+  .spin { transform-box:fill-box; transform-origin:center; }
+  @keyframes turn { to { transform:rotate(360deg); } }
+  @keyframes turnback { to { transform:rotate(-360deg); } }
+  @keyframes slide { 0%,100% { transform:translateX(0);} 50% { transform:translateX(110px);} }
+  @keyframes rise { 0%,100% { transform:translateY(0);} 50% { transform:translateY(-70px);} }
+  @keyframes tilt { 0%,100% { transform:rotate(-7deg);} 50% { transform:rotate(7deg);} }
+  @keyframes breathe { 0%,100% { transform:scale(1);} 50% { transform:scale(.72);} }
+  .a1 { animation:turn 38s linear infinite; }
+  .a2 { animation:turnback 24s linear infinite; }
+  .a3 { animation:slide 9s cubic-bezier(.7,0,.3,1) infinite; }
+  .a4 { animation:rise 7s cubic-bezier(.7,0,.3,1) infinite; }
+  .a5 { animation:tilt 11s ease-in-out infinite; transform-box:view-box; transform-origin:420px 430px; }
+  .a6 { animation:breathe 6s ease-in-out infinite; }
+  .a7 { animation:slide 13s cubic-bezier(.7,0,.3,1) infinite reverse; }
+  .stage.paused * { animation-play-state:paused; }
+
+  section.courses { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border-bottom:10px solid var(--black); }
+  .course { padding:clamp(22px,3vw,44px); min-height:340px; position:relative; display:flex; flex-direction:column; cursor:pointer; overflow:hidden;
+    border-right:10px solid var(--black); transition:background .35s, color .35s; outline-offset:-6px; }
+  .course:last-child { border-right:0; }
+  .course .glyph { width:112px; height:112px; margin-bottom:auto; transition:transform .7s cubic-bezier(.6,0,.2,1); }
+  .course:hover .glyph, .course:focus-visible .glyph, .course.on .glyph { transform:rotate(90deg) scale(1.12); }
+  .course h2 { font-size:clamp(28px,3.3vw,46px); letter-spacing:-.03em; line-height:.95; margin:26px 0 10px; }
+  .course p { font-size:15px; line-height:1.45; max-width:32ch; }
+  .course small { font-size:10px; letter-spacing:.26em; margin-top:16px; display:block; }
+  .course.c1:hover, .course.c1.on { background:var(--yellow); }
+  .course.c2:hover, .course.c2.on { background:var(--red); color:var(--paper); }
+  .course.c3:hover, .course.c3.on { background:var(--blue); color:var(--paper); }
+  .course.c2:hover .glyph *, .course.c2.on .glyph * { fill:var(--paper); }
+  .course.c3:hover .glyph *, .course.c3.on .glyph * { fill:var(--yellow); }
+
+  section.manifest { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2fr); }
+  .big { background:var(--black); color:var(--paper); padding:clamp(24px,4vw,60px); font-size:clamp(30px,4.4vw,64px); font-weight:700; letter-spacing:-.035em; line-height:.95; }
+  .big em { font-style:normal; color:var(--yellow); }
+  .tt { padding:clamp(24px,4vw,60px); }
+  .tt h3 { font-size:11px; letter-spacing:.3em; font-weight:400; margin-bottom:18px; }
+  .tt table { width:100%; border-collapse:collapse; font-size:clamp(14px,1.4vw,18px); }
+  .tt td { padding:13px 8px 13px 0; border-top:2px solid var(--black); vertical-align:top; }
+  .tt tr:last-child td { border-bottom:2px solid var(--black); }
+  .tt td:first-child { width:5.2em; font-variant-numeric:tabular-nums; }
+  .tt td:last-child { text-align:right; white-space:nowrap; }
+  .dot { display:inline-block; width:.7em; height:.7em; margin-right:.5em; vertical-align:baseline; }
+  .d-r { background:var(--red); border-radius:50%; } .d-b { background:var(--blue); } .d-y { background:var(--yellow); clip-path:polygon(50% 0,100% 100%,0 100%); }
+  footer { padding:20px clamp(20px,4vw,60px); font-size:11px; letter-spacing:.24em; display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; border-top:10px solid var(--black); }
+
+  @media (max-width:820px) {
+    .plate { grid-template-columns:1fr; }
+    .txt { border-right:0; border-bottom:10px solid var(--black); }
+    .stage { min-height:92vw; }
+    section.courses { grid-template-columns:1fr; }
+    .course { border-right:0; border-bottom:10px solid var(--black); min-height:0; }
+    .course:last-child { border-bottom:0; }
+    .course .glyph { margin-bottom:20px; width:84px; height:84px; }
+    section.manifest { grid-template-columns:1fr; }
+    .tt td:last-child { white-space:normal; }
+  }
+  @media (prefers-reduced-motion: reduce) { .stage * { animation:none !important; } .course .glyph { transition:none; } }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← 100</a>
+
+<main>
+<div class="plate">
+  <div class="txt">
+    <p class="no">prospectus nº 22 · winter term</p>
+    <h1>werk<span>haus</span>lindau</h1>
+    <p class="lede">a school where the hand and the ruler are taught to agree. three shapes, three colours, one long table.</p>
+    <div class="bars" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="meta">
+      <div><b>founded</b>in a disused tram depot, by eleven people and a kiln</div>
+      <div><b>admission</b>bring one object you made and one you would unmake</div>
+      <div><b>hours</b>workshops open at first light, close when the glue is dry</div>
+      <div><b>motto</b>less, but on purpose</div>
+    </div>
+  </div>
+
+  <div class="stage" id="stage" title="click to pause the composition">
+    <svg viewBox="0 0 840 860" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Animated composition of circles, triangles and squares in red, blue, yellow and black">
+      <defs>
+        <pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="4" height="10" fill="#141414"/></pattern>
+        <pattern id="dots" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="2.6" fill="#141414"/></pattern>
+      </defs>
+      <!-- ground planes -->
+      <rect x="0" y="0" width="840" height="860" fill="#efe8d8"/>
+      <rect x="0" y="560" width="840" height="300" fill="#e3dac4"/>
+      <rect x="520" y="0" width="320" height="560" fill="#141414"/>
+      <!-- the great wheel -->
+      <g class="spin a1">
+        <circle cx="330" cy="330" r="250" fill="#d7301f"/>
+        <path d="M330 80 A250 250 0 0 1 580 330 L330 330 Z" fill="#141414"/>
+        <circle cx="330" cy="330" r="250" fill="none" stroke="#141414" stroke-width="8"/>
+      </g>
+      <g class="spin a2">
+        <circle cx="330" cy="330" r="118" fill="#efe8d8"/>
+        <path d="M330 212 A118 118 0 0 0 330 448 Z" fill="#1d4fa3"/>
+        <circle cx="330" cy="330" r="34" fill="#f2b705"/>
+      </g>
+      <!-- the balance beam -->
+      <g class="a5">
+        <rect x="70" y="425" width="700" height="10" fill="#141414"/>
+        <rect x="80" y="352" width="72" height="72" fill="#1d4fa3"/>
+        <circle cx="724" cy="386" r="38" fill="#f2b705"/>
+        <rect x="618" y="396" width="56" height="28" fill="url(#hatch)"/>
+      </g>
+      <polygon points="420,436 468,560 372,560" fill="#141414"/>
+      <!-- yellow triangle sliding on the horizon -->
+      <g class="a3"><polygon points="60,560 220,560 140,700" fill="#f2b705"/><polygon points="60,560 140,700 140,560" fill="#141414" opacity=".16"/></g>
+      <!-- blue column rising -->
+      <g class="a4"><rect x="600" y="600" width="110" height="330" fill="#1d4fa3"/><rect x="600" y="600" width="110" height="26" fill="#efe8d8"/><rect x="600" y="644" width="110" height="10" fill="#efe8d8"/></g>
+      <!-- small actors -->
+      <g class="spin a6"><circle cx="680" cy="140" r="78" fill="#efe8d8"/></g>
+      <circle cx="680" cy="140" r="30" fill="#d7301f"/>
+      <rect x="548" y="260" width="264" height="6" fill="#f2b705"/>
+      <rect x="548" y="284" width="170" height="6" fill="#efe8d8"/>
+      <rect x="548" y="308" width="92" height="6" fill="#d7301f"/>
+      <g class="a7"><rect x="250" y="760" width="150" height="46" fill="url(#dots)"/><rect x="420" y="760" width="46" height="46" fill="#d7301f"/></g>
+      <g class="spin a1" style="animation-duration:14s"><polygon points="760,470 808,548 712,548" fill="#f2b705"/></g>
+      <line x1="0" y1="560" x2="840" y2="560" stroke="#141414" stroke-width="8"/>
+      <line x1="520" y1="0" x2="520" y2="560" stroke="#141414" stroke-width="8"/>
+    </svg>
+    <span class="hint" id="hint">composition in motion — click to hold</span>
+  </div>
+</div>
+
+<section class="courses" aria-label="foundation courses">
+  <article class="course c1" tabindex="0">
+    <svg class="glyph" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,6 96,94 4,94" fill="#f2b705" stroke="#141414" stroke-width="5"/></svg>
+    <h2>the triangle term</h2>
+    <p>direction, tension, the diagonal. students fold, brace and truss until paper carries a brick.</p>
+    <small>weeks 1–12 · master: ottilie brandmeier</small>
+  </article>
+  <article class="course c2" tabindex="0">
+    <svg class="glyph" viewBox="0 0 100 100" aria-hidden="true"><rect x="8" y="8" width="84" height="84" fill="#d7301f" stroke="#141414" stroke-width="5"/></svg>
+    <h2>the square term</h2>
+    <p>rest, module, the honest right angle. a chair is drawn forty times and built once.</p>
+    <small>weeks 13–24 · master: jorun vesterlid</small>
+  </article>
+  <article class="course c3" tabindex="0">
+    <svg class="glyph" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="43" fill="#1d4fa3" stroke="#141414" stroke-width="5"/></svg>
+    <h2>the circle term</h2>
+    <p>rotation, rhythm, return. wheels, lamps and a dance performed in cardboard costume.</p>
+    <small>weeks 25–36 · master: tadeo ilmarinen</small>
+  </article>
+</section>
+
+<section class="manifest">
+  <div class="big">form is not <em>decoration.</em> form is what is left when you stop apologising.</div>
+  <div class="tt">
+    <h3>a week at the long table</h3>
+    <table>
+      <tr><td>mon</td><td><i class="dot d-r"></i>colour: one red, mixed ninety ways</td><td>dye room</td></tr>
+      <tr><td>tue</td><td><i class="dot d-b"></i>joinery without nails, without excuses</td><td>wood shop</td></tr>
+      <tr><td>wed</td><td><i class="dot d-y"></i>letterforms drawn with compass only</td><td>type loft</td></tr>
+      <tr><td>thu</td><td><i class="dot d-b"></i>weaving the grid; unweaving the grid</td><td>loom hall</td></tr>
+      <tr><td>fri</td><td><i class="dot d-r"></i>critique, soup, and the lantern parade</td><td>depot floor</td></tr>
+    </table>
+  </div>
+</section>
+<footer><span>werkhaus lindau · tramhof 4</span><span>applications close when the snow does</span><span>▲ ■ ●</span></footer>
+</main>
+
+<script>
+(() => {
+  const stage = document.getElementById('stage'), hint = document.getElementById('hint');
+  stage.addEventListener('click', () => {
+    const p = stage.classList.toggle('paused');
+    hint.textContent = p ? 'composition held — click to release' : 'composition in motion — click to hold';
+  });
+  // touch / keyboard: tap a course to keep it lit
+  document.querySelectorAll('.course').forEach(c => {
+    const toggle = () => { const on = c.classList.contains('on'); document.querySelectorAll('.course.on').forEach(o => o.classList.remove('on')); if (!on) c.classList.add('on'); };
+    c.addEventListener('click', toggle);
+    c.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Wet Garden — paint flowers in water</title>
+<meta name="description" content="A sheet of cold-pressed paper with soft watercolour washes made from SVG turbulence and displacement. Click or tap anywhere to bloom a painted flower.">
+<style>
+  :root{--paper:#f6f0e4;--ink:#4a4038;--soft:#8c7f72}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;background:#d9d0c0}
+  body{font-family:"Cochin","Hoefler Text","Garamond","Palatino Linotype",Georgia,serif;color:var(--ink)}
+  .sheet{position:fixed;inset:clamp(8px,1.6vw,22px);background:var(--paper);box-shadow:0 1px 0 #fff inset,0 18px 50px -18px rgba(70,50,30,.5);overflow:hidden;border-radius:3px}
+  svg#g{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair;touch-action:none;outline:none}
+  .hud{position:absolute;pointer-events:none}
+  .ttl{left:clamp(18px,4vw,54px);top:clamp(16px,4vh,46px);max-width:70%}
+  h1{font-weight:400;font-style:italic;font-size:clamp(34px,6vw,84px);line-height:.92;letter-spacing:-.01em;color:#5a4b40;mix-blend-mode:multiply}
+  .ttl p{margin-top:12px;font-size:clamp(13px,1.3vw,16px);letter-spacing:.04em;color:var(--soft);max-width:30ch;line-height:1.5}
+  .back{right:clamp(16px,3vw,40px);top:clamp(16px,4vh,40px);pointer-events:auto;font-style:italic;font-size:15px;color:var(--soft);text-decoration:none;border-bottom:1px solid currentColor}
+  .back:hover,.back:focus-visible{color:#b5523f}
+  .tray{left:50%;bottom:clamp(14px,3vh,30px);transform:translateX(-50%);pointer-events:auto;display:flex;align-items:center;gap:clamp(6px,1.4vw,12px);padding:9px 12px;background:rgba(255,252,245,.82);border:1px solid rgba(90,75,64,.22);border-radius:14px;box-shadow:0 8px 22px -12px rgba(70,50,30,.5);max-width:calc(100% - 24px)}
+  .pan{width:clamp(28px,7.4vw,38px);height:clamp(28px,7.4vw,38px);border-radius:9px 11px 8px 12px;border:1px solid rgba(74,64,56,.3);cursor:pointer;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.55),transparent 45%),var(--c);box-shadow:inset 0 -5px 8px rgba(0,0,0,.14);transition:transform .2s;flex:none;padding:0}
+  .pan:hover{transform:translateY(-2px)}
+  .pan[aria-pressed=true]{outline:2px solid #5a4b40;outline-offset:2px;transform:translateY(-3px) rotate(-3deg)}
+  .pan.mix{background:conic-gradient(#d86a78,#e8a23d,#6f8fbf,#8e6bb0,#d86a78)}
+  .rinse{font:inherit;font-style:italic;font-size:15px;background:none;border:0;border-left:1px solid rgba(90,75,64,.25);padding:4px 4px 4px 12px;color:var(--ink);cursor:pointer;white-space:nowrap}
+  .rinse:hover,.rinse:focus-visible{color:#b5523f}
+  .count{right:clamp(16px,3vw,40px);bottom:clamp(20px,4vh,40px);font-style:italic;font-size:14px;color:var(--soft);text-align:right}
+  .pt{transform-origin:0 0;animation:bloom 1.1s cubic-bezier(.2,.9,.3,1) both}
+  .st{stroke-dasharray:1;stroke-dashoffset:1;animation:grow .9s ease-out forwards}
+  .bleed{transform-origin:0 0;animation:bleed 2.4s ease-out both}
+  .wash{animation:breathe 16s ease-in-out infinite alternate}
+  @keyframes bloom{from{transform:scale(0);opacity:0}60%{opacity:.9}to{transform:scale(1)}}
+  @keyframes grow{to{stroke-dashoffset:0}}
+  @keyframes bleed{from{transform:scale(.1);opacity:.55}to{transform:scale(1);opacity:.16}}
+  @keyframes breathe{to{transform:translate(1.5%,-1%)}}
+  @media(max-width:560px){.count{display:none}.ttl p{max-width:24ch}}
+  @media(prefers-reduced-motion:reduce){.pt,.bleed{animation:none}.st{animation:none;stroke-dashoffset:0}.wash{animation:none}.bleed{opacity:.16}}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <svg id="g" tabindex="0" role="application" aria-label="Watercolour paper. Click, tap, or press Enter to paint a flower.">
+    <defs>
+      <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4" result="n"/>
+        <feDiffuseLighting in="n" lighting-color="#fff" surfaceScale="1.1" result="l"><feDistantLight azimuth="50" elevation="62"/></feDiffuseLighting>
+        <feComposite in="l" in2="SourceGraphic" operator="in"/></filter>
+      <filter id="wash" x="-30%" y="-30%" width="160%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".008 .012" numOctaves="3" seed="11" result="t"/>
+        <feDisplacementMap in="SourceGraphic" in2="t" scale="130" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation="16"/></filter>
+      <filter id="paint" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="3" result="t"/>
+        <feDisplacementMap in="SourceGraphic" in2="t" scale="13" xChannelSelector="R" yChannelSelector="B" result="d"/><feGaussianBlur in="d" stdDeviation=".7" result="b"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".5" numOctaves="1" seed="8" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.1 1.25" result="ga"/>
+        <feComposite in="b" in2="ga" operator="in"/></filter>
+      <filter id="paint2" x="-40%" y="-40%" width="180%" height="180%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="21" result="t"/>
+        <feDisplacementMap in="SourceGraphic" in2="t" scale="10" xChannelSelector="G" yChannelSelector="R"/><feGaussianBlur stdDeviation=".5"/></filter>
+      <filter id="soft" x="-60%" y="-60%" width="220%" height="220%"><feTurbulence type="fractalNoise" baseFrequency=".02" numOctaves="2" seed="5" result="t"/>
+        <feDisplacementMap in="SourceGraphic" in2="t" scale="40"/><feGaussianBlur stdDeviation="9"/></filter>
+    </defs>
+    <g id="washes" style="mix-blend-mode:multiply"></g>
+    <g id="flowers" style="mix-blend-mode:multiply"></g>
+    <rect width="100%" height="100%" fill="#fff" filter="url(#grain)" opacity=".5" style="mix-blend-mode:multiply;pointer-events:none"/>
+  </svg>
+  <div class="hud ttl"><h1>The Wet<br>Garden</h1><p>Touch the paper anywhere. Something will grow there while the wash is still damp.</p></div>
+  <a class="hud back" href="index.html">← 100</a>
+  <div class="hud count" id="count"></div>
+  <div class="hud tray" id="tray" role="group" aria-label="Paint pans"></div>
+</div>
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg', svg = document.getElementById('g'), layer = document.getElementById('flowers'), washes = document.getElementById('washes');
+  const el = (n, a, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+  const R = (a, b) => a + Math.random() * (b - a), pick = a => a[Math.floor(Math.random() * a.length)];
+  const PANS = [
+    { n: 'Madder rose', c: '#d5677a', d: '#a83a55', h: '#f2c14e' },
+    { n: 'Poppy', c: '#e2643c', d: '#b33a22', h: '#3b2a2a' },
+    { n: 'Gamboge', c: '#eab13c', d: '#c7801c', h: '#8a4b1f' },
+    { n: 'Cornflower', c: '#6b8fc9', d: '#3f5fa6', h: '#f1d98a' },
+    { n: 'Wisteria', c: '#9a78bd', d: '#6c4a98', h: '#f3d27a' }
+  ];
+  const GREENS = ['#6f9a63', '#587f5d', '#88a35a', '#4f7868'];
+  const MAX = 34; let pan = -1, planted = 0;
+  const tray = document.getElementById('tray'), count = document.getElementById('count');
+  const pans = [];
+  [...PANS, null].forEach((p, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'pan' + (p ? '' : ' mix');
+    if (p) b.style.setProperty('--c', p.c);
+    b.title = p ? p.n : 'Whatever the brush picks up'; b.setAttribute('aria-label', b.title);
+    b.setAttribute('aria-pressed', p ? 'false' : 'true');
+    b.addEventListener('click', () => { pan = p ? i : -1; pans.forEach(x => x.setAttribute('aria-pressed', x === b)); });
+    pans.push(b); tray.appendChild(b);
+  });
+  const rinse = document.createElement('button'); rinse.type = 'button'; rinse.className = 'rinse'; rinse.textContent = 'Rinse the page';
+  rinse.addEventListener('click', () => { layer.textContent = ''; planted = 0; note(); });
+  tray.appendChild(rinse);
+  const note = () => { count.textContent = planted ? `${planted} bloom${planted > 1 ? 's' : ''} this sitting` : 'an empty bed'; };
+
+  function layWashes() {
+    washes.textContent = '';
+    const w = svg.clientWidth, h = svg.clientHeight;
+    [[.18, .78, .34, .2, '#b9d3a8', .5], [.72, .86, .4, .16, '#a9cdb5', .45], [.82, .22, .26, .2, '#f3d6c2', .5], [.42, .4, .3, .22, '#cfe0ee', .42], [.1, .2, .2, .16, '#f1e3b4', .4], [.55, .98, .6, .1, '#8fb58b', .4]]
+      .forEach(([x, y, rx, ry, c, o], i) => el('ellipse', { class: 'wash', cx: x * w, cy: y * h, rx: rx * w, ry: ry * h + 30, fill: c, opacity: o, filter: 'url(#wash)', style: `animation-delay:${-i * 3}s` }, washes));
+  }
+  const petal = (len, wid, tip) => `M0 0C${-wid} ${-len * .25} ${-wid * tip} ${-len * .9} 0 ${-len}C${wid * tip} ${-len * .9} ${wid} ${-len * .25} 0 0Z`;
+  function flower(x, y, forced) {
+    const P = forced != null ? PANS[forced] : pan >= 0 ? PANS[pan] : pick(PANS);
+    const s = Math.min(1.25, Math.max(.7, svg.clientWidth / 900)) * R(.8, 1.25);
+    const g = el('g', { transform: `translate(${x.toFixed(1)} ${y.toFixed(1)})`, filter: `url(#${Math.random() < .5 ? 'paint' : 'paint2'})` });
+    el('circle', { class: 'bleed', r: 62 * s, fill: P.c, filter: 'url(#soft)' }, g);
+    // stem and leaves, painted downward from the bloom
+    const sl = R(70, 150) * s, bend = R(-40, 40) * s, green = pick(GREENS);
+    el('path', { class: 'st', pathLength: 1, d: `M0 6Q${bend} ${sl * .5} ${bend * .4} ${sl}`, fill: 'none', stroke: green, 'stroke-width': 3.2 * s, 'stroke-linecap': 'round', opacity: .75 }, g);
+    for (let i = 0, n = 1 + (Math.random() < .6); i < n; i++) {
+      const t = R(.35, .75), lx = 2 * (1 - t) * t * bend + t * t * bend * .4, ly = 6 + (sl - 6) * t, side = i ? -1 : 1;
+      const lg = el('g', { transform: `translate(${lx.toFixed(1)} ${ly.toFixed(1)}) rotate(${side * R(50, 80)})` }, g);
+      el('path', { class: 'pt', d: petal(R(26, 40) * s, 9 * s, .5), fill: green, opacity: .62, style: `animation-delay:${.5 + i * .15}s` }, lg);
+    }
+    const kind = pick(['daisy', 'daisy', 'poppy', 'tulip', 'sprig']);
+    const add = (rot, d, fill, op, delay, sc) => { const pg = el('g', { transform: `rotate(${rot.toFixed(1)})${sc ? ` scale(${sc})` : ''}` }, g); el('path', { class: 'pt', d, fill, 'fill-opacity': op, stroke: fill, 'stroke-opacity': .5, 'stroke-width': 1.2, style: `animation-delay:${delay.toFixed(2)}s` }, pg); };
+    if (kind === 'daisy') {
+      const n = 7 + Math.floor(R(0, 7)), len = R(26, 40) * s, wid = R(7, 11) * s, off = R(0, 360);
+      for (let i = 0; i < n; i++) add(off + i * 360 / n + R(-7, 7), petal(len * R(.85, 1.1), wid, .8), i % 3 ? P.c : P.d, R(.5, .72), i * .035);
+      el('circle', { class: 'pt', r: 7.5 * s, fill: P.h, opacity: .9, style: 'animation-delay:.45s' }, g);
+    } else if (kind === 'poppy') {
+      const off = R(0, 360), len = R(34, 46) * s;
+      for (let i = 0; i < 5; i++) add(off + i * 72 + R(-10, 10), petal(len, len * .72, 1.25), i % 2 ? P.c : P.d, R(.48, .62), i * .07);
+      for (let i = 0; i < 9; i++) { const a = i / 9 * 6.283, r = R(3, 9) * s; el('circle', { class: 'pt', cx: Math.cos(a) * r, cy: Math.sin(a) * r, r: 2.2 * s, fill: P.h, opacity: .85, style: `animation-delay:${.5 + i * .02}s` }, g); }
+    } else if (kind === 'tulip') {
+      const len = R(40, 54) * s;
+      [-24, 24, 0].forEach((a, i) => add(a + R(-4, 4), petal(len * (i === 2 ? 1 : .92), len * .36, 1.1), i === 2 ? P.c : P.d, i === 2 ? .7 : .55, i * .12));
+    } else {
+      for (let i = 0; i < 16; i++) { const t = i / 16, a = -90 + R(-16, 16), r = (10 + t * 62) * s, rad = a * Math.PI / 180, px = Math.cos(rad) * r + R(-7, 7) * s * (1 - t * .6), py = Math.sin(rad) * r;
+        el('circle', { class: 'pt', cx: px, cy: py, r: R(3.4, 6.5) * s * (1 - t * .45), fill: i % 3 ? P.c : P.d, opacity: R(.5, .75), style: `animation-delay:${(i * .04).toFixed(2)}s` }, g); }
+    }
+    // a few stray droplets
+    for (let i = 0, n = Math.floor(R(1, 5)); i < n; i++) { const a = R(0, 6.283), r = R(48, 96) * s; el('circle', { class: 'pt', cx: Math.cos(a) * r, cy: Math.sin(a) * r, r: R(1.2, 3.4) * s, fill: P.c, opacity: .5, style: `animation-delay:${R(.2, .7).toFixed(2)}s` }, g); }
+    layer.appendChild(g);
+    while (layer.childElementCount > MAX) layer.firstElementChild.remove();
+    planted++; note();
+  }
+  svg.addEventListener('pointerdown', e => { const r = svg.getBoundingClientRect(); flower(e.clientX - r.left, e.clientY - r.top); });
+  svg.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flower(R(.1, .9) * svg.clientWidth, R(.3, .8) * svg.clientHeight); } });
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(layWashes, 150); });
+  layWashes(); note();
+  // the garden arrives with a few blooms already painted
+  [[.62, .5, 0], [.8, .62, 3], [.42, .68, 2], [.9, .38, 4], [.2, .6, 1], [.55, .3, 3]].forEach(([x, y, k], i) => setTimeout(() => flower(x * svg.clientWidth, y * svg.clientHeight, k), 250 + i * 320));
+})();
+</script>
+</body>
+</html>

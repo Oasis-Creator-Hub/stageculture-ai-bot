@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skarvtind Observatory — Aurora Station at 70° North</title>
+<meta name="description" content="Skarvtind Observatory: a fictional arctic aurora station. Live-drawn northern lights over a mountain ridge, tonight's forecast, instruments and winter residencies.">
+<style>
+:root{--night:#03060d;--ice:#e4f4ef;--glow:#86ffc1;--mute:#8ea3a6;--rule:rgba(228,244,239,.16);
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace}
+*{box-sizing:border-box;margin:0}
+html{background:var(--night);scroll-behavior:smooth}
+body{color:var(--ice);font-family:var(--serif);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+#sky{position:fixed;inset:0;width:100%;height:100%;display:block}
+a{color:inherit}
+.bar{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:baseline;gap:1rem;
+  padding:1.4rem clamp(1.1rem,4vw,3.5rem);font:500 .68rem/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;z-index:3}
+.bar a{text-decoration:none;opacity:.75}.bar a:hover{opacity:1;color:var(--glow)}
+.bar nav{display:flex;gap:1.6rem}
+.hero{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;
+  padding:6rem clamp(1.1rem,4vw,3.5rem) 0}
+.coords{font:500 .7rem/1 var(--mono);letter-spacing:.3em;color:var(--glow);margin-bottom:1.3rem}
+h1{font-weight:400;font-size:clamp(2.7rem,9.4vw,8.6rem);line-height:.92;letter-spacing:-.025em;max-width:11ch;
+  text-shadow:0 2px 40px rgba(3,6,13,.7)}
+h1 em{font-style:italic;color:var(--glow);font-weight:400}
+.lede{max-width:34rem;margin:1.6rem 0 2.6rem;font-size:clamp(1rem,1.5vw,1.2rem);line-height:1.55;color:#c9dcd9;text-shadow:0 1px 14px #03060d}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--rule);margin:0 calc(-1*clamp(1.1rem,4vw,3.5rem));
+  background:linear-gradient(rgba(3,6,13,.25),rgba(3,6,13,.82));backdrop-filter:blur(3px)}
+.strip>div{padding:1.1rem clamp(1.1rem,4vw,3.5rem) 1.3rem;border-left:1px solid var(--rule)}
+.strip>div:first-child{border-left:0}
+.k{font:500 .62rem/1 var(--mono);letter-spacing:.24em;text-transform:uppercase;color:var(--mute)}
+.v{font-size:clamp(1.3rem,2.6vw,2.1rem);margin-top:.5rem;font-variant-numeric:tabular-nums}
+.v small{font:.7rem var(--mono);color:var(--mute);letter-spacing:.1em}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;max-width:12rem;height:22px;background:none;margin-top:.45rem;display:block}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--ice)}
+input[type=range]::-moz-range-track{height:1px;background:var(--ice)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--glow);margin-top:-7px;box-shadow:0 0 14px var(--glow)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:var(--glow);box-shadow:0 0 14px var(--glow)}
+main{position:relative;background:linear-gradient(rgba(3,6,13,.82),rgba(3,6,13,.94) 30%)}
+section{padding:clamp(4rem,10vw,8rem) clamp(1.1rem,4vw,3.5rem);border-top:1px solid var(--rule);display:grid;
+  grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(1.5rem,5vw,5rem)}
+h2{font-weight:400;font-size:clamp(1.8rem,3.6vw,3.1rem);line-height:1.05;letter-spacing:-.015em}
+h2 span{display:block;font:500 .66rem/1 var(--mono);letter-spacing:.28em;color:var(--glow);margin-bottom:1.1rem;text-transform:uppercase}
+p{line-height:1.65;color:#bdd0cd;max-width:40rem}
+.hours{display:flex;align-items:flex-end;gap:clamp(3px,.8vw,10px);height:210px;border-bottom:1px solid var(--rule);margin-top:2rem}
+.hours i{flex:1;background:linear-gradient(var(--glow),rgba(134,255,193,.08));position:relative;min-width:0;transition:height .6s cubic-bezier(.2,.7,.2,1)}
+.hours i.peak{background:linear-gradient(#fff,var(--glow) 30%,rgba(134,255,193,.12))}
+.hours i b{position:absolute;bottom:-1.6rem;left:50%;transform:translateX(-50%);font:400 .6rem var(--mono);color:var(--mute);font-style:normal}
+.note{margin-top:2.8rem;font:.72rem/1.7 var(--mono);color:var(--mute);letter-spacing:.04em}
+ol{list-style:none;padding:0;counter-reset:n}
+ol li{counter-increment:n;display:grid;grid-template-columns:3.2rem 1fr;gap:.2rem 1rem;padding:1.5rem 0;border-bottom:1px solid var(--rule)}
+ol li:first-child{border-top:1px solid var(--rule)}
+ol li::before{content:"0" counter(n);font:.7rem var(--mono);color:var(--glow);letter-spacing:.15em;padding-top:.5rem}
+ol h3{font-weight:400;font-size:1.45rem}
+ol p{grid-column:2;font-size:.98rem}
+.cabins{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.cabins div{background:rgba(3,6,13,.9);padding:1.6rem 1.4rem 1.8rem}
+.cabins h3{font-weight:400;font-style:italic;font-size:1.5rem;margin:.6rem 0}
+.cabins p{font-size:.92rem}
+.cta{display:inline-block;margin-top:2rem;padding:.95rem 1.5rem;border:1px solid var(--glow);color:var(--glow);text-decoration:none;
+  font:500 .7rem var(--mono);letter-spacing:.24em;text-transform:uppercase;transition:.3s}
+.cta:hover{background:var(--glow);color:var(--night)}
+footer{position:relative;background:#03060d;padding:2rem clamp(1.1rem,4vw,3.5rem);display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;
+  font:.64rem var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--mute);border-top:1px solid var(--rule)}
+@media(max-width:760px){.bar nav a:not(.home){display:none}.strip{grid-template-columns:1fr 1fr}.strip>div:nth-child(3){border-left:0}
+  .strip>div:nth-child(n+3){border-top:1px solid var(--rule)}section{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<header class="hero">
+  <div class="bar"><span>Skarvtind Observatory</span>
+    <nav><a href="#tonight">Tonight</a><a href="#instruments">Instruments</a><a href="#stay">Residency</a><a class="home" href="index.html">← 100</a></nav></div>
+  <div class="coords">70°02′N · 23°41′E · ALT 912 M</div>
+  <h1>The sky is <em>speaking</em> tonight.</h1>
+  <p class="lede">For sixty winters we have kept one small dome on the shoulder of Skarvtind, listening to the solar wind arrive. Come up the mountain. Bring wool. Stay until the green begins to move.</p>
+  <div class="strip">
+    <div><div class="k">Geomagnetic index</div><div class="v">Kp <span id="kpv">5</span></div>
+      <input id="kp" type="range" min="1" max="9" value="5" aria-label="Geomagnetic activity, Kp index"></div>
+    <div><div class="k">Solar wind</div><div class="v"><span id="wind">540</span> <small>KM/S</small></div></div>
+    <div><div class="k">Cloud over ridge</div><div class="v">6 <small>% · CLEAR</small></div></div>
+    <div><div class="k">Best window</div><div class="v">23:10 <small>— 01:40</small></div></div>
+  </div>
+</header>
+<main>
+<section id="tonight">
+  <h2><span>Tonight's watch</span>Quiet until eleven, then the curtain.</h2>
+  <div><p>A fast stream left the sun three days ago and reaches the magnetosphere after dusk. Expect a pale arc low in the north, rising to moving bands and — if the field tips south — a full corona overhead. Drag the Kp dial above to see what each level looks like from our ridge.</p>
+    <div class="hours" id="hours" role="img" aria-label="Hourly aurora likelihood from 18:00 to 06:00"></div>
+    <p class="note">LIKELIHOOD OF VISIBLE AURORA, HOURLY · MODEL RUN 16:00 LOCAL · UPDATED BY HAND WHEN THE ANTENNA ICES</p></div>
+</section>
+<section id="instruments">
+  <h2><span>Instruments</span>Three ways of paying attention.</h2>
+  <ol>
+    <li><h3>The Hallan all-sky camera</h3><p>A fisheye eye under a heated glass blister. One exposure every eleven seconds since 1994 — over twenty million frames of the same patch of dark.</p></li>
+    <li><h3>Fluxgate magnetometer “Old Needle”</h3><p>Buried two metres under the moraine, away from every nail and stove. It feels a substorm half a minute before our eyes do.</p></li>
+    <li><h3>The 40 cm Brekke reflector</h3><p>Not for aurora at all. On still nights we open the slit, turn south, and let visitors find Saturn for themselves.</p></li>
+  </ol>
+</section>
+<section id="stay">
+  <h2><span>Winter residency</span>Four bunks, one stove, no lamps after nine.</h2>
+  <div><div class="cabins">
+    <div><div class="k">Nov — Jan</div><h3>Polar night</h3><p>The sun does not rise. Twenty hours of observing sky; blue noon for skiing down to the fjord.</p></div>
+    <div><div class="k">Feb — Mar</div><h3>Returning light</h3><p>Equinox storms and the season's brightest displays. Dog sled supply run every Thursday.</p></div>
+    <div><div class="k">All season</div><h3>Night keeper</h3><p>Sit one watch with the duty observer. Log the arcs in pencil, as it has always been done.</p></div>
+  </div>
+  <a class="cta" href="#tonight">Request a bunk →</a></div>
+</section>
+</main>
+<footer><span>© Skarvtind Observatory Trust</span><span>Road closed above Lavvodalen in wind over 20 m/s</span><a href="index.html">← Back to the 100</a></footer>
+<script>
+(()=>{
+const cv=document.getElementById('sky'),g=cv.getContext('2d');
+const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W=0,H=0,back,front,kp=5,ease=5,t=40,twk=[],domeX=0,domeY=0,raf=0;
+const strip=cols=>{const c=document.createElement('canvas');c.width=1;c.height=256;const x=c.getContext('2d'),
+  gr=x.createLinearGradient(0,0,0,256);cols.forEach((s,i)=>gr.addColorStop([0,.4,.84,.955,1][i],s));x.fillStyle=gr;x.fillRect(0,0,1,256);return c};
+const S=[strip(['rgba(140,80,255,0)','rgba(120,90,255,.30)','rgba(60,255,160,.85)','rgba(220,255,236,1)','rgba(255,255,255,0)']),
+         strip(['rgba(255,80,160,0)','rgba(210,70,190,.34)','rgba(70,240,190,.8)','rgba(200,255,240,.95)','rgba(255,255,255,0)']),
+         strip(['rgba(60,200,255,0)','rgba(60,170,255,.22)','rgba(110,255,150,.7)','rgba(230,255,220,.9)','rgba(255,255,255,0)'])];
+const R=[{y:.50,h:.40,sp:.10,f:1.0,p:0.0,a:.50,s:0},{y:.40,h:.34,sp:.07,f:1.6,p:2.1,a:.40,s:1},
+         {y:.58,h:.30,sp:.13,f:.7,p:4.2,a:.36,s:2},{y:.33,h:.26,sp:.05,f:2.2,p:5.5,a:.30,s:0}];
+function build(){
+  const dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;
+  cv.width=W*dpr;cv.height=H*dpr;g.setTransform(dpr,0,0,dpr,0,0);
+  let s=4711;const rnd=()=>(s=s*16807%2147483647)/2147483647;
+  const layer=()=>{const c=document.createElement('canvas');c.width=W*dpr;c.height=H*dpr;const x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return[c,x]};
+  let x;[back,x]=layer();
+  const sky=x.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#02040b');sky.addColorStop(.55,'#07142a');sky.addColorStop(.85,'#12324a');sky.addColorStop(1,'#1d4a55');
+  x.fillStyle=sky;x.fillRect(0,0,W,H);
+  twk=[];const n=Math.min(900,W*H/1500|0);
+  for(let i=0;i<n;i++){const sx=rnd()*W,sy=Math.pow(rnd(),1.4)*H*.86,r=rnd()<.04?1.5:rnd()*.9+.2,a=.3+rnd()*.7;
+    x.fillStyle=`rgba(${220+rnd()*35|0},${230+rnd()*25|0},255,${a})`;x.beginPath();x.arc(sx,sy,r,0,7);x.fill();
+    if(r>1.1&&twk.length<60)twk.push([sx,sy,rnd()*6.3,1+rnd()*2]);}
+  [front,x]=layer();
+  const ridge=(base,amp,ph)=>u=>base-amp*(.55*(1-Math.abs(Math.sin(u*1.15+ph)))+.32*(1-Math.abs(Math.sin(u*2.7+ph*2.3)))+.09*Math.sin(u*7+ph*3)+.04*Math.sin(u*19+ph));
+  const draw=(fn,fill,snow)=>{x.beginPath();x.moveTo(0,H);for(let px=0;px<=W+4;px+=4)x.lineTo(px,fn(px/Math.max(W,900)*6.283));x.lineTo(W,H);x.closePath();x.fillStyle=fill;x.fill();
+    if(snow){x.strokeStyle=snow;x.lineWidth=1.2;x.beginPath();for(let px=0;px<=W+4;px+=4){const y=fn(px/Math.max(W,900)*6.283);px?x.lineTo(px,y):x.moveTo(px,y)}x.stroke()}};
+  draw(ridge(H*.86,H*.26,1.3),'#0b1c2c','rgba(170,220,225,.20)');
+  draw(ridge(H*.93,H*.20,3.9),'#06111d','rgba(170,220,225,.12)');
+  const near=ridge(H*1.0,H*.15,.4);draw(near,'#02060c');
+  domeX=W*.74;domeY=near(domeX/Math.max(W,900)*6.283)+3;
+  x.fillStyle='#02060c';x.beginPath();x.arc(domeX,domeY-9,13,Math.PI,0);x.rect(domeX-13,domeY-9,26,12);x.rect(domeX+18,domeY-12,2,14);x.fill();
+  x.fillStyle='#ffd58a';x.fillRect(domeX-2,domeY-4,3,3);
+}
+function frame(now){
+  if(!still)t=now/1000+40;ease+=(kp-ease)*.04;const k=ease/5;
+  g.globalCompositeOperation='source-over';g.globalAlpha=1;g.drawImage(back,0,0,W,H);
+  for(const s of twk){g.globalAlpha=.25+.35*Math.sin(t*s[3]+s[2]);g.fillStyle='#fff';g.fillRect(s[0]-1.5,s[1]-.5,3,1);g.fillRect(s[0]-.5,s[1]-1.5,1,3)}
+  g.globalCompositeOperation='lighter';
+  const st=W>1400?4:3;
+  for(const r of R){const sp=t*r.sp*(.6+k*.5);
+    for(let px=-st;px<W+st;px+=st){const u=px*.0021*r.f;
+      const y=H*(r.y-.05*(k-1)+.07*Math.sin(u+sp+r.p)+.035*Math.sin(u*2.9-sp*1.7+r.p*2));
+      const h=H*r.h*Math.min(k,1.5)*(.5+.3*Math.sin(u*1.7+sp*.8+r.p)+.2*Math.sin(px*.045+t*1.3+r.p));
+      const a=r.a*Math.min(k,1.7)*(.45+.4*Math.sin(u*1.3-sp*1.1+r.p*3)+.15*Math.sin(px*.11+Math.sin(t*.6+r.p)*3));
+      if(a>.02&&h>4){g.globalAlpha=Math.min(a,1);g.drawImage(S[r.s],px,y-h,st+.6,h)}}}
+  g.globalCompositeOperation='source-over';g.globalAlpha=1;g.drawImage(front,0,0,W,H);
+  if(Math.sin(t*2.4)>.2){g.fillStyle='rgba(255,70,60,.9)';g.beginPath();g.arc(domeX+19,domeY-13,1.8,0,7);g.fill()}
+  raf=still?0:requestAnimationFrame(frame);
+}
+const redraw=()=>{if(still){ease=kp;frame(0)}};
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{build();redraw()},120)});
+const kpEl=document.getElementById('kp'),hours=document.getElementById('hours');
+function bars(){hours.innerHTML='';const base=[8,12,20,34,52,78,96,88,64,44,30,18,10];
+  base.forEach((b,i)=>{const el=document.createElement('i'),v=Math.min(100,b*(.35+kp*.13));el.style.height=Math.max(3,v)+'%';if(i==6||i==7)el.className='peak';
+    if(i%2==0){const l=document.createElement('b');l.textContent=String((18+i)%24).padStart(2,'0');el.appendChild(l)}hours.appendChild(el)})}
+kpEl.addEventListener('input',()=>{kp=+kpEl.value;document.getElementById('kpv').textContent=kp;document.getElementById('wind').textContent=340+kp*40;bars();redraw()});
+document.addEventListener('visibilitychange',()=>{if(!still){cancelAnimationFrame(raf);if(!document.hidden)raf=requestAnimationFrame(frame)}});
+build();bars();if(still){ease=kp;frame(0)}else raf=requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

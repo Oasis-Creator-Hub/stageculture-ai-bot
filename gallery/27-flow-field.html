@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Room 27 — Currents (a generative flow-field painting)</title>
+<meta name="description" content="A generative noise flow-field painting hung on a quiet gallery wall. Click the canvas and it repaints itself in a new curated palette, with a fresh placard.">
+<style>
+  :root { --wall:#e9e6df; --text:#22211f; --mute:#77736b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { min-height:100%; }
+  body { color:var(--text); font-family:"Helvetica Neue",Helvetica,"Nimbus Sans",Arial,sans-serif; overflow-x:hidden;
+    background:
+      radial-gradient(ellipse 60% 55% at 42% 38%, rgba(255,252,244,.95), rgba(255,252,244,0) 70%),
+      linear-gradient(180deg, #dcd8cf 0%, var(--wall) 30%, #dedad1 100%); min-height:100vh; display:flex; flex-direction:column; }
+  .back { position:fixed; top:16px; left:18px; z-index:4; font-size:11px; letter-spacing:.2em; color:var(--mute); text-decoration:none; }
+  .back:hover { color:var(--text); }
+  .room { position:fixed; top:16px; right:18px; font-size:11px; letter-spacing:.2em; color:var(--mute); text-transform:uppercase; }
+  .wall { flex:1; display:grid; grid-template-columns:minmax(0,auto) minmax(180px,250px); gap:clamp(22px,4vw,64px); justify-content:center; align-items:end;
+    padding:clamp(58px,9vh,96px) clamp(16px,4vw,48px) clamp(30px,6vh,60px); }
+  .frame { position:relative; padding:clamp(8px,1.2vw,14px); background:linear-gradient(135deg,#2e2b27,#151412 60%,#2a2723); cursor:pointer; border:0; display:block;
+    box-shadow:0 1px 0 #55504a inset, 0 40px 50px -30px rgba(40,34,24,.55), 0 14px 18px -8px rgba(40,34,24,.35), 14px 30px 60px -20px rgba(40,34,24,.3); }
+  .frame:focus-visible { outline:2px solid #b4553a; outline-offset:6px; }
+  .mat { display:block; background:#f7f4ec; padding:clamp(12px,2.6vw,34px); box-shadow:inset 0 0 0 1px #d8d3c6, inset 2px 3px 8px rgba(0,0,0,.18); }
+  canvas { display:block; width:min(62vh, 78vw, 620px); aspect-ratio:4/5; box-shadow:0 0 0 1px rgba(0,0,0,.12); }
+  .placard { align-self:end; margin-bottom:clamp(10px,6vh,70px); background:#fbfaf6; padding:18px 18px 16px; font-size:12.5px; line-height:1.5;
+    box-shadow:0 1px 2px rgba(0,0,0,.18), 0 6px 14px -8px rgba(0,0,0,.3); border-radius:1px; }
+  .placard .artist { font-weight:700; font-size:14px; }
+  .placard .life { color:var(--mute); margin-bottom:10px; }
+  .placard h1 { font-family:"Iowan Old Style",Palatino,Georgia,serif; font-style:italic; font-weight:400; font-size:21px; line-height:1.15; margin-bottom:2px; }
+  .placard .medium { color:var(--mute); margin-bottom:10px; }
+  .placard p.note { font-size:12px; border-top:1px solid #dcd7ca; padding-top:10px; }
+  .sw { display:flex; gap:0; margin:10px 0 8px; height:12px; }
+  .sw i { flex:1; }
+  .acc { display:flex; justify-content:space-between; color:var(--mute); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; font-variant-numeric:tabular-nums; }
+  .floor { height:clamp(34px,9vh,90px); background:linear-gradient(180deg,#b8ab95 0,#c9bda8 8%,#a89a83 100%); border-top:7px solid #f3f0e8; box-shadow:0 -1px 0 #bdb8ac; position:relative; }
+  .floor::after { content:"click the painting to commission another"; position:absolute; left:0; right:0; top:50%; transform:translateY(-50%); text-align:center; font-size:10.5px; letter-spacing:.26em; text-transform:uppercase; color:rgba(50,40,26,.6); }
+  @media (max-width:760px) {
+    .wall { grid-template-columns:1fr; justify-items:center; align-items:start; }
+    .placard { margin:0; max-width:340px; width:100%; }
+    .floor::after { content:"tap the painting for another"; }
+  }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← 100</a>
+<span class="room">Room 27 · Works on air</span>
+<main class="wall">
+  <button class="frame" id="frame" aria-label="Flow-field painting. Activate to repaint with a new palette.">
+    <span class="mat"><canvas id="c"></canvas></span>
+  </button>
+  <aside class="placard" aria-live="polite">
+    <div class="artist">Ines Valtari-Okoro</div>
+    <div class="life">b. 1987, Port Maren · lives and works on the ferry</div>
+    <h1 id="title">Currents</h1>
+    <div class="medium" id="medium">Pigment drawn by wind that does not exist, on screen</div>
+    <div class="sw" id="sw"></div>
+    <p class="note" id="note"></p>
+    <div class="acc" style="margin-top:10px"><span id="acc">Acc. no. 27.0001</span><span id="pal">—</span></div>
+  </aside>
+</main>
+<div class="floor" aria-hidden="true"></div>
+
+<script>
+(() => {
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d'), frame = document.getElementById('frame');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const PALETTES = [
+    { name: 'Tidewater', bg: '#f2ece0', inks: ['#0f3b57', '#1c6e8c', '#274c77', '#a3cef1', '#e76f51', '#0f3b57'], scale: 1.6, turns: 1.4, w: [.6, 2.2], q: 0,
+      note: 'Painted the week the harbour froze. The single line of coral is the pilot boat, which went out anyway.' },
+    { name: 'Persimmon', bg: '#1d1a1c', inks: ['#f4a259', '#e76f51', '#bc4b51', '#f4e285', '#5b8e7d', '#f7f0e3'], scale: 2.4, turns: 2.2, w: [.5, 1.6], q: 0,
+      note: 'Valtari-Okoro calls this her “loud room”. She asks that it be hung where people queue.' },
+    { name: 'Lichen', bg: '#e6e8dc', inks: ['#3a5a40', '#588157', '#a3b18a', '#344e41', '#c9a227', '#dad7cd'], scale: 1.1, turns: 1, w: [1.2, 4.5], q: 0,
+      note: 'Broad, slow marks. The artist reports that she held her breath for most of it, which is not possible.' },
+    { name: 'Switchback', bg: '#f5efe6', inks: ['#111111', '#111111', '#d62828', '#f77f00', '#003049', '#8d99ae'], scale: 1.9, turns: 1.6, w: [.7, 2], q: 8,
+      note: 'Here the field is only permitted eight directions. The result is a map of a city that would be exhausting to live in.' },
+    { name: 'Plum Dusk', bg: '#241a2e', inks: ['#f2c6de', '#c9a0dc', '#7b5ea7', '#f9dc5c', '#5bc0be', '#efe9f4'], scale: 3, turns: 3, w: [.35, 1.1], q: 0,
+      note: 'Fine as hair. Visitors are asked not to exhale directly at the work.' },
+    { name: 'Kiln', bg: '#ead9c5', inks: ['#7f2b0a', '#b3541e', '#d98e4a', '#3c2415', '#f2efe9', '#1f6f78'], scale: 1.4, turns: 1.8, w: [.9, 3.2], q: 0,
+      note: 'The teal arrived by accident and was allowed to stay, on the condition that it behave.' },
+    { name: 'Signal', bg: '#f4f1e8', inks: ['#ef233c', '#2b2d42', '#2b2d42', '#8d99ae', '#ffb703', '#2b2d42'], scale: 2.1, turns: 1.2, w: [.5, 2.6], q: 5,
+      note: 'Five headings, like a weathervane with opinions. The yellow is used exactly as often as the artist laughs.' }
+  ];
+  const T1 = ['Currents', 'Undertow', 'Weather', 'Slow Rivers', 'Draught', 'Murmuration', 'Thermals', 'Low Tide', 'Crosswind', 'Eddies'];
+  const T2 = ['for a Closed Window', 'at the Third Bridge', 'with Interruptions', 'after an Argument', 'in an Empty Room', 'before the Ferry', 'Remembered Badly', 'No. ', 'for Two Left Hands', 'on a Tuesday'];
+
+  let seed = 2701, palIdx = 0, parts = [], raf = 0, W = 0, H = 0, dpr = 1, perm, pal, count = 1;
+  const mul = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  let R = mul(seed);
+
+  // classic gradient noise
+  function initNoise() { const p = [...Array(256).keys()]; for (let i = 255; i > 0; i--) { const j = (R() * (i + 1)) | 0; [p[i], p[j]] = [p[j], p[i]]; } perm = p.concat(p); }
+  const fade = t => t * t * t * (t * (t * 6 - 15) + 10), G = [[1, 1], [-1, 1], [1, -1], [-1, -1], [1, 0], [-1, 0], [0, 1], [0, -1]];
+  function noise(x, y) {
+    const X = Math.floor(x) & 255, Y = Math.floor(y) & 255, xf = x - Math.floor(x), yf = y - Math.floor(y), u = fade(xf), v = fade(yf);
+    const g = (ix, iy, dx, dy) => { const h = G[perm[perm[ix] + iy] & 7]; return h[0] * dx + h[1] * dy; };
+    const a = g(X, Y, xf, yf), b = g(X + 1, Y, xf - 1, yf), c = g(X, Y + 1, xf, yf - 1), d = g(X + 1, Y + 1, xf - 1, yf - 1);
+    return a + u * (b - a) + v * (c + u * (d - c) - a - u * (b - a));
+  }
+  const field = (x, y) => {
+    let a = (noise(x * pal.scale, y * pal.scale) + .5 * noise(x * pal.scale * 2.3 + 9, y * pal.scale * 2.3 + 4)) * Math.PI * 2 * pal.turns;
+    if (pal.q) { const s = Math.PI * 2 / pal.q; a = Math.round(a / s) * s; }
+    return a;
+  };
+
+  function size() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const r = cv.getBoundingClientRect(); W = Math.max(1, Math.round(r.width * dpr)); H = Math.max(1, Math.round(r.height * dpr));
+    if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; return true; }
+    return false;
+  }
+
+  function begin() {
+    cancelAnimationFrame(raf); R = mul(seed); pal = PALETTES[palIdx]; initNoise();
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = pal.bg; ctx.fillRect(0, 0, W, H);
+    // paper tooth
+    for (let i = 0; i < 2600; i++) { ctx.fillStyle = `rgba(${R() < .5 ? '0,0,0' : '255,255,255'},${R() * .05})`; ctx.fillRect(R() * W, R() * H, 1 + R() * 2 * dpr, 1 + R() * 2 * dpr); }
+    parts = []; const N = 1500;
+    // clustered seeding gives the composition weight rather than uniform fuzz
+    const cl = []; for (let i = 0; i < 5; i++) cl.push([.15 + R() * .7, .15 + R() * .95, .08 + R() * .28]);
+    for (let i = 0; i < N; i++) {
+      let x, y; if (R() < .7) { const c = cl[(R() * cl.length) | 0], a = R() * 6.283, d = Math.sqrt(R()) * c[2]; x = c[0] + Math.cos(a) * d; y = c[1] + Math.sin(a) * d * 1.2; } else { x = R(); y = R() * 1.25; }
+      const big = R() < .08;
+      parts.push({ x, y, c: pal.inks[(R() * pal.inks.length) | 0], w: (pal.w[0] + R() * R() * (pal.w[1] - pal.w[0])) * (big ? 2.2 : 1), life: 50 + (R() * 240) | 0, age: 0, dir: R() < .12 ? -1 : 1, a: .55 + R() * .45 });
+    }
+    ctx.lineCap = 'round';
+    if (reduce) { for (let i = 0; i < 300; i++) if (!step()) break; } else raf = requestAnimationFrame(loop);
+  }
+  const M = .055; // unpainted margin
+  function step() {
+    let alive = 0; const u = W, st = .0024;
+    for (const p of parts) {
+      if (p.age >= p.life) continue;
+      const a = field(p.x, p.y), nx = p.x + Math.cos(a) * st * p.dir, ny = p.y + Math.sin(a) * st * p.dir;
+      if (nx < M || nx > 1 - M || ny < M || ny > 1.25 - M) { p.age = p.life; continue; }
+      const taper = Math.sin(Math.PI * Math.min(1, (p.age + 1) / p.life)) * .8 + .2;
+      ctx.globalAlpha = p.a; ctx.strokeStyle = p.c; ctx.lineWidth = Math.max(.4, p.w * taper * u / 620);
+      ctx.beginPath(); ctx.moveTo(p.x * u, p.y * u); ctx.lineTo(nx * u, ny * u); ctx.stroke();
+      p.x = nx; p.y = ny; p.age++; alive++;
+    }
+    ctx.globalAlpha = 1; return alive;
+  }
+  function loop() { let alive = 0; for (let i = 0; i < 5; i++) alive = step(); if (alive) raf = requestAnimationFrame(loop); }
+
+  const $ = id => document.getElementById(id);
+  function placard() {
+    const p = PALETTES[palIdx], r = mul(seed * 7 + 3), a = T1[(r() * T1.length) | 0]; let b = T2[(r() * T2.length) | 0]; if (b === 'No. ') b += 1 + ((r() * 40) | 0);
+    $('title').textContent = `${a} ${b}`; $('note').textContent = p.note; $('pal').textContent = p.name;
+    $('acc').textContent = 'Acc. no. 27.' + String(count).padStart(4, '0');
+    $('medium').textContent = `${p.q ? 'Ruled' : 'Free'} flow field, ${p.inks.length} inks, seed ${seed}`;
+    const sw = $('sw'); sw.innerHTML = ''; [p.bg, ...new Set(p.inks)].forEach(c => { const i = document.createElement('i'); i.style.background = c; sw.appendChild(i); });
+  }
+  frame.addEventListener('click', () => {
+    seed = (Math.random() * 99999) | 0; palIdx = (palIdx + 1 + ((Math.random() * (PALETTES.length - 1)) | 0)) % PALETTES.length; count++;
+    placard(); begin();
+  });
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (size()) begin(); }, 120); });
+  size(); placard(); begin();
+})();
+</script>
+</body>
+</html>

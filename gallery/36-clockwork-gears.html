@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hollis &amp; Wren No. 36 — a skeleton clock in brass</title>
+<meta name="description" content="A steampunk skeleton clock: a brass SVG gear train with correctly meshing teeth and true ratios, driving a face that shows your real local time.">
+<style>
+  :root{--wood:#1c120b;--brass:#d9a441;--pale:#f1d58f;--cop:#b8683a;--ink:#f0dfb8}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{min-height:100vh;background:
+      radial-gradient(90% 70% at 50% 30%,#3a2616 0,#1c120b 60%,#0d0805 100%);
+    color:var(--ink);font-family:"Didot","Bodoni MT","Bodoni 72","Playfair Display","Times New Roman",serif;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
+    background:repeating-linear-gradient(92deg,rgba(0,0,0,.2) 0 2px,transparent 2px 9px,rgba(255,200,120,.03) 9px 11px,transparent 11px 23px)}
+  .wrap{position:relative;max-width:1280px;margin:0 auto;padding:clamp(16px,3vw,36px);display:grid;gap:18px}
+  header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;border-bottom:1px solid rgba(217,164,65,.4);padding-bottom:14px}
+  h1{font-weight:400;font-size:clamp(28px,5vw,62px);line-height:.95;letter-spacing:.01em}
+  h1 em{color:var(--brass)}
+  h1 small{display:block;font:11px/1.3 "Copperplate","Copperplate Gothic Light","Gill Sans",sans-serif;letter-spacing:.4em;text-transform:uppercase;color:var(--brass);margin-bottom:10px}
+  .back{font:11px "Copperplate","Copperplate Gothic Light","Gill Sans",sans-serif;letter-spacing:.3em;color:var(--brass);text-decoration:none;border:1px solid rgba(217,164,65,.6);padding:8px 12px;border-radius:2px;white-space:nowrap}
+  .back:hover,.back:focus-visible{background:var(--brass);color:var(--wood)}
+  svg{width:100%;height:auto;display:block;filter:drop-shadow(0 30px 40px rgba(0,0,0,.55))}
+  .plaque{display:grid;grid-template-columns:1fr;gap:16px;align-items:start}
+  .time{font-variant-numeric:tabular-nums;font-size:clamp(40px,8vw,84px);line-height:1;color:var(--pale);letter-spacing:.02em}
+  .time span{font-size:.4em;color:var(--brass);margin-left:.3em;letter-spacing:.2em}
+  .note{font-style:italic;font-size:clamp(15px,1.5vw,18px);line-height:1.6;color:#cbb891;max-width:52ch}
+  table{border-collapse:collapse;width:100%;font:12px/1.3 ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#cbb891}
+  th,td{text-align:left;padding:7px 10px 7px 0;border-bottom:1px solid rgba(217,164,65,.2);white-space:nowrap}
+  th{font:10px "Copperplate","Copperplate Gothic Light","Gill Sans",sans-serif;letter-spacing:.24em;text-transform:uppercase;color:var(--brass)}
+  td i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px}
+  .num{font:400 21px "Didot","Bodoni MT","Times New Roman",serif;fill:#f1d58f;text-anchor:middle;dominant-baseline:central}
+  .eng{font:9px "Copperplate","Copperplate Gothic Light","Gill Sans",sans-serif;letter-spacing:3px;fill:#f1d58f;opacity:.75;text-anchor:middle}
+  @media(min-width:900px){.plaque{grid-template-columns:auto 1fr 1.1fr;gap:44px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><small>Hollis &amp; Wren · Horologists to Nobody in Particular</small>Movement <em>No. 36</em></h1>
+    <a class="back" href="index.html">← 100</a>
+  </header>
+  <svg id="clock" viewBox="118 84 856 692" role="img" aria-label="Skeleton clock with a train of eight meshing brass gears and hands showing the current time">
+    <defs>
+      <radialGradient id="brass" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#ffe9a6"/><stop offset=".45" stop-color="#d9a441"/><stop offset="1" stop-color="#7c5516"/></radialGradient>
+      <radialGradient id="gold" cx=".4" cy=".3" r=".9"><stop offset="0" stop-color="#fff3c4"/><stop offset=".5" stop-color="#e8bd58"/><stop offset="1" stop-color="#94681c"/></radialGradient>
+      <radialGradient id="copper" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#f6b890"/><stop offset=".5" stop-color="#b8683a"/><stop offset="1" stop-color="#5e2c14"/></radialGradient>
+      <radialGradient id="bronze" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#d9b77a"/><stop offset=".5" stop-color="#8f6a33"/><stop offset="1" stop-color="#3f2b10"/></radialGradient>
+      <radialGradient id="steel" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#eef1f2"/><stop offset=".5" stop-color="#8d979c"/><stop offset="1" stop-color="#30383c"/></radialGradient>
+      <linearGradient id="plate" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b2a1c"/><stop offset=".5" stop-color="#241810"/><stop offset="1" stop-color="#120b06"/></linearGradient>
+      <linearGradient id="enamel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14202b"/><stop offset="1" stop-color="#0a1016"/></linearGradient>
+      <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#000" flood-opacity=".55"/></filter>
+    </defs>
+    <path d="M176 250q0-110 120-126l470-28q170-4 180 150l10 300q-6 140-150 160l-470 54q-170 6-176-150z" fill="url(#plate)" stroke="#6b4a1e" stroke-width="3"/>
+    <path d="M196 256q0-96 104-110l462-28q150-2 160 132l10 296q-6 122-134 140l-462 52q-150 6-156-132z" fill="none" stroke="#d9a441" stroke-opacity=".28" stroke-width="1" stroke-dasharray="2 7"/>
+    <g id="rivets"></g>
+    <g id="gears"></g>
+    <g id="dial"></g>
+    <g id="hands" filter="url(#sh)">
+      <g id="hh"><path d="M-7 18L-9 -70Q-16 -92 0 -128Q16 -92 9 -70L7 18Z" fill="#10171d" stroke="#d9a441" stroke-width="1.5"/><circle cy="-88" r="5" fill="#d9a441"/></g>
+      <g id="mh"><path d="M-5 24L-6 -110Q-11 -130 0 -186Q11 -130 6 -110L5 24Z" fill="#10171d" stroke="#d9a441" stroke-width="1.5"/></g>
+      <g id="sh2"><path d="M-1.4 46L-1.4 -196L1.4 -196L1.4 46Z" fill="#c2452d"/><circle cy="34" r="9" fill="none" stroke="#c2452d" stroke-width="3"/></g>
+      <circle r="11" fill="url(#steel)" stroke="#20262a"/><circle r="3.5" fill="#20262a"/>
+    </g>
+  </svg>
+  <div class="plaque">
+    <div class="time" id="time">00:00<span>00</span></div>
+    <p class="note">Nothing here is faked. The small copper flywheel turns once every five seconds; each wheel after it is slowed by its tooth count alone, twelve to one, until the seconds arbor goes round exactly once a minute and carries the red hand with it.</p>
+    <table aria-label="Gear train"><thead><tr><th>Wheel</th><th>Teeth</th><th>Rev / min</th></tr></thead><tbody id="tb"></tbody></table>
+  </div>
+</div>
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg', $ = id => document.getElementById(id), TAU = Math.PI * 2;
+  const el = (n, a, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+  const pol = (r, a) => (r * Math.cos(a)).toFixed(2) + ' ' + (r * Math.sin(a)).toFixed(2);
+  // gear outline: tooth 0 is centred on angle 0; plus spoke windows (even-odd)
+  function gearPath(N, m, spokes, hub) {
+    const r = m * N / 2, ra = r + m * .95, rr = r - m * 1.2, p = TAU / N; let d = '';
+    for (let i = 0; i < N; i++) { const a = i * p;
+      d += (i ? 'L' : 'M') + pol(rr, a - .27 * p) + 'L' + pol(r, a - .2 * p) + 'L' + pol(ra, a - .1 * p) + 'L' + pol(ra, a + .1 * p) + 'L' + pol(r, a + .2 * p) + 'L' + pol(rr, a + .27 * p); }
+    d += 'Z';
+    if (spokes) { const r1 = hub, r2 = rr - Math.max(6, m * 1.6), gap = Math.min(.5, 9 / r1);
+      for (let i = 0; i < spokes; i++) { const a0 = i * TAU / spokes + gap, a1 = (i + 1) * TAU / spokes - gap, g2 = gap * r1 / r2, b0 = i * TAU / spokes + g2, b1 = (i + 1) * TAU / spokes - g2;
+        d += `M${pol(r1, a0)}A${r1} ${r1} 0 0 1 ${pol(r1, a1)}L${pol(r2, b1)}A${r2} ${r2} 0 0 0 ${pol(r2, b0)}Z`; } }
+    return d;
+  }
+  // The train. `par` + `dir` (deg, from parent centre) = meshing; `on` = fixed to the same arbor.
+  const G = [
+    { id: 'sec', name: 'Seconds wheel', N: 36, m: 7, x: 565.5, y: 346, fill: 'gold', spokes: 6, hub: 40, z: 1 },
+    { id: 'p1', name: 'Third pinion', N: 12, m: 7, par: 'sec', dir: 150, fill: 'steel', z: 2 },
+    { id: 'third', name: 'Third wheel', N: 48, m: 6, on: 'p1', fill: 'brass', spokes: 5, hub: 53, z: 0 },
+    { id: 'fly', name: 'Flywheel', N: 12, m: 6, par: 'third', dir: 200, fill: 'copper', spokes: 3, hub: 9, z: 1 },
+    { id: 'idler', name: 'Idler', N: 20, m: 6, par: 'third', dir: 100, fill: 'bronze', spokes: 4, hub: 13, z: 1 },
+    { id: 'gov', name: 'Governor wheel', N: 30, m: 6, par: 'idler', dir: 170, fill: 'copper', spokes: 5, hub: 16, z: 1 },
+    { id: 'p2', name: 'Centre pinion', N: 10, m: 6, on: 'sec', fill: 'steel', z: 4 },
+    { id: 'great', name: 'Great wheel', N: 60, m: 6, par: 'p2', dir: 20, fill: 'bronze', spokes: 8, hub: 26, z: 3 }
+  ];
+  const by = {}; G.forEach(g => by[g.id] = g);
+  G.forEach(g => {
+    g.r = g.m * g.N / 2;
+    if (g.on) { const p = by[g.on]; g.x = p.x; g.y = p.y; g.rpm = p.rpm; }
+    else if (g.par) { const p = by[g.par], a = g.dir * Math.PI / 180, dist = p.r + g.r; g.phi = a; g.x = p.x + Math.cos(a) * dist; g.y = p.y + Math.sin(a) * dist; g.rpm = -p.rpm * p.N / g.N; }
+    else g.rpm = 1;
+  });
+  const layer = $('gears');
+  const order = [...G].sort((a, b) => a.z - b.z || b.r - a.r);
+  order.forEach(g => {
+    const o = el('g', { transform: `translate(${g.x.toFixed(2)} ${g.y.toFixed(2)})`, filter: 'url(#sh)' }, layer);
+    g.node = el('g', {}, o);
+    el('path', { d: gearPath(g.N, g.m, g.spokes, g.hub), fill: `url(#${g.fill})`, 'fill-rule': 'evenodd', stroke: '#2a1808', 'stroke-width': 1.1, 'stroke-linejoin': 'round' }, g.node);
+    if (g.spokes) { el('circle', { r: g.r - g.m * 1.2 - Math.max(6, g.m * 1.6) + 3, fill: 'none', stroke: '#2a1808', 'stroke-opacity': .35, 'stroke-width': 1 }, g.node);
+      el('circle', { cx: g.hub * .55, r: Math.max(1.6, g.hub * .12), fill: '#2a1808', opacity: .7 }, g.node); }
+    { el('circle', { r: Math.min(8, g.r * .22), fill: 'url(#steel)', stroke: '#1c1208' }, o); el('path', { d: `M${-Math.min(5, g.r * .14)} 0H${Math.min(5, g.r * .14)}`, stroke: '#1c1208', 'stroke-width': 1.6 }, o); }
+  });
+  // rivets round the back plate
+  [[236, 170], [420, 118], [640, 106], [860, 120], [940, 300], [946, 520], [880, 690], [640, 734], [420, 758], [230, 740], [182, 560], [180, 360]].forEach(([x, y]) => { el('circle', { cx: x, cy: y, r: 7, fill: 'url(#brass)', stroke: '#2a1808' }, $('rivets')); el('circle', { cx: x - 1.5, cy: y - 1.5, r: 2, fill: '#fff', opacity: .5 }, $('rivets')); });
+  // skeleton chapter ring on the seconds arbor
+  const C = by.sec, dial = $('dial'); dial.setAttribute('transform', `translate(${C.x} ${C.y})`);
+  el('circle', { r: 216, fill: 'none', stroke: 'url(#enamel)', 'stroke-width': 44, opacity: .93, filter: 'url(#sh)' }, dial);
+  el('circle', { r: 238, fill: 'none', stroke: 'url(#gold)', 'stroke-width': 5 }, dial); el('circle', { r: 194, fill: 'none', stroke: 'url(#gold)', 'stroke-width': 3 }, dial);
+  for (let i = 0; i < 60; i++) { const a = i * TAU / 60, big = i % 5 === 0; el('path', { d: `M${pol(big ? 226 : 230, a)}L${pol(235, a)}`, stroke: '#f1d58f', 'stroke-width': big ? 2.4 : 1, opacity: big ? 1 : .7 }, dial); }
+  ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'].forEach((t, i) => { const a = i * TAU / 12 - Math.PI / 2; const tx = el('text', { class: 'num', x: (212 * Math.cos(a)).toFixed(1), y: (212 * Math.sin(a)).toFixed(1), transform: `rotate(${i * 30} ${(212 * Math.cos(a)).toFixed(1)} ${(212 * Math.sin(a)).toFixed(1)})` }, dial); tx.textContent = t; });
+  el('path', { id: 'arc', d: 'M-150 0A150 150 0 0 0 150 0', fill: 'none' }, dial);
+  const et = el('text', { class: 'eng' }, dial), tp = el('textPath', { href: '#arc', startOffset: '50%' }, et); tp.textContent = 'HOLLIS & WREN · EIGHT WHEELS · NO JEWELS';
+  $('hands').setAttribute('transform', `translate(${C.x} ${C.y})`);
+  // table
+  const tones = { gold: '#e8bd58', steel: '#8d979c', brass: '#d9a441', copper: '#b8683a', bronze: '#8f6a33' };
+  $('tb').innerHTML = G.map(g => `<tr><td><i style="background:${tones[g.fill]}"></i>${g.name}</td><td>${g.N}</td><td>${g.rpm > 0 ? '+' : '−'}${Math.abs(g.rpm).toFixed(Math.abs(g.rpm) < 1 ? 3 : 1)}</td></tr>`).join('');
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, timeEl = $('time');
+  let lastSec = -1;
+  function update() {
+    const now = new Date(), ms = reduce ? 0 : now.getMilliseconds();
+    const s = now.getSeconds() + ms / 1000, mi = now.getMinutes() + s / 60, h = (now.getHours() % 12) + mi / 60;
+    // total turns of the seconds arbor since local midnight keeps every wheel in phase
+    by.sec.th = ((now.getHours() * 60 + now.getMinutes()) + s / 60) * TAU - Math.PI / 2;
+    G.forEach(g => {
+      if (g.on) g.th = by[g.on].th;
+      else if (g.par) { const p = by[g.par]; g.th = g.phi + Math.PI + Math.PI / g.N - (p.th - g.phi) * p.N / g.N; }
+      g.node.setAttribute('transform', `rotate(${((g.th * 180 / Math.PI) % 360).toFixed(3)})`);
+    });
+    $('sh2').setAttribute('transform', `rotate(${(s * 6).toFixed(2)})`);
+    $('mh').setAttribute('transform', `rotate(${(mi * 6).toFixed(3)})`);
+    $('hh').setAttribute('transform', `rotate(${(h * 30).toFixed(3)})`);
+    if (now.getSeconds() !== lastSec) { lastSec = now.getSeconds(); const z = n => String(n).padStart(2, '0'); timeEl.innerHTML = `${z(now.getHours())}:${z(now.getMinutes())}<span>${z(lastSec)}</span>`; }
+  }
+  if (reduce) { update(); setInterval(update, 1000); }
+  else { const loop = () => { update(); requestAnimationFrame(loop); }; loop(); }
+})();
+</script>
+</body>
+</html>

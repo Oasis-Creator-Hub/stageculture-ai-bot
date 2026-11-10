@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Great Swell off Heron Rock — a woodblock sea</title>
+<meta name="description" content="An original seascape in the manner of a colour woodblock print: flat inks, keyblock outlines, paper grain and a slow animated swell.">
+<style>
+  :root { --paper: #e9dcbd; --ink: #14233b; --seal: #b5372a; }
+  * { box-sizing: border-box; }
+  html { background: #d8c9a6; }
+  body { margin: 0; min-height: 100vh; color: var(--ink); font-family: "Hoefler Text", "Baskerville", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    background: radial-gradient(140% 100% at 50% 0%, #efe4c9 0%, #dccdaa 70%, #c9b88f 100%); display: grid; place-items: center; padding: clamp(14px, 3.5vw, 48px); }
+  main { width: min(1120px, 100%); }
+  .sheet { background: var(--paper); padding: clamp(8px, 1.6vw, 20px); box-shadow: 0 1px 0 #fff8 inset, 0 30px 60px -30px rgba(60,40,10,.55), 0 2px 6px rgba(60,40,10,.25); position: relative; }
+  .sheet svg { display: block; width: 100%; aspect-ratio: 1200 / 780; outline: 2px solid var(--ink); outline-offset: -2px; }
+  .caption { display: grid; grid-template-columns: 1fr auto; gap: 1rem 2rem; align-items: end; padding: clamp(14px, 2vw, 24px) clamp(4px, 1vw, 10px) 4px; }
+  .plate { font-size: .72rem; letter-spacing: .3em; text-transform: uppercase; color: var(--seal); }
+  h1 { margin: .25em 0 .2em; font-weight: 400; font-size: clamp(1.5rem, 3.6vw, 2.5rem); letter-spacing: .01em; line-height: 1.05; }
+  .caption p { margin: 0; max-width: 46ch; font-size: .95rem; line-height: 1.55; font-style: italic; color: #3b4658; }
+  .sea-state { display: flex; gap: 8px; align-items: center; }
+  .sea-state span { font-size: .68rem; letter-spacing: .26em; text-transform: uppercase; margin-right: 6px; color: #5a6274; }
+  .sea-state button { font: inherit; font-size: .8rem; letter-spacing: .08em; width: 4.4em; height: 4.4em; border: 2px solid var(--seal); color: var(--seal); background: transparent; border-radius: 6px 9px 5px 8px; cursor: pointer; transition: background .25s, color .25s, transform .25s; }
+  .sea-state button:hover { transform: rotate(-3deg); }
+  .sea-state button[aria-pressed="true"] { background: var(--seal); color: var(--paper); }
+  .sea-state button:focus-visible, .back:focus-visible { outline: 2px dashed var(--ink); outline-offset: 3px; }
+  .back { position: absolute; right: clamp(8px, 1.6vw, 20px); top: -1.9em; font-size: .7rem; letter-spacing: .3em; color: #5a4a2c; text-decoration: none; }
+  .back:hover { color: var(--seal); }
+  main { padding-top: 1.4em; }
+  @media (max-width: 640px) { .sheet svg { aspect-ratio: 1 / 1; } .caption { grid-template-columns: 1fr; } .sea-state button { width: 4em; height: 4em; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="sheet">
+    <a class="back" href="index.html">&larr; 100</a>
+    <svg id="print" viewBox="0 0 1200 780" preserveAspectRatio="xMinYMid slice" role="img" aria-label="Woodblock-style print of a great curling wave before a red sun, with small boats and a rocky islet">
+      <defs>
+        <linearGradient id="bokTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22426a"/><stop offset=".55" stop-color="#22426a" stop-opacity=".35"/><stop offset="1" stop-color="#22426a" stop-opacity="0"/></linearGradient>
+        <linearGradient id="bokHor" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#e59a76"/><stop offset="1" stop-color="#e59a76" stop-opacity="0"/></linearGradient>
+        <filter id="grain" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency=".9 .55" numOctaves="3" seed="4" result="n"/>
+          <feColorMatrix in="n" type="matrix" values="0 0 0 0 .36  0 0 0 0 .27  0 0 0 0 .14  0 0 0 -1.5 1.02"/>
+        </filter>
+        <filter id="fibre" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency=".012 .4" numOctaves="2" seed="9"/>
+          <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 .96  0 0 0 0 .84  0 0 0 -2.2 1.05"/>
+        </filter>
+        <filter id="wobble"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="2" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="3.2"/></filter>
+      </defs>
+      <rect width="1200" height="780" fill="#eee0bf"/>
+      <rect width="1200" height="190" fill="url(#bokTop)"/>
+      <rect y="230" width="1200" height="215" fill="url(#bokHor)" opacity=".8"/>
+      <circle cx="800" cy="262" r="84" fill="#c1432c"/>
+      <g fill="#eee0bf">
+        <rect x="610" y="296" width="330" height="15" rx="7.5"/><rect x="700" y="322" width="360" height="12" rx="6"/>
+        <rect x="900" y="150" width="340" height="16" rx="8"/><rect x="820" y="176" width="250" height="11" rx="5.5"/>
+        <rect x="380" y="92" width="300" height="14" rx="7" opacity=".85"/><rect x="460" y="116" width="150" height="10" rx="5" opacity=".85"/>
+      </g>
+      <g id="birds" fill="none" stroke="#14233b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></g>
+      <g filter="url(#wobble)">
+        <g stroke="#14233b" stroke-width="2.6" stroke-linejoin="round">
+          <path d="M930 446 L946 402 L962 384 L984 350 L1004 368 L1018 342 L1046 322 L1070 360 L1092 372 L1112 410 L1136 446Z" fill="#55626b"/>
+          <path d="M984 350 L1000 392 L990 446 M1046 322 L1052 380 L1040 446 M1018 342 L1024 376" fill="none" stroke-width="1.8" opacity=".7"/>
+          <path d="M1150 446 L1160 418 L1174 404 L1190 420 L1210 446Z" fill="#55626b"/>
+          <path d="M1046 324 C1040 300 1052 280 1074 262" fill="none" stroke-width="5"/>
+          <g fill="#2d4a3b"><path d="M1034 268 q40 -26 82 0 q-42 10 -82 0Z"/><path d="M1056 246 q30 -22 64 -2 q-34 10 -64 2Z"/><path d="M1010 290 q28 -18 58 0 q-30 8 -58 0Z"/></g>
+        </g>
+        <g id="boats" stroke="#14233b" stroke-width="2.2" stroke-linejoin="round"></g>
+        <g id="seaBack"></g>
+        <g id="great">
+          <path d="M-40 800 L-40 492 C56 468 150 366 250 276 C330 204 440 152 540 170 C612 184 664 232 684 296 C644 254 584 236 524 254 C444 278 402 352 412 432 C422 522 500 592 660 650 L660 800Z" fill="#1c4270" stroke="#14233b" stroke-width="3.4" stroke-linejoin="round"/>
+          <path d="M684 296 C644 254 584 236 524 254 C444 278 402 352 412 432 C422 522 500 592 660 650 C560 640 470 590 440 500 C416 420 440 320 530 284 C590 262 644 270 684 296Z" fill="#7fa9b6" stroke="#14233b" stroke-width="2.4" stroke-linejoin="round"/>
+          <g fill="none" stroke="#5c8fae" stroke-linecap="round" stroke-width="13">
+            <path d="M-30 566 C80 528 176 424 272 328 C350 254 446 212 536 218"/>
+            <path d="M-30 650 C100 600 206 488 300 390 C352 336 404 300 452 284"/>
+            <path d="M40 728 C160 668 262 560 340 452"/>
+          </g>
+          <g fill="none" stroke="#eee0bf" stroke-linecap="round" stroke-width="3" opacity=".85">
+            <path d="M-30 608 C92 564 192 456 286 360 C348 300 414 262 484 246"/>
+            <path d="M-10 694 C120 640 232 528 318 424"/>
+            <path d="M470 330 C448 380 448 450 478 508 M508 312 C486 360 482 430 508 486"/>
+          </g>
+          <g id="foamA" fill="#f3ead0" stroke="#14233b" stroke-width="6"></g>
+          <g id="foamB" fill="#f3ead0"></g>
+        </g>
+        <g id="spray" fill="#f3ead0" stroke="#14233b" stroke-width="1.6"></g>
+        <g id="seaFront"></g>
+      </g>
+      <g transform="translate(44 40)">
+        <rect width="58" height="262" fill="#b5372a" stroke="#14233b" stroke-width="2"/>
+        <rect x="5" y="5" width="48" height="252" fill="none" stroke="#eee0bf" stroke-width="1"/>
+        <g id="cart" fill="#f3ead0" font-family="Baskerville, 'Palatino Linotype', Georgia, serif" font-size="19" text-anchor="middle"></g>
+        <g transform="translate(8 274)"><rect width="42" height="42" rx="4" fill="none" stroke="#b5372a" stroke-width="3"/>
+          <path d="M8 16 q6.5 -9 13 0 t13 0 M8 28 q6.5 -9 13 0 t13 0" fill="none" stroke="#b5372a" stroke-width="3.4" stroke-linecap="round"/></g>
+      </g>
+      <rect width="1200" height="780" filter="url(#fibre)" opacity=".5" style="mix-blend-mode:soft-light"/>
+      <rect width="1200" height="780" filter="url(#grain)" opacity=".5" style="mix-blend-mode:multiply"/>
+    </svg>
+    <div class="caption">
+      <div>
+        <div class="plate">Twelve Weathers of the Outer Sea &middot; Plate VII</div>
+        <h1>Great Swell off Heron Rock</h1>
+        <p>Three herring boats run for the lee of the rock as the evening sea stands up behind them. Cut in six blocks; indigo, rust and pine on mulberry paper.</p>
+      </div>
+      <div class="sea-state" role="group" aria-label="Sea state">
+        <span>Sea</span>
+        <button data-s="0.45" aria-pressed="false">Calm</button>
+        <button data-s="1" aria-pressed="true">Rising</button>
+        <button data-s="1.9" aria-pressed="false">Gale</button>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg', $ = id => document.getElementById(id);
+  const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
+  let s = 11; const rnd = () => (s = (s * 48271) % 2147483647) / 2147483647;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // cartouche lettering, stacked like a title slip
+  'GREAT SWELL'.split('').forEach((ch, i) => { el('text', { x: 29, y: 30 + i * 21.5 }, $('cart')).textContent = ch; });
+
+  // birds
+  [[560, 60, 13], [610, 84, 10], [520, 96, 9], [668, 58, 8], [1010, 104, 11], [1062, 122, 8]].forEach(([x, y, w]) =>
+    el('path', { d: `M${x - w} ${y - w * .3} q${w * .55} ${-w * .7} ${w} ${w * .25} q${w * .45} ${-w * .95} ${w} ${-w * .25}` }, $('birds')));
+
+  // boats on the horizon
+  const boats = [[742, 438, 1], [846, 444, .8], [900, 436, .62]].map(([x, y, k]) => {
+    const g = el('g', {}, $('boats'));
+    el('path', { d: `M${-34 * k} ${-6 * k} L${38 * k} ${-10 * k} L${28 * k} ${8 * k} L${-24 * k} ${8 * k}Z`, fill: '#6d4a33' }, g);
+    el('path', { d: `M${-4 * k} ${-8 * k} L${-4 * k} ${-58 * k}`, fill: 'none' }, g);
+    el('path', { d: `M${-20 * k} ${-54 * k} L${14 * k} ${-56 * k} L${18 * k} ${-16 * k} L${-22 * k} ${-14 * k}Z`, fill: '#eee0bf' }, g);
+    el('path', { d: `M${-21 * k} ${-41 * k} L${16 * k} ${-43 * k} M${-21.5 * k} ${-28 * k} L${17 * k} ${-30 * k}`, fill: 'none', 'stroke-width': 1.2 }, g);
+    return { g, x, y, ph: rnd() * 6 };
+  });
+
+  // foam: clustered discs drawn twice so the outlines merge into one scalloped edge
+  const lip = [[214, 304], [262, 262], [312, 222], [366, 190], [424, 166], [484, 156], [542, 164], [596, 184], [640, 216], [670, 254], [686, 296]];
+  const discs = [];
+  for (let i = 0; i < lip.length - 1; i++) {
+    const [x0, y0] = lip[i], [x1, y1] = lip[i + 1];
+    for (let j = 0; j < 4; j++) {
+      const t = j / 4, r = 13 + rnd() * 13;
+      discs.push([x0 + (x1 - x0) * t + (rnd() - .5) * 10, y0 + (y1 - y0) * t - 6 - rnd() * 12, r]);
+    }
+  }
+  // claws: fingers of foam hooking off the lip
+  [[430, 150, -1.9, .5], [500, 142, -1.5, .7], [566, 152, -1.1, .85], [622, 180, -.6, 1], [662, 222, -.1, 1.1], [690, 276, .5, 1.2], [680, 320, 1.3, 1], [650, 300, 1.9, .7]].forEach(([x, y, a, k]) => {
+    let r = 15 * k, px = x, py = y, ang = a;
+    for (let n = 0; n < 6; n++) { discs.push([px, py, r]); px += Math.cos(ang) * r * 1.25; py += Math.sin(ang) * r * 1.25; ang += .34; r *= .8; }
+  });
+  discs.forEach(([cx, cy, r]) => { el('circle', { cx, cy, r }, $('foamA')); el('circle', { cx, cy, r }, $('foamB')); });
+  for (let i = 0; i < 64; i++) {
+    const a = -2.2 + rnd() * 2.9, d = 40 + Math.pow(rnd(), 1.6) * 260;
+    el('circle', { cx: 600 + Math.cos(a) * d * 1.15, cy: 236 + Math.sin(a) * d * .8, r: 1.6 + rnd() * 4.2 * (1 - d / 340) }, $('spray'));
+  }
+
+  // rows of cusped waves
+  const inks = ['#9dbcbb', '#7da7b1', '#5b8dab', '#3f729b', '#2c5b8a', '#214a78', '#1a3b63', '#132c4d'];
+  const rows = inks.map((fill, i) => {
+    const parent = i < 4 ? $('seaBack') : $('seaFront');
+    return { i, base: 446 + i * 44 + i * i * 1.1, amp: 8 + i * 5.2, len: 84 + i * 40, ph: rnd() * 6,
+      body: el('path', { fill, stroke: '#14233b', 'stroke-width': 2 + i * .22, 'stroke-linejoin': 'round' }, parent),
+      line: el('path', { fill: 'none', stroke: '#f1e6c8', 'stroke-width': 1.6 + i * .25, 'stroke-linecap': 'round', opacity: .8 }, parent),
+      caps: el('path', { fill: '#f3ead0', stroke: '#14233b', 'stroke-width': 1.5, 'stroke-linejoin': 'round' }, parent) };
+  });
+  let state = 1, target = 1, clock = 0;
+  function draw(t) {
+    for (const r of rows) {
+      const k = Math.PI / r.len, shift = clock * (14 + r.i * 7) + r.ph * r.len, A = r.amp * (.55 + state * .5);
+      const Y = x => r.base - A * (1 - Math.pow(Math.abs(Math.sin((x + shift) * k)), .78)) + Math.sin(x / 310 + t * .5 + r.i * .9) * (3 + r.i * 1.6) * state;
+      let d = '', l = '', c = '';
+      for (let x = -40; x <= 1240; x += 5) { const y = Y(x).toFixed(1); d += (d ? 'L' : 'M') + x + ' ' + y; }
+      d += 'L1240 800L-40 800Z';
+      // crest positions: where (x+shift)*k is a multiple of PI
+      const first = Math.ceil((-40 + shift) / r.len) * r.len - shift;
+      for (let x = first; x < 1240; x += r.len) {
+        const y = Y(x), w = r.len * .2, h = A * .5;
+        l += `M${(x + r.len * .16).toFixed(1)} ${(Y(x + r.len * .16) + 5 + r.i).toFixed(1)}Q${(x + r.len * .5).toFixed(1)} ${(Y(x + r.len * .5) + 7 + r.i * 1.6).toFixed(1)} ${(x + r.len * .84).toFixed(1)} ${(Y(x + r.len * .84) + 5 + r.i).toFixed(1)}`;
+        if (r.i > 1) c += `M${(x - w).toFixed(1)} ${(y + h).toFixed(1)}Q${(x - w * .3).toFixed(1)} ${(y + h * .1).toFixed(1)} ${x.toFixed(1)} ${(y - 1).toFixed(1)}q${(w * .5).toFixed(1)} ${(h * .12).toFixed(1)} ${(w * .62).toFixed(1)} ${(h * .62).toFixed(1)}q${(-w * .5).toFixed(1)} ${(-h * .3).toFixed(1)} ${(-w * .78).toFixed(1)} ${(h * .06).toFixed(1)}Q${(x - w * .6).toFixed(1)} ${(y + h * .7).toFixed(1)} ${(x - w).toFixed(1)} ${(y + h).toFixed(1)}Z`;
+      }
+      r.body.setAttribute('d', d); r.line.setAttribute('d', l); r.caps.setAttribute('d', c);
+    }
+    $('great').setAttribute('transform', `translate(${(Math.sin(t * .6) * 5 * state).toFixed(2)} ${(Math.sin(t * .8) * 7 * state + (1 - state) * 16).toFixed(2)}) rotate(${(Math.sin(t * .5) * .7 * state).toFixed(3)} 300 700)`);
+    $('spray').setAttribute('transform', `translate(${(Math.sin(t * .9) * 6 * state).toFixed(2)} ${(Math.cos(t * 1.1) * 8 * state).toFixed(2)})`);
+    $('spray').setAttribute('opacity', Math.min(1, .25 + state * .6).toFixed(2));
+    for (const b of boats) b.g.setAttribute('transform', `translate(${b.x} ${(b.y + Math.sin(t * 1.2 + b.ph) * 3.5 * state).toFixed(2)}) rotate(${(Math.sin(t * 1.1 + b.ph) * 5 * state).toFixed(2)})`);
+  }
+  let prev = 0;
+  function loop(ms) {
+    const t = ms / 1000, dt = Math.min(.05, t - prev); prev = t;
+    state += (target - state) * .03; clock += dt * (.5 + state * .9);
+    draw(t); requestAnimationFrame(loop);
+  }
+  document.querySelectorAll('.sea-state button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.sea-state button').forEach(o => o.setAttribute('aria-pressed', o === b));
+    target = +b.dataset.s; if (reduce) { state = target; draw(0); }
+  }));
+  if (reduce) draw(0); else requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

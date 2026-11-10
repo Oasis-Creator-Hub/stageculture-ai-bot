@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>枯山水 Karesansui — a garden to rake</title>
+<meta name="description" content="An interactive dry landscape garden. Drag across the sand to rake grooves around five stones; choose a rake, or smooth everything and begin again.">
+<style>
+  :root{--wall:#e9e4d8;--ink:#2e2b26;--mute:#8d877a;--red:#a23b2a}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;background:var(--wall)}
+  body{font-family:"Hiragino Mincho ProN","Yu Mincho","Songti SC","Noto Serif CJK JP","Optima","Palatino Linotype",serif;color:var(--ink);
+    display:grid;grid-template-columns:auto 1fr;grid-template-rows:1fr auto}
+  aside{grid-row:1/3;writing-mode:vertical-rl;padding:clamp(18px,3.4vw,40px) clamp(10px,1.8vw,26px);display:flex;justify-content:space-between;align-items:center;gap:14px}
+  h1{font-weight:300;font-size:clamp(20px,2.6vw,32px);letter-spacing:.5em;white-space:nowrap}
+  h1 span{font-size:.42em;letter-spacing:.42em;color:var(--mute);margin-top:1.6em;font-family:"Optima","Gill Sans","Avenir Next","Segoe UI",sans-serif;text-transform:uppercase}
+  .seal{writing-mode:horizontal-tb;width:30px;height:30px;background:var(--red);color:#f3ead9;display:grid;place-items:center;font-size:17px;border-radius:3px;text-decoration:none;flex:none}
+  .seal:hover,.seal:focus-visible{background:var(--ink)}
+  .bed{position:relative;margin:clamp(12px,2.4vw,34px) clamp(12px,2.4vw,34px) 0 0;border:clamp(7px,1vw,12px) solid #3a332b;border-radius:2px;box-shadow:inset 0 0 0 1px #1d1a16,0 20px 40px -24px rgba(40,30,20,.6);overflow:hidden;background:#d9cfb9;min-height:0}
+  canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:none}
+  .rake{position:absolute;left:0;top:0;pointer-events:none;opacity:0;transition:opacity .3s;will-change:transform}
+  .rake i{position:absolute;width:5px;height:5px;margin:-2.5px;border-radius:50%;background:#2e2b26;box-shadow:0 2px 3px rgba(0,0,0,.4)}
+  .rake::before{content:"";position:absolute;left:var(--l);top:-1.5px;width:var(--w);height:3px;background:#6d5437;border-radius:2px}
+  footer{padding:clamp(10px,1.6vw,18px) clamp(12px,2.4vw,34px) clamp(12px,2vw,22px) 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 22px;
+    font-family:"Optima","Gill Sans","Avenir Next","Segoe UI",sans-serif;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--mute)}
+  .tools{display:flex;align-items:center;gap:6px 16px;flex-wrap:wrap}
+  button{font:inherit;letter-spacing:inherit;text-transform:inherit;background:none;border:0;color:var(--mute);cursor:pointer;padding:8px 0;border-bottom:1px solid transparent}
+  button:hover,button:focus-visible{color:var(--ink)}
+  button[aria-pressed=true]{color:var(--ink);border-color:var(--red)}
+  .sep{width:1px;height:14px;background:#c4bcab}
+  #haiku{font-family:"Hiragino Mincho ProN","Yu Mincho","Palatino Linotype",serif;font-style:italic;text-transform:none;letter-spacing:.06em;font-size:14px;color:var(--ink);opacity:.8;transition:opacity 1.2s;min-height:1.4em}
+  @media(max-width:520px){#haiku{flex-basis:100%;order:-1}}
+</style>
+</head>
+<body>
+<aside>
+  <h1>枯山水<span>a dry garden · no. 37</span></h1>
+  <a class="seal" href="index.html" aria-label="Back to the 100" title="Back to the 100">百</a>
+</aside>
+<div class="bed" id="bed">
+  <canvas id="c" aria-label="Sand garden. Drag to rake." role="img"></canvas>
+  <div class="rake" id="rake"></div>
+</div>
+<footer>
+  <div id="haiku"></div>
+  <div class="tools">
+    <button type="button" data-t="3" aria-pressed="false">Fine</button>
+    <button type="button" data-t="5" aria-pressed="true">Rake</button>
+    <button type="button" data-t="9" aria-pressed="false">Wide</button>
+    <span class="sep"></span>
+    <button type="button" id="rings">Ring stones</button>
+    <button type="button" id="smooth">Smooth sand</button>
+  </div>
+</footer>
+<script>
+(() => {
+  const bed = document.getElementById('bed'), cv = document.getElementById('c'), ctx = cv.getContext('2d'), rakeEl = document.getElementById('rake'), haiku = document.getElementById('haiku');
+  const sand = document.createElement('canvas'), sx = sand.getContext('2d');   // sand + grooves
+  const top = document.createElement('canvas'), tx = top.getContext('2d');     // stones, moss, shadows
+  // stones in normalised coordinates (x, y, radius as fraction of min side, squash, rotation)
+  const STONES = [[.24, .36, .085, .72, -.3], [.31, .47, .04, .8, .5], [.68, .6, .11, .62, .2], [.8, .27, .05, .85, -.6], [.53, .2, .03, .7, 1]];
+  const LINES = ['the rake remembers / what the hand forgets to say / lines, then no more lines', 'five stones do not move / everything else in the world / agrees to go round', 'smooth it all away / the garden is not finished / it is only still', 'one long breath of sand / combed from the wall to the wall / by nobody much'];
+  let W, H, dpr, S, tines = 5, strokes = [], cur = null, hl = 0;
+  const SP = () => Math.max(5, Math.min(9, S / 70));
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2); W = bed.clientWidth; H = bed.clientHeight; S = Math.min(W, H);
+    [cv, sand, top].forEach(c => { c.width = Math.max(1, Math.round(W * dpr)); c.height = Math.max(1, Math.round(H * dpr)); });
+    [ctx, sx, tx].forEach(c => c.setTransform(dpr, 0, 0, dpr, 0, 0));
+    baseSand(); drawTop(); strokes.forEach(replay); paint(); cursorShape();
+  }
+  function baseSand() {
+    const g = sx.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#e6dcc6'); g.addColorStop(1, '#d6cab0');
+    sx.fillStyle = g; sx.fillRect(0, 0, W, H);
+    let s = 37; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    const n = Math.min(26000, W * H / 14);
+    for (let i = 0; i < n; i++) { sx.fillStyle = r() < .5 ? 'rgba(255,250,236,.5)' : 'rgba(120,98,64,.22)'; sx.fillRect(r() * W, r() * H, 1, 1); }
+  }
+  // one pass of the rake between two points
+  function comb(a, b, n) {
+    const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy); if (len < .5) return;
+    const sp = SP(), half = (n - 1) / 2;
+    sx.lineCap = 'round';
+    sx.strokeStyle = 'rgba(222,211,187,.9)'; sx.lineWidth = sp * n + 2;            // drag the old pattern flat
+    sx.beginPath(); sx.moveTo(a.x, a.y); sx.lineTo(b.x, b.y); sx.stroke();
+    for (let i = 0; i < n; i++) {
+      const o = (i - half) * sp, ax = a.x + a.nx * o, ay = a.y + a.ny * o, bx = b.x + b.nx * o, by = b.y + b.ny * o;
+      sx.strokeStyle = 'rgba(112,90,56,.5)'; sx.lineWidth = sp * .36;
+      sx.beginPath(); sx.moveTo(ax, ay); sx.lineTo(bx, by); sx.stroke();
+      sx.strokeStyle = 'rgba(255,251,240,.75)'; sx.lineWidth = sp * .26;
+      sx.beginPath(); sx.moveTo(ax + sp * .3, ay + sp * .3); sx.lineTo(bx + sp * .3, by + sp * .3); sx.stroke();
+    }
+  }
+  function replay(st) { const pts = st.p.map(q => ({ x: q.x * W, y: q.y * H, nx: q.nx, ny: q.ny })); for (let i = 1; i < pts.length; i++) comb(pts[i - 1], pts[i], st.n); }
+  function ringStones() {
+    STONES.forEach(([x, y, r, sq]) => {
+      for (let k = 0; k < 2; k++) {
+        const st = { n: 5, p: [] }, rad = r * S * 1.25 + SP() * 3 + k * SP() * 5.6;
+        for (let i = 0; i <= 72; i++) { const a = i / 72 * Math.PI * 2, nx = Math.cos(a), ny = Math.sin(a); st.p.push({ x: x + nx * rad / W, y: y + ny * rad * (sq * .5 + .5) / H, nx, ny }); }
+        strokes.push(st); replay(st);
+      }
+    });
+    paint();
+  }
+  function drawTop() {
+    tx.clearRect(0, 0, W, H);
+    let s = 91; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    STONES.forEach(([x, y, rr, sq, rot]) => {
+      const cx = x * W, cy = y * H, R = rr * S;
+      tx.save(); tx.translate(cx, cy);
+      for (let i = 0; i < 70; i++) { const a = r() * 6.283, d = R * (.85 + r() * .35); tx.fillStyle = `rgba(${70 + r() * 40 | 0},${96 + r() * 40 | 0},${52 + r() * 20 | 0},${.5 + r() * .4})`; tx.beginPath(); tx.arc(Math.cos(a) * d, Math.sin(a) * d * sq + R * .1, R * (.05 + r() * .09), 0, 6.283); tx.fill(); }
+      tx.fillStyle = 'rgba(50,38,22,.3)'; tx.filter = 'none';
+      tx.beginPath(); tx.ellipse(R * .22, R * .26, R * 1.05, R * sq * 1.02, rot, 0, 6.283); tx.fill();
+      tx.rotate(rot);
+      const pts = []; for (let i = 0; i < 9; i++) { const a = i / 9 * 6.283; pts.push([Math.cos(a) * R * (.82 + r() * .3), Math.sin(a) * R * sq * (.82 + r() * .3)]); }
+      const path = () => { tx.beginPath(); pts.forEach((p, i) => { const q = pts[(i + 1) % 9], mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2; i ? tx.quadraticCurveTo(p[0], p[1], mx, my) : tx.moveTo(mx, my); }); const p = pts[0], q = pts[1]; tx.quadraticCurveTo(p[0], p[1], (p[0] + q[0]) / 2, (p[1] + q[1]) / 2); tx.closePath(); };
+      const g = tx.createRadialGradient(-R * .35, -R * .4 * sq, R * .05, 0, 0, R * 1.2); g.addColorStop(0, '#8e8d86'); g.addColorStop(.5, '#55554f'); g.addColorStop(1, '#262521');
+      path(); tx.fillStyle = g; tx.fill(); tx.save(); tx.clip();
+      for (let i = 0; i < 6; i++) { tx.strokeStyle = `rgba(${r() < .5 ? '20,20,18' : '190,188,178'},${.1 + r() * .14})`; tx.lineWidth = 1 + r() * 2; tx.beginPath(); const yy = (r() - .5) * R * 1.6 * sq; tx.moveTo(-R * 1.2, yy); tx.bezierCurveTo(-R * .4, yy + (r() - .5) * R * .5, R * .4, yy + (r() - .5) * R * .5, R * 1.2, yy + (r() - .5) * R * .3); tx.stroke(); }
+      tx.restore(); tx.restore();
+    });
+    const v = tx.createRadialGradient(W / 2, H / 2, S * .35, W / 2, H / 2, Math.hypot(W, H) * .62); v.addColorStop(0, 'rgba(60,44,20,0)'); v.addColorStop(1, 'rgba(60,44,20,.22)');
+    tx.fillStyle = v; tx.fillRect(0, 0, W, H);
+  }
+  function paint() { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(sand, 0, 0); ctx.drawImage(top, 0, 0); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+  function cursorShape() { const sp = SP(), w = sp * (tines - 1); rakeEl.style.setProperty('--w', (w + 8) + 'px'); rakeEl.style.setProperty('--l', (-w / 2 - 4) + 'px'); rakeEl.innerHTML = Array.from({ length: tines }, (_, i) => `<i style="left:${(i - (tines - 1) / 2) * sp}px"></i>`).join(''); }
+  const pos = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  let ang = 0;
+  function moveCursor(p) { rakeEl.style.opacity = 1; rakeEl.style.transform = `translate(${p.x}px,${p.y}px) rotate(${ang}rad)`; }
+  cv.addEventListener('pointerdown', e => { const p = pos(e); cur = { n: tines, p: [], last: p, sm: p }; strokes.push(cur); try { cv.setPointerCapture(e.pointerId); } catch (_) {} moveCursor(p); });
+  cv.addEventListener('pointermove', e => {
+    const p = pos(e);
+    if (!cur) { if (e.pointerType === 'mouse') moveCursor(p); return; }
+    const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+    (evs.length ? evs : [e]).forEach(ev => {
+      const q = pos(ev), sm = { x: cur.sm.x + (q.x - cur.sm.x) * .35, y: cur.sm.y + (q.y - cur.sm.y) * .35 };
+      const dx = sm.x - cur.last.x, dy = sm.y - cur.last.y, d = Math.hypot(dx, dy); cur.sm = sm;
+      if (d < 2.5) return;
+      let nx = -dy / d, ny = dx / d; const prev = cur.p[cur.p.length - 1];
+      if (prev) { nx = prev.nx * .6 + nx * .4; ny = prev.ny * .6 + ny * .4; const l = Math.hypot(nx, ny) || 1; nx /= l; ny /= l; }
+      const a = prev ? { x: prev.x * W, y: prev.y * H, nx: prev.nx, ny: prev.ny } : { x: cur.last.x, y: cur.last.y, nx, ny }, b = { x: sm.x, y: sm.y, nx, ny };
+      if (!prev) cur.p.push({ x: a.x / W, y: a.y / H, nx, ny });
+      comb(a, b, cur.n); cur.p.push({ x: b.x / W, y: b.y / H, nx, ny }); cur.last = sm; ang = Math.atan2(ny, nx);
+    });
+    paint(); moveCursor(cur.sm);
+  });
+  const end = e => { if (!cur) return; if (cur.p.length < 2) strokes.pop(); cur = null; if (strokes.length > 400) strokes.splice(0, strokes.length - 400); if (e.pointerType !== 'mouse') rakeEl.style.opacity = 0; };
+  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+  cv.addEventListener('pointerleave', () => { if (!cur) rakeEl.style.opacity = 0; });
+  document.querySelectorAll('[data-t]').forEach(b => b.addEventListener('click', () => { tines = +b.dataset.t; document.querySelectorAll('[data-t]').forEach(x => x.setAttribute('aria-pressed', x === b)); cursorShape(); }));
+  document.getElementById('rings').addEventListener('click', ringStones);
+  document.getElementById('smooth').addEventListener('click', () => { strokes = []; baseSand(); paint(); verse(); });
+  function verse() { haiku.style.opacity = 0; setTimeout(() => { haiku.textContent = LINES[hl++ % LINES.length]; haiku.style.opacity = .8; }, 600); }
+  // opening composition: long horizontal combing, then rings
+  function opening() {
+    const sp = SP(), band = sp * 9, rows = Math.ceil(H / band) + 1;
+    for (let j = 0; j < rows; j++) { const st = { n: 9, p: [] }, y = (j + .5) * band; for (let i = 0; i <= 40; i++) { const x = i / 40; st.p.push({ x, y: (y + Math.sin(x * 5 + j * .7) * sp * 1.2) / H, nx: 0, ny: 1 }); } strokes.push(st); replay(st); }
+    ringStones();
+  }
+  let rt; new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(resize, 80); }).observe(bed);
+  resize(); opening(); verse();
+})();
+</script>
+</body>
+</html>

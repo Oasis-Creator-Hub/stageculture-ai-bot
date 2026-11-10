@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grotte des Échos — Chamber III by Torchlight</title>
+<meta name="description" content="A dark cave wall of ochre and charcoal paintings that can only be seen inside a flickering circle of torchlight. Move your pointer or finger to carry the torch and find all nine figures.">
+<style>
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:none}
+.ui{position:fixed;pointer-events:none;color:#c9a777;font-family:"Hoefler Text","Baskerville","Big Caslon","Iowan Old Style",Georgia,serif;text-shadow:0 1px 6px #000}
+#title{left:clamp(14px,3vw,34px);bottom:clamp(14px,3vh,30px);max-width:60vw}
+#title b{display:block;font-weight:400;font-size:clamp(20px,3.4vw,38px);letter-spacing:.06em;font-style:italic;line-height:1.05}
+#title span{font-size:11px;letter-spacing:.34em;text-transform:uppercase;opacity:.7}
+#tally{right:clamp(14px,3vw,34px);bottom:clamp(14px,3vh,30px);text-align:right;font-size:11px;letter-spacing:.3em;text-transform:uppercase;opacity:.8}
+#tally i{display:block;font-style:normal;font-size:20px;letter-spacing:.3em;margin-bottom:4px;color:#e2b46a}
+#cap{left:50%;top:clamp(18px,5vh,48px);transform:translateX(-50%);text-align:center;width:min(90vw,560px);opacity:0;transition:opacity .9s}
+#cap.on{opacity:1}
+#cap b{display:block;font-weight:400;font-style:italic;font-size:clamp(20px,3vw,30px);color:#ecd3a0}
+#cap span{font-size:11px;letter-spacing:.28em;text-transform:uppercase;opacity:.75}
+a.back{position:fixed;left:14px;top:12px;color:#8a6c44;font:12px Georgia,serif;letter-spacing:.2em;text-decoration:none;z-index:3;text-shadow:0 1px 4px #000}
+a.back:hover{color:#ecd3a0}
+</style>
+</head>
+<body>
+<canvas id="c" aria-label="Cave wall. Paintings appear in the torchlight around your pointer."></canvas>
+<a class="back" href="index.html">← 100</a>
+<div class="ui" id="cap"><b></b><span></span></div>
+<div class="ui" id="title"><span>Chamber III · the Gallery of Hooves</span><b>Grotte des Échos</b></div>
+<div class="ui" id="tally"><i id="marks">·········</i><span id="count">0 of 9 found — carry the torch</span></div>
+<script>
+(function(){
+const cv=document.getElementById('c'),ctx=cv.getContext('2d'),wall=document.createElement('canvas'),wc=wall.getContext('2d');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W=0,H=0,dpr=1,U=1,seed=7;
+const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+const RED='#8f3418',OCH='#c28a36',CHAR='#17110c',KAO='#d9ccb2';
+function curve(c,p,closed){c.beginPath();const n=p.length;
+  if(closed){c.moveTo((p[n-1][0]+p[0][0])/2,(p[n-1][1]+p[0][1])/2);for(let i=0;i<n;i++){const q=p[(i+1)%n];c.quadraticCurveTo(p[i][0],p[i][1],(p[i][0]+q[0])/2,(p[i][1]+q[1])/2)}c.closePath()}
+  else{c.moveTo(p[0][0],p[0][1]);for(let i=1;i<n-1;i++)c.quadraticCurveTo(p[i][0],p[i][1],(p[i][0]+p[i+1][0])/2,(p[i][1]+p[i+1][1])/2);c.lineTo(p[n-1][0],p[n-1][1])}}
+function rough(c,p,o){o=o||{};const j=o.j==null?.9:o.j;
+  if(o.fill){c.globalAlpha=o.fa||.5;c.fillStyle=o.fill;curve(c,p,true);c.fill()}
+  c.strokeStyle=o.stroke||CHAR;c.lineCap=c.lineJoin='round';
+  for(let k=0;k<3;k++){c.globalAlpha=.42;c.lineWidth=(o.w||1.8)*(.7+rnd()*.7);curve(c,p.map(q=>[q[0]+(rnd()-.5)*j,q[1]+(rnd()-.5)*j]),o.closed!==false&&!!o.fill||o.closed===true);c.stroke()}
+  c.globalAlpha=1}
+function dot(c,x,y,r,col,a){c.globalAlpha=a||.7;c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,7);c.fill();c.globalAlpha=1}
+function bison(c){
+  rough(c,[[5,38],[10,26],[14,20],[32,7],[55,13],[82,17],[90,24],[88,42],[86,58],[81,58],[79,44],[60,47],[40,47],[36,58],[31,58],[30,45],[22,45],[14,51],[10,44]],{fill:RED,fa:.6,w:2.4});
+  rough(c,[[14,20],[9,12],[15,5]],{w:2});rough(c,[[90,24],[97,31],[94,41]],{w:1.6});rough(c,[[72,46],[74,58]],{w:2});rough(c,[[26,46],[24,57]],{w:2});
+  rough(c,[[20,14],[30,10],[42,12],[50,16]],{stroke:CHAR,w:4});dot(c,13,30,1.4,CHAR,.9)}
+function stag(c){
+  rough(c,[[95,22],[88,16],[78,28],[70,30],[40,28],[22,32],[18,50],[16,62],[20,62],[26,46],[45,44],[62,44],[64,62],[68,62],[70,44],[78,40],[86,29]],{fill:OCH,fa:.55,w:2});
+  [[[87,16],[84,4],[78,-5]],[[84,4],[90,-3]],[[82,0],[74,1]],[[89,16],[93,6],[97,-3]],[[93,6],[100,5]],[[80,-2],[84,-9]]].forEach(a=>rough(c,a,{w:1.7}));
+  rough(c,[[30,46],[28,60]],{w:1.8});rough(c,[[58,45],[56,60]],{w:1.8});dot(c,89,20,1.1,CHAR,.9)}
+function horse(c){
+  rough(c,[[4,30],[10,20],[14,14],[26,18],[50,20],[78,20],[84,28],[80,56],[76,56],[74,40],[52,43],[34,41],[32,56],[28,56],[27,41],[20,37],[12,35]],{fill:OCH,fa:.5,w:2});
+  rough(c,[[14,13],[22,14],[30,18]],{w:4.2});rough(c,[[80,22],[90,30],[91,46]],{w:2.6});dot(c,10,26,1,CHAR,.9);
+  for(let i=0;i<5;i++)rough(c,[[40+i*7,26],[39+i*7,38]],{w:1.1,stroke:CHAR})}
+function person(c,x,y,sp){rough(c,[[x,y],[x+4,y+14]],{w:2.2,stroke:RED});dot(c,x-1,y-4,3,RED,.8);
+  rough(c,[[x+4,y+14],[x-3,y+26]],{w:2,stroke:RED});rough(c,[[x+4,y+14],[x+12,y+25]],{w:2,stroke:RED});
+  rough(c,[[x+1,y+4],[x+11,y+1]],{w:1.8,stroke:RED});if(sp)rough(c,[[x-12,y+8],[x+28,y-8]],{w:1.2,stroke:CHAR,j:.4})}
+function hunters(c){person(c,18,22,1);person(c,44,18,1);person(c,70,26,0);rough(c,[[70,30],[82,22]],{w:1.6,stroke:RED});rough(c,[[84,10],[80,22],[86,34]],{w:1.3})}
+function hand(c,x,y,rot){c.save();c.translate(x,y);c.rotate(rot);c.globalAlpha=.62;c.fillStyle=RED;c.beginPath();c.ellipse(0,0,7,8,0,0,7);c.fill();
+  c.strokeStyle=RED;c.lineCap='round';[[-52,11],[-22,14],[0,15],[22,13],[72,8]].forEach(([a,l],i)=>{const r=(a-90)*Math.PI/180;c.lineWidth=i===4?3.6:3;c.beginPath();c.moveTo(Math.cos(r)*5,Math.sin(r)*5);c.lineTo(Math.cos(r)*(l+5),Math.sin(r)*(l+5));c.stroke()});
+  c.restore();c.globalAlpha=1}
+function hands(c){hand(c,22,34,-.4);hand(c,48,24,.1);hand(c,72,36,.5);hand(c,36,52,-.15);hand(c,62,54,.3);for(let i=0;i<120;i++)dot(c,10+rnd()*80,8+rnd()*60,.5+rnd()*.8,RED,.25)}
+function spiral(c){const p=[];for(let t=0;t<17;t+=.35)p.push([50+Math.cos(t)*t*1.7,30+Math.sin(t)*t*1.7]);rough(c,p,{w:2.2,stroke:OCH,j:.6});rough(c,p,{w:1,stroke:KAO,j:.6});
+  for(let i=0;i<12;i++){const a=i/12*6.283;dot(c,50+Math.cos(a)*36,30+Math.sin(a)*36,1.6,RED,.7)}}
+function shaman(c){rough(c,[[50,20],[50,44]],{w:3,stroke:CHAR});rough(c,[[50,44],[41,62]],{w:2.4});rough(c,[[50,44],[59,62]],{w:2.4});
+  rough(c,[[50,26],[42,20],[34,8]],{w:2.2});rough(c,[[50,26],[58,20],[66,8]],{w:2.2});dot(c,50,13,5.5,CHAR,.85);dot(c,48,12,.9,KAO,.9);dot(c,52,12,.9,KAO,.9);
+  [[[47,9],[40,0],[35,-6]],[[40,0],[45,-6]],[[53,9],[60,0],[65,-6]],[[60,0],[55,-6]]].forEach(a=>rough(c,a,{w:1.6,stroke:RED}));
+  rough(c,[[44,32],[50,36],[56,32]],{w:1.4,stroke:KAO})}
+function tally(c){for(let r=0;r<2;r++)for(let i=0;i<14;i++)dot(c,8+i*6.2,20+r*9+Math.sin(i*.7)*2,1.5+((i+r)%3)*.3,r?RED:CHAR,.75);
+  c.globalAlpha=.7;c.fillStyle=KAO;c.beginPath();c.arc(50,46,8,0,7);c.fill();c.globalCompositeOperation='source-atop';c.globalAlpha=1;c.globalCompositeOperation='source-over';
+  rough(c,[[44,40],[40,46],[44,52]],{w:1.4,stroke:CHAR})}
+const F=[
+ {n:'The Old Bull',d:'red ochre, charcoal line · the largest figure',L:[.21,.36],P:[.34,.13],s:1.75,f:bison},
+ {n:'The Calf That Follows',d:'ochre wash over an earlier drawing',L:[.43,.2],P:[.7,.25],s:.95,f:bison},
+ {n:'Stag at the Ford',d:'yellow ochre · antlers scraped into the stone',L:[.67,.3],P:[.36,.37],s:1.35,f:stag},
+ {n:'Two Striped Horses',d:'manes blown from a hollow bone',L:[.83,.62],P:[.66,.5],s:1.15,f:horse,two:1},
+ {n:'The Running Hunt',d:'three figures, two spears, one argument',L:[.5,.58],P:[.32,.62],s:1.1,f:hunters},
+ {n:'Five Left Hands',d:'pressed in wet ochre by different people',L:[.11,.74],P:[.74,.73],s:1.05,f:hands},
+ {n:'The Turning Sun',d:'white kaolin on ochre · twelve red dots',L:[.9,.2],P:[.78,.08],s:.9,f:spiral},
+ {n:'The One With Antlers',d:'charcoal · stands apart from the herd',L:[.31,.76],P:[.28,.83],s:1.15,f:shaman},
+ {n:'Twenty-Eight Nights',d:'a tally beneath a pale moon',L:[.66,.84],P:[.68,.91],s:1,f:tally}];
+function noiseTex(w,h){const t=document.createElement('canvas');t.width=w;t.height=h;const c=t.getContext('2d'),im=c.createImageData(w,h),d=im.data;
+  const hsh=(x,y)=>{const s=Math.sin(x*127.1+y*311.7)*43758.5453;return s-Math.floor(s)};
+  const vn=(x,y)=>{const xi=Math.floor(x),yi=Math.floor(y),fx=x-xi,fy=y-yi,u=fx*fx*(3-2*fx),v=fy*fy*(3-2*fy);
+    return hsh(xi,yi)*(1-u)*(1-v)+hsh(xi+1,yi)*u*(1-v)+hsh(xi,yi+1)*(1-u)*v+hsh(xi+1,yi+1)*u*v};
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){let n=0,a=.5,f=.018;for(let o=0;o<5;o++){n+=vn(x*f,y*f*1.4)*a;a*=.5;f*=2.1}
+    const r=Math.abs(vn(x*.03+9,y*.05)-.5)*2,v=n*.8+r*.25,i=(y*w+x)*4;d[i]=70+v*130;d[i+1]=54+v*108;d[i+2]=38+v*82;d[i+3]=255}
+  c.putImageData(im,0,0);return t}
+function build(){
+  dpr=Math.min(devicePixelRatio||1,1.5);W=innerWidth;H=innerHeight;cv.width=wall.width=Math.round(W*dpr);cv.height=wall.height=Math.round(H*dpr);
+  U=Math.sqrt(W*H)/520;seed=7;const c=wc;c.setTransform(dpr,0,0,dpr,0,0);
+  c.imageSmoothingQuality='high';c.drawImage(noiseTex(Math.ceil(W/4),Math.ceil(H/4)),0,0,W,H);
+  for(let i=0;i<9;i++){let x=rnd()*W,y=rnd()*H,a=rnd()*6.28;c.strokeStyle='rgba(20,12,6,.45)';c.lineWidth=.6+rnd()*1.4;c.beginPath();c.moveTo(x,y);
+    for(let k=0;k<60;k++){a+=(rnd()-.5)*.7;x+=Math.cos(a)*9;y+=Math.sin(a)*9;c.lineTo(x,y)}c.stroke()}
+  const port=H>W*1.05;
+  F.forEach(g=>{const p=port?g.P:g.L;g.x=p[0]*W;g.y=p[1]*H;g.r=U*g.s*38;const k=U*g.s*(port?.9:1);
+    c.save();c.translate(g.x,g.y);c.scale(k,k);c.translate(-50,-30);g.f(c);
+    if(g.two){c.translate(34,-22);c.scale(.72,.72);g.f(c)}c.restore()});
+  for(let i=0;i<W*H/260;i++){const x=rnd()*W,y=rnd()*H,v=rnd();c.fillStyle=v<.5?'rgba(40,28,18,.35)':'rgba(190,165,130,.22)';c.fillRect(x,y,1+rnd()*1.6,1+rnd()*1.6)}
+  const g=c.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.75);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.55)');c.fillStyle=g;c.fillRect(0,0,W,H)}
+let tx=0,ty=0,x=0,y=0,user=false,found=0,capT=0,sparks=[];
+const cap=document.getElementById('cap');
+function move(e){user=true;tx=e.clientX;ty=e.clientY}
+cv.addEventListener('pointermove',move);cv.addEventListener('pointerdown',move);
+function check(){F.forEach((g,i)=>{if(!g.hit&&Math.hypot(g.x-x,g.y-y)<g.r*1.1){g.hit=true;found++;
+  cap.firstChild.textContent=g.n;cap.lastChild.textContent=g.d;cap.classList.add('on');capT=performance.now()+4200;
+  document.getElementById('marks').textContent='❘'.repeat(found)+'·'.repeat(9-found);
+  document.getElementById('count').textContent=found===9?'All nine found — the wall is yours':found+' of 9 found'}})}
+function frame(t){
+  const s=t/1000;
+  if(!user){tx=W*(.5+.36*Math.sin(s*.21));ty=H*(.48+.3*Math.sin(s*.33+1))}
+  x+=(tx-x)*.14;y+=(ty-y)*.14;check();if(capT&&t>capT){cap.classList.remove('on');capT=0}
+  const fl=reduce?1:1+.05*Math.sin(s*13)+.04*Math.sin(s*31.7)+.03*Math.sin(s*7.3)+(Math.random()-.5)*.03;
+  const R=Math.max(150,Math.min(W,H)*.34)*fl,jx=reduce?0:Math.sin(s*17)*2,jy=reduce?0:Math.cos(s*23)*2;
+  ctx.setTransform(1,0,0,1,0,0);ctx.globalCompositeOperation='source-over';ctx.drawImage(wall,0,0);
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.globalCompositeOperation='multiply';
+  const g=ctx.createRadialGradient(x+jx,y+jy,0,x+jx,y+jy,R);
+  g.addColorStop(0,'#ffe2b0');g.addColorStop(.25,'#f0b672');g.addColorStop(.55,'#8a4a1c');g.addColorStop(.8,'#2a1206');g.addColorStop(1,'#050201');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.globalCompositeOperation='lighter';
+  const fg=ctx.createRadialGradient(x,y,0,x,y,26*fl);fg.addColorStop(0,'rgba(255,220,150,.5)');fg.addColorStop(1,'rgba(255,120,20,0)');ctx.fillStyle=fg;ctx.fillRect(x-40,y-40,80,80);
+  if(!reduce){if(sparks.length<36&&Math.random()<.5)sparks.push({x:x+(Math.random()-.5)*10,y:y,vx:(Math.random()-.5)*26,vy:-30-Math.random()*50,l:1});
+    for(let i=sparks.length-1;i>=0;i--){const p=sparks[i];p.x+=p.vx/60;p.y+=p.vy/60;p.vx+=(Math.random()-.5)*4;p.l-=.018;if(p.l<=0){sparks.splice(i,1);continue}
+      ctx.fillStyle='rgba(255,'+(120+p.l*110|0)+',40,'+p.l*.8+')';ctx.fillRect(p.x,p.y,1.8,1.8)}}
+  requestAnimationFrame(frame)}
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(build,120)});
+build();x=tx=W/2;y=ty=H/2;requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

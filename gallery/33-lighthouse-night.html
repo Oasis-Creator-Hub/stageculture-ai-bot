@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skerry Vane Light — a night watch</title>
+<meta name="description" content="A night seascape in SVG: a lighthouse beam sweeping through fog over layered waves, with pages from an invented keeper's log.">
+<style>
+  :root{--night:#060d1a;--deep:#0a1830;--lamp:#ffe9a8;--paper:#d9cfb8;--rule:rgba(217,207,184,.16);--red:#b5483c}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--night);color:var(--paper);font-family:"Baskerville","Libre Baskerville","Goudy Old Style","Palatino Linotype",Georgia,serif;overflow-x:hidden}
+  .scene{position:relative;height:100vh;height:100svh;min-height:520px;overflow:hidden}
+  .scene svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .title{position:absolute;left:clamp(18px,5vw,70px);top:clamp(18px,6vh,64px);max-width:min(80vw,520px);text-shadow:0 2px 20px #060d1a}
+  .title p{font:11px/1.4 "Gill Sans","Gill Sans MT","Trebuchet MS",sans-serif;letter-spacing:.42em;text-transform:uppercase;color:var(--lamp);opacity:.8}
+  .title h1{font-weight:400;font-size:clamp(40px,7.4vw,98px);line-height:.92;margin:14px 0 14px;letter-spacing:-.01em}
+  .title h1 i{display:block;font-size:.42em;letter-spacing:.02em;opacity:.8;margin-top:.35em}
+  .chart{font:12px/1.5 ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.14em;opacity:.7;border-left:1px solid var(--lamp);padding-left:12px}
+  .back{position:absolute;right:clamp(16px,4vw,48px);top:clamp(18px,5vh,44px);font:11px "Gill Sans","Trebuchet MS",sans-serif;letter-spacing:.3em;color:var(--paper);text-decoration:none;opacity:.6;padding:6px 0;border-bottom:1px solid currentColor}
+  .back:hover,.back:focus-visible{opacity:1;color:var(--lamp)}
+  .down{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);font:10px "Gill Sans","Trebuchet MS",sans-serif;letter-spacing:.4em;text-transform:uppercase;opacity:.6;color:var(--paper);text-decoration:none}
+  .star{animation:tw 4s ease-in-out infinite}
+  @keyframes tw{50%{opacity:.25}}
+  .w{animation:roll linear infinite}
+  @keyframes roll{to{transform:translateX(-1600px)}}
+  .fog{animation:drift ease-in-out infinite alternate}
+  @keyframes drift{to{transform:translateX(140px)}}
+  .log{position:relative;background:linear-gradient(#050b16,#0a1528);padding:clamp(56px,9vw,120px) clamp(18px,6vw,90px) 90px}
+  .log::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(transparent 0 35px,var(--rule) 35px 36px);pointer-events:none}
+  .log header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:3px double rgba(217,207,184,.5);padding-bottom:16px;margin-bottom:10px;position:relative}
+  .log h2{font-weight:400;font-style:italic;font-size:clamp(30px,4.6vw,54px)}
+  .log header span{font:11px "Gill Sans","Trebuchet MS",sans-serif;letter-spacing:.3em;text-transform:uppercase;opacity:.65}
+  .entries{position:relative;max-width:980px}
+  .entry{display:grid;grid-template-columns:1fr;gap:4px;padding:28px 0 26px;border-bottom:1px solid rgba(217,207,184,.22)}
+  .when{font:12px/1.5 ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.1em;color:var(--lamp);opacity:.85}
+  .when b{display:block;font-weight:400;color:var(--paper);opacity:.6}
+  .entry p{font-size:clamp(17px,1.7vw,21px);line-height:36px;font-style:italic;max-width:62ch}
+  .entry p::first-letter{font-size:1.5em;font-style:normal;color:var(--lamp)}
+  .entry .mark{color:var(--red);font-style:normal;font-variant:small-caps;letter-spacing:.08em}
+  .sig{margin-top:40px;font-style:italic;font-size:22px;opacity:.75;position:relative}
+  .sig small{display:block;font:11px "Gill Sans","Trebuchet MS",sans-serif;letter-spacing:.3em;text-transform:uppercase;margin-top:6px;opacity:.7}
+  @media(min-width:760px){.entry{grid-template-columns:190px 1fr;gap:30px}}
+  @media(prefers-reduced-motion:reduce){.star,.w,.fog{animation:none}}
+</style>
+</head>
+<body>
+<div class="scene">
+  <svg id="sea" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" role="img" aria-label="A lighthouse on a rock at night, its beam sweeping across fog and waves">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#040915"/><stop offset=".55" stop-color="#0b1d3a"/><stop offset="1" stop-color="#1b3a5c"/></linearGradient>
+      <radialGradient id="moonglow"><stop offset="0" stop-color="#cfe0f2" stop-opacity=".35"/><stop offset="1" stop-color="#cfe0f2" stop-opacity="0"/></radialGradient>
+      <radialGradient id="fogg"><stop offset="0" stop-color="#9fb6cc" stop-opacity=".5"/><stop offset=".6" stop-color="#7f9ab6" stop-opacity=".18"/><stop offset="1" stop-color="#7f9ab6" stop-opacity="0"/></radialGradient>
+      <radialGradient id="fogl"><stop offset="0" stop-color="#fff0c0" stop-opacity=".55"/><stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/></radialGradient>
+      <radialGradient id="flare"><stop offset="0" stop-color="#fffdf2"/><stop offset=".18" stop-color="#ffe9a8" stop-opacity=".8"/><stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/></radialGradient>
+      <linearGradient id="beamg" gradientUnits="userSpaceOnUse" x1="780" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#fff6d0" stop-opacity=".95"/><stop offset=".5" stop-color="#ffe9a8" stop-opacity=".3"/><stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/></linearGradient>
+      <linearGradient id="tower" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3d4a5e"/><stop offset=".45" stop-color="#c9c6bb"/><stop offset="1" stop-color="#5b6577"/></linearGradient>
+      <linearGradient id="band" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a1a1c"/><stop offset=".45" stop-color="#a03e36"/><stop offset="1" stop-color="#4a2022"/></linearGradient>
+      <linearGradient id="rock" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2536"/><stop offset="1" stop-color="#05080f"/></linearGradient>
+      <clipPath id="tw"><path d="M748 392h64l22 300H726z"/></clipPath>
+    </defs>
+    <rect width="1600" height="900" fill="url(#sky)"/>
+    <g id="stars"></g>
+    <circle cx="1180" cy="170" r="150" fill="url(#moonglow)"/>
+    <path d="M1180 132a40 40 0 1 0 28 68 32 32 0 1 1-28-68z" fill="#e4ecf4" opacity=".9"/>
+    <path d="M0 640q200-18 420-6t520-10 660 8v40H0z" fill="#12294a" opacity=".7"/>
+    <g id="beamBack"></g>
+    <g class="fog" style="animation-duration:38s"><ellipse cx="300" cy="560" rx="520" ry="90" fill="url(#fogg)"/><ellipse cx="1350" cy="520" rx="460" ry="70" fill="url(#fogg)"/></g>
+    <g id="wavesBack"></g>
+    <!-- rock and tower -->
+    <path d="M560 760c30-40 70-52 110-60 20-20 60-22 86-12 30-10 70-4 92 14 46 4 96 20 140 58z" fill="url(#rock)"/>
+    <path d="M846 700h70v-34l-35-22-35 22z" fill="#141d2c"/><rect x="872" y="676" width="12" height="14" fill="#f3c45c" opacity=".9"/>
+    <path d="M748 392h64l22 300H726z" fill="url(#tower)"/>
+    <g clip-path="url(#tw)"><rect x="700" y="450" width="160" height="52" fill="url(#band)"/><rect x="700" y="566" width="160" height="56" fill="url(#band)"/></g>
+    <rect x="773" y="420" width="12" height="20" rx="6" fill="#f3c45c"/><rect x="772" y="524" width="14" height="24" rx="7" fill="#1a2030"/><rect x="770" y="640" width="18" height="52" rx="9" fill="#141a28"/>
+    <path d="M734 392h92v-8h-92z" fill="#1c2535"/><path d="M738 384v-22M756 384v-22M774 384v-22M792 384v-22M808 384v-22M822 384v-22M736 362h88" stroke="#1c2535" stroke-width="3" fill="none"/>
+    <rect x="756" y="318" width="48" height="66" fill="#16202f"/><rect x="760" y="322" width="40" height="56" fill="#ffe9a8" id="lampglass" opacity=".85"/>
+    <path d="M770 322v56M790 322v56" stroke="#16202f" stroke-width="3"/>
+    <path d="M750 318h60l-22-30h-16z" fill="#141c2a"/><path d="M780 288v-22" stroke="#141c2a" stroke-width="3"/><circle cx="780" cy="264" r="4" fill="#141c2a"/>
+    <g id="beamFront"></g>
+    <circle id="flareC" cx="780" cy="350" r="60" fill="url(#flare)"/>
+    <g id="glints"></g>
+    <g id="wavesFront"></g>
+    <g class="fog" style="animation-duration:52s;animation-direction:alternate-reverse"><ellipse id="fogL" cx="330" cy="610" rx="560" ry="120" fill="url(#fogg)"/><ellipse id="fogR" cx="1270" cy="630" rx="560" ry="130" fill="url(#fogg)"/>
+      <ellipse id="litL" cx="380" cy="470" rx="420" ry="150" fill="url(#fogl)" opacity="0"/><ellipse id="litR" cx="1180" cy="470" rx="420" ry="150" fill="url(#fogl)" opacity="0"/></g>
+  </svg>
+  <div class="title">
+    <p>58°41′ N · the outer skerries</p>
+    <h1>Skerry Vane<i>a light, and the man who winds it</i></h1>
+    <div class="chart">Fl W 12s · 38 m · 19 M<br>fog signal: horn, 2 blasts ev. 60s</div>
+  </div>
+  <a class="back" href="index.html">← 100</a>
+  <a class="down" href="#log">the log ↓</a>
+</div>
+<section class="log" id="log">
+  <header><h2>Keeper's Log</h2><span>Station No. 33 · winter quarter · A. Tormund Hale, principal</span></header>
+  <div class="entries">
+    <article class="entry"><div class="when">3 Nov · 16:40<b>wind NW 4 · glass 29.8</b></div><p>Lit at sunset and wound the clockwork. The lens turned as sweet as a kitchen clock. Supply boat stood off on account of swell; she signalled <span class="mark">all well</span> and went home with my letters still aboard.</p></article>
+    <article class="entry"><div class="when">9 Nov · 02:15<b>wind W 7 · glass 29.1, falling</b></div><p>Sea breaking clean over the landing. Spray on the lantern panes forty metres up, which I had not thought possible. Wiped the glass on the half-hour. The light does not care what the weather thinks of it, and I am trying to learn the trick.</p></article>
+    <article class="entry"><div class="when">14 Nov · 21:05<b>calm · fog, thick</b></div><p>Fog came in like a held breath. Started the horn at nine. Between blasts I could hear a ship's bell answering somewhere to the south, patient and polite, the two of us talking all night without one word in common.</p></article>
+    <article class="entry"><div class="when">15 Nov · 06:30<b>calm · fog lifting</b></div><p>The bell passed east at first light. I never saw the vessel. Entered her as <span class="mark">ship unknown, heard only</span>. Slept four hours and dreamed the beam was a hand feeling along a shelf for something it had put down.</p></article>
+    <article class="entry"><div class="when">22 Nov · 17:10<b>wind NE 3 · frost</b></div><p>Cleaned the prisms with spirit and a chamois. Counted them again: two hundred and eighty-eight, same as ever. A seal has taken the lower step as her own and regards me, correctly, as the lodger.</p></article>
+    <article class="entry"><div class="when">30 Nov · 23:50<b>wind SW 5 · rain</b></div><p>Oil sufficient, wicks trimmed, mantle sound. Nothing to report, which on this rock is the best report there is. The light went round. Somewhere out there, somebody turned for home because of it.</p></article>
+  </div>
+  <p class="sig">A. T. Hale<small>entries continue overleaf</small></p>
+</section>
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg', $ = id => document.getElementById(id);
+  const el = (n, a, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); p.appendChild(e); return e; };
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let s = 7; const R = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < 150; i++) { const y = R() * R() * 560; el('circle', { class: R() < .35 ? 'star' : '', cx: (R() * 1600).toFixed(0), cy: y.toFixed(0), r: (0.5 + R() * 1.2).toFixed(1), fill: R() < .15 ? '#ffe9c8' : '#dbe7f5', opacity: (0.35 + R() * 0.6).toFixed(2), style: `animation-delay:${(-R() * 4).toFixed(1)}s` }, $('stars')); }
+  // waves: periodic over 1600 so a -1600 translate loops seamlessly
+  function wave(parent, y, amp, k, fill, dur, op) {
+    let d = `M0 ${y}`;
+    for (let x = 0; x <= 3200; x += 20) { const t = x / 1600 * Math.PI * 2; d += `L${x} ${(y + Math.sin(t * k) * amp + Math.sin(t * (k * 2 + 1) + 1.3) * amp * .45 + Math.sin(t * (k * 5 + 2)) * amp * .18).toFixed(1)}`; }
+    el('path', { d: d + 'V900H0Z', fill, class: 'w', opacity: op, style: `animation-duration:${dur}s` }, parent);
+  }
+  wave($('wavesBack'), 662, 5, 3, '#143258', 70, 1);
+  wave($('wavesBack'), 694, 8, 2, '#10294a', 48, 1);
+  wave($('wavesFront'), 742, 11, 2, '#0c2140', 34, .96);
+  wave($('wavesFront'), 790, 14, 1, '#081830', 26, .97);
+  wave($('wavesFront'), 846, 16, 1, '#050f20', 19, 1);
+  const glints = []; for (let i = 0; i < 16; i++) glints.push(el('rect', { x: 0, y: 700 + i * 9 + R() * 4, width: 30 + R() * 80, height: 2, rx: 1, fill: '#ffe9a8', opacity: 0 }, $('glints')));
+  const mk = p => [0, 1, 2].map(() => el('polygon', { fill: 'url(#beamg)', points: '' }, p));
+  const back = mk($('beamBack')), front = mk($('beamFront')), grad = $('beamg');
+  const LX = 780, LY = 350, PERIOD = 12;
+  function beam(th) {
+    const c = Math.cos(th), sn = Math.sin(th), dir = c >= 0 ? 1 : -1, len = 90 + 1500 * Math.abs(c), toward = Math.max(0, sn);
+    const spread = 30 + 150 * Math.abs(c) + 240 * (1 - Math.abs(c)) * toward;
+    const ex = LX + dir * len, drop = 26 * Math.abs(c);
+    grad.setAttribute('x1', LX); grad.setAttribute('x2', ex);
+    const set = sn >= 0 ? front : back, other = sn >= 0 ? back : front;
+    other.forEach(p => p.setAttribute('opacity', 0));
+    [1, .62, .3].forEach((f, i) => {
+      set[i].setAttribute('points', `${LX},${LY - 7} ${ex},${LY + drop - spread * f} ${ex},${LY + drop + spread * f} ${LX},${LY + 7}`);
+      set[i].setAttribute('opacity', (sn >= 0 ? .2 : .11) + i * .05);
+    });
+    const fl = Math.pow(toward, 10);
+    $('flareC').setAttribute('r', 46 + fl * 620); $('flareC').setAttribute('opacity', .55 + fl * .45);
+    $('lampglass').setAttribute('opacity', .6 + .4 * Math.abs(sn));
+    $('litR').setAttribute('opacity', (Math.max(0, c) ** 2 * .55).toFixed(3));
+    $('litL').setAttribute('opacity', (Math.max(0, -c) ** 2 * .55).toFixed(3));
+    glints.forEach((g, i) => {
+      const reach = 60 + Math.abs(c) * 520, w = +g.getAttribute('width');
+      g.setAttribute('x', LX + dir * (20 + (i * 53 % 97) / 97 * reach) - w / 2 + Math.sin(th * 7 + i) * 6);
+      g.setAttribute('opacity', ((0.12 + fl * .6) * (0.4 + 0.6 * Math.abs(Math.sin(th * 9 + i * 2.1)))).toFixed(3));
+    });
+  }
+  if (reduce) beam(0.5);
+  else { const loop = t => { beam((t / 1000 / PERIOD) * Math.PI * 2 + 2.2); requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CREDENTIAL // Ione Varga-Kesh — transit tier 3</title>
+<meta name="description" content="A cyberpunk identity card with RGB-split and clip-path glitch effects, a verification scan, pointer-reactive holo stripes and hover-triggered signal corruption.">
+<style>
+  :root{--bg:#060708;--acid:#c9ff2f;--mag:#ff2466;--cy:#17eaff;--dim:#7b8576;--mx:50%;--my:50%;--rx:0deg;--ry:0deg}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{background:var(--bg);color:var(--acid);font-family:"Arial Narrow","Roboto Condensed","Helvetica Neue Condensed","Franklin Gothic Medium Cond","Liberation Sans Narrow",Impact,sans-serif;overflow-x:hidden;
+    background-image:linear-gradient(rgba(201,255,47,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(201,255,47,.05) 1px,transparent 1px);background-size:44px 44px}
+  .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace}
+  main{min-height:100vh;min-height:100svh;display:grid;grid-template-columns:1fr;grid-template-rows:auto 1fr auto;padding:clamp(14px,3vw,34px);gap:18px;position:relative}
+  .top,.bot{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
+  .top b{color:var(--acid);font-weight:400}
+  .top a{color:var(--acid);text-decoration:none;border:1px solid var(--acid);padding:6px 10px}
+  .top a:hover,.top a:focus-visible{background:var(--acid);color:#000}
+  .ghost{position:absolute;left:-.04em;bottom:8vh;font-size:clamp(90px,24vw,330px);font-weight:900;line-height:.8;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1px rgba(201,255,47,.13);pointer-events:none;user-select:none;white-space:nowrap}
+  .stage{display:grid;place-items:center;perspective:1200px;padding:10px 0}
+  .card{position:relative;width:min(100%,560px);aspect-ratio:1.586;transform:rotateX(var(--rx)) rotateY(var(--ry));transform-style:preserve-3d;transition:transform .25s ease-out;cursor:crosshair;
+    background:linear-gradient(135deg,#12160f 0,#0a0c0b 55%,#141018 100%);border:1px solid rgba(201,255,47,.55);
+    clip-path:polygon(0 0,calc(100% - 34px) 0,100% 34px,100% 100%,26px 100%,0 calc(100% - 26px));
+    container-type:inline-size;touch-action:none;outline:none}
+  .card:focus-visible{border-color:#fff}
+  .in{position:absolute;inset:0;padding:4.2cqw 4.6cqw;display:grid;grid-template-columns:31cqw 1fr;grid-template-rows:auto 1fr auto;gap:2.2cqw 4cqw}
+  .hd{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;font-size:2.3cqw;letter-spacing:.3em;text-transform:uppercase;border-bottom:1px solid rgba(201,255,47,.35);padding-bottom:1.6cqw}
+  .hd span:last-child{color:var(--mag)}
+  .face{position:relative;background:#0d100c;border:1px solid rgba(201,255,47,.4);overflow:hidden;align-self:stretch}
+  .face svg{position:absolute;inset:0;width:100%;height:100%}
+  .face .r{color:var(--mag);mix-blend-mode:screen;transform:translateX(-3px);opacity:.75}
+  .face .c{color:var(--cy);mix-blend-mode:screen;transform:translateX(3px);opacity:.75}
+  .face .w{color:#e9f5d2}
+  .face::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.38) 2px 3px)}
+  .data{display:grid;grid-template-columns:1fr 1fr;gap:1.5cqw 2.6cqw;align-content:start;min-width:0}
+  .name{grid-column:1/-1;font-size:8.4cqw;font-weight:900;line-height:.86;letter-spacing:-.01em;text-transform:uppercase;position:relative;color:#f3ffd6}
+  .gl{position:relative;display:inline-block}
+  .gl::before,.gl::after{content:attr(data-t);position:absolute;left:0;top:0;width:100%;pointer-events:none}
+  .gl::before{color:var(--mag);transform:translateX(-2px);mix-blend-mode:screen;clip-path:inset(0 0 55% 0);animation:slice1 3.7s steps(1) infinite}
+  .gl::after{color:var(--cy);transform:translateX(2px);mix-blend-mode:screen;clip-path:inset(60% 0 0 0);animation:slice2 2.9s steps(1) infinite}
+  @keyframes slice1{0%,88%{clip-path:inset(0 0 100% 0)}89%{clip-path:inset(8% 0 62% 0);transform:translateX(-7px)}92%{clip-path:inset(52% 0 20% 0);transform:translateX(5px)}95%{clip-path:inset(30% 0 48% 0);transform:translateX(-3px)}}
+  @keyframes slice2{0%,81%{clip-path:inset(100% 0 0 0)}82%{clip-path:inset(66% 0 6% 0);transform:translateX(8px)}86%{clip-path:inset(12% 0 70% 0);transform:translateX(-5px)}90%{clip-path:inset(44% 0 34% 0);transform:translateX(3px)}}
+  .f{min-width:0}
+  .f small{display:block;font-size:1.9cqw;letter-spacing:.26em;color:var(--dim);text-transform:uppercase;margin-bottom:.3cqw}
+  .f span{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:2.9cqw;letter-spacing:.04em;white-space:nowrap;display:block;overflow:hidden}
+  .ft{grid-column:1/-1;display:flex;align-items:flex-end;justify-content:space-between;gap:3cqw}
+  .bars{display:flex;align-items:stretch;height:6.4cqw;gap:.35cqw;flex:1;min-width:0;overflow:hidden}
+  .bars i{background:var(--acid);flex:none}
+  .status{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:2.3cqw;letter-spacing:.12em;text-align:right;white-space:nowrap}
+  .status b{display:inline-block;width:1.5cqw;height:1.5cqw;background:var(--acid);margin-right:1cqw;animation:blink 1s steps(2) infinite}
+  @keyframes blink{50%{opacity:.15}}
+  .holo{position:absolute;right:0;top:17%;bottom:20%;width:5.2cqw;opacity:.85;mix-blend-mode:screen;
+    background:repeating-linear-gradient(115deg,#ff2466 0 6%,#ffd52e 12%,#c9ff2f 18%,#17eaff 26%,#7a5bff 34%,#ff2466 40%);background-size:300% 300%;background-position:var(--mx) var(--my);
+    -webkit-mask:repeating-linear-gradient(0deg,#000 0 3px,transparent 3px 5px);mask:repeating-linear-gradient(0deg,#000 0 3px,transparent 3px 5px)}
+  .sheen{position:absolute;inset:0;pointer-events:none;background:radial-gradient(60cqw circle at var(--mx) var(--my),rgba(255,255,255,.13),transparent 60%)}
+  .scan{position:absolute;left:0;right:0;top:0;height:22%;pointer-events:none;background:linear-gradient(transparent,rgba(23,234,255,.16) 85%,rgba(23,234,255,.9) 97%,#fff 100%);animation:scan 4.2s cubic-bezier(.5,0,.5,1) infinite;mix-blend-mode:screen}
+  @keyframes scan{0%{transform:translateY(-110%)}70%,100%{transform:translateY(460%)}}
+  .tear{position:absolute;inset:0;pointer-events:none;opacity:0;background:
+    linear-gradient(90deg,transparent 10%,rgba(255,36,102,.55) 10% 34%,transparent 34%) 0 22%/100% 5% no-repeat,
+    linear-gradient(90deg,transparent 48%,rgba(23,234,255,.5) 48% 92%,transparent 92%) 0 57%/100% 3% no-repeat,
+    linear-gradient(90deg,rgba(201,255,47,.5) 0 22%,transparent 22%) 0 79%/100% 7% no-repeat}
+  /* corruption state */
+  .card.bad{animation:shake .32s steps(2) infinite;border-color:var(--mag)}
+  .card.bad .in{animation:rip .9s steps(1) infinite}
+  .card.bad .tear{opacity:1;animation:tear .5s steps(1) infinite}
+  .card.bad .gl::before{animation-duration:.45s}.card.bad .gl::after{animation-duration:.37s}
+  .card.bad .face .r{animation:jx .3s steps(2) infinite}.card.bad .face .c{animation:jx .3s steps(2) infinite reverse}
+  .card.bad .face .w{animation:rip 1.1s steps(1) infinite reverse}
+  .card.bad .status{color:var(--mag)}.card.bad .status b{background:var(--mag);animation-duration:.2s}
+  .card.bad .scan{animation-duration:.8s;background:linear-gradient(transparent,rgba(255,36,102,.25) 85%,var(--mag) 100%)}
+  @keyframes shake{0%{translate:0 0}50%{translate:-3px 1px}100%{translate:2px -1px}}
+  @keyframes jx{0%{transform:translate(-9px,2px)}100%{transform:translate(8px,-3px)}}
+  @keyframes rip{0%{clip-path:inset(0)}20%{clip-path:inset(12% 0 60% 0);transform:translateX(-10px)}28%{clip-path:inset(0)}55%{clip-path:inset(58% 0 14% 0);transform:translateX(12px) skewX(-8deg)}62%{clip-path:inset(0);transform:none}84%{clip-path:inset(34% 0 40% 0);transform:translateX(-5px)}90%{clip-path:inset(0)}}
+  @keyframes tear{0%{background-position:0 22%,0 57%,0 79%}33%{background-position:30px 68%,-40px 12%,10px 40%}66%{background-position:-20px 44%,22px 88%,-12px 8%}}
+  .bot{align-items:flex-end;flex-wrap:wrap}
+  .bot p{max-width:46ch;line-height:1.7;letter-spacing:.14em}
+  .fault{font:inherit;font-size:12px;letter-spacing:.28em;text-transform:uppercase;background:none;border:1px solid var(--mag);color:var(--mag);padding:12px 18px;cursor:pointer}
+  .fault:hover,.fault:focus-visible,.fault[aria-pressed=true]{background:var(--mag);color:#000}
+  @media(prefers-reduced-motion:reduce){.gl::before,.gl::after,.scan,.status b,.card.bad,.card.bad .in,.card.bad .tear,.card.bad .face .r,.card.bad .face .c,.card.bad .face .w{animation:none!important}
+    .card{transition:none}.card.bad .in{transform:translateX(-6px) skewX(-3deg)}.scan{display:none}}
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><div>Halden Arcology Authority<br><b>Credential viewer v9.34</b></div><a href="index.html">← 100</a></div>
+  <div class="ghost" aria-hidden="true">ID/034</div>
+  <div class="stage">
+    <div class="card" id="card" tabindex="0" role="img" aria-label="Identity card for Ione Varga-Kesh, courier, transit tier 3. Hover or press to corrupt the signal.">
+      <div class="in">
+        <div class="hd"><span>Citizen credential</span><span>Tier 3 // Transit</span></div>
+        <div class="face" id="face"></div>
+        <div class="data">
+          <div class="name"><span class="gl" data-t="IONE" data-s>IONE</span><br><span class="gl" data-t="VARGA-KESH" data-s>VARGA-KESH</span></div>
+          <div class="f"><small>Ident</small><span data-s>HX-7741-0934-K</span></div>
+          <div class="f"><small>Class</small><span data-s>COURIER / NIGHT</span></div>
+          <div class="f"><small>Sector</small><span data-s>LOWER MERIDIAN 12</span></div>
+          <div class="f"><small>Expires</small><span data-s>2187.11.30</span></div>
+        </div>
+        <div class="ft"><div class="bars" id="bars"></div><div class="status"><b></b><span id="st">VERIFYING</span></div></div>
+      </div>
+      <div class="holo"></div><div class="sheen"></div><div class="scan"></div><div class="tear"></div>
+    </div>
+  </div>
+  <div class="bot"><p>Hover, press or hold the card to degrade the carrier signal. The Authority reminds you that a corrupted credential is still a binding one.</p>
+    <button class="fault" id="fault" type="button" aria-pressed="false">Inject fault</button></div>
+</main>
+<script>
+(() => {
+  const card = document.getElementById('card'), st = document.getElementById('st'), fault = document.getElementById('fault');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // portrait: three tinted copies of one angular silhouette
+  const P = `<svg viewBox="0 0 120 150" preserveAspectRatio="xMidYMid slice" class="K" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="bevel">
+    <path d="M60 22 84 30 92 58 86 86 70 104 50 104 34 86 28 58 36 30Z" fill="currentColor" fill-opacity=".14"/>
+    <path d="M36 30 28 16 60 8 92 16 84 30M28 58 20 62 26 80 34 86M92 58 100 62 94 80 86 86"/>
+    <path d="M50 104 46 122 14 134 6 150M70 104 74 122 106 134 114 150M46 122 60 132 74 122"/>
+    <path d="M38 56 54 54 52 62 40 62ZM66 54 82 56 80 62 68 62Z" fill="currentColor"/>
+    <path d="M60 60 56 78 64 78M48 90 60 88 72 90M36 30 60 44 84 30M60 44V22"/></g>
+    <g fill="currentColor"><rect x="8" y="8" width="10" height="2"/><rect x="8" y="8" width="2" height="10"/><rect x="102" y="140" width="10" height="2"/><rect x="110" y="132" width="2" height="10"/></g></svg>`;
+  document.getElementById('face').innerHTML = ['r', 'c', 'w'].map(k => P.replace('K', k)).join('');
+  // barcode
+  let seed = 934; const rnd = () => (seed = (seed * 48271) % 2147483647) / 2147483647;
+  document.getElementById('bars').innerHTML = Array.from({ length: 64 }, () => `<i style="width:${(0.25 + Math.floor(rnd() * 4) * 0.28).toFixed(2)}cqw;opacity:${rnd() < .12 ? .25 : 1}"></i>`).join('');
+
+  const fields = [...document.querySelectorAll('[data-s]')].map(e => ({ e, t: e.textContent }));
+  const JUNK = '█▓▒░#%&/\\<>01ΞΣ¥§ø';
+  let bad = false, pinned = false, timer = null, statusTimer = null;
+  function scramble(amount) {
+    fields.forEach(f => {
+      const s = f.t.split('').map(ch => ch !== ' ' && Math.random() < amount ? JUNK[Math.floor(Math.random() * JUNK.length)] : ch).join('');
+      f.e.textContent = s; if (f.e.dataset.t !== undefined) f.e.dataset.t = s;
+    });
+  }
+  function restore() { fields.forEach(f => { f.e.textContent = f.t; if (f.e.dataset.t !== undefined) f.e.dataset.t = f.t; }); }
+  function setBad(on) {
+    if (on === bad) return; bad = on;
+    card.classList.toggle('bad', on); clearInterval(timer);
+    if (on) { st.textContent = 'SIGNAL CORRUPT'; scramble(.35); if (!reduce) timer = setInterval(() => scramble(0.15 + Math.random() * 0.4), 90); }
+    else { // resolve back in a few passes
+      let n = 4; timer = setInterval(() => { if (--n <= 0) { clearInterval(timer); restore(); st.textContent = 'VERIFIED'; } else scramble(n * .07); }, reduce ? 0 : 70);
+    }
+  }
+  function tilt(e) {
+    const r = card.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+    const s = document.documentElement.style;
+    s.setProperty('--mx', (x * 100).toFixed(1) + '%'); s.setProperty('--my', (y * 100).toFixed(1) + '%');
+    if (!reduce) { s.setProperty('--ry', ((x - .5) * 16).toFixed(2) + 'deg'); s.setProperty('--rx', ((.5 - y) * 12).toFixed(2) + 'deg'); }
+  }
+  card.addEventListener('pointerenter', e => { tilt(e); setBad(true); });
+  card.addEventListener('pointerdown', e => { tilt(e); setBad(true); try { card.setPointerCapture(e.pointerId); } catch (_) {} });
+  card.addEventListener('pointermove', tilt);
+  const leave = () => { const s = document.documentElement.style; s.setProperty('--rx', '0deg'); s.setProperty('--ry', '0deg'); if (!pinned) setBad(false); };
+  card.addEventListener('pointerleave', leave); card.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') leave(); }); card.addEventListener('pointercancel', leave);
+  card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fault.click(); } });
+  fault.addEventListener('click', () => { pinned = !pinned; fault.setAttribute('aria-pressed', pinned); fault.textContent = pinned ? 'Clear fault' : 'Inject fault'; setBad(pinned); });
+  // idle status cycle follows the scan bar
+  statusTimer = setInterval(() => { if (!bad) { st.textContent = 'VERIFYING'; setTimeout(() => { if (!bad) st.textContent = 'VERIFIED'; }, 2600); } }, 4200);
+  setTimeout(() => { if (!bad) st.textContent = 'VERIFIED'; }, 2600);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GAZETTE OF NOTHING — a Dada cut-up machine</title>
+<meta name="description" content="A Dada collage of torn paper scraps and mismatched type. Press the lever and the machine cuts a fresh nonsense poem out of yesterday's newspaper.">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--paper:#e9e1cf;--ink:#16130f;--red:#d2291c;--news:#d8d0bb;--yel:#e8b62a;--blue:#27407a}
+  body{background:#b9ad92;color:var(--ink);min-height:100vh;overflow-x:hidden;font-family:Georgia,"Times New Roman",serif;
+    background-image:radial-gradient(circle at 20% 10%,rgba(255,255,255,.25),transparent 50%),repeating-linear-gradient(0deg,rgba(0,0,0,.03) 0 1px,transparent 1px 4px)}
+  svg.defs{position:absolute;width:0;height:0}
+  .board{position:relative;max-width:1100px;margin:0 auto;padding:clamp(54px,8vw,90px) clamp(12px,3vw,30px) 60px}
+  a.back{position:absolute;top:14px;left:18px;font:900 13px/1 "Courier New",monospace;color:var(--ink);background:var(--yel);padding:6px 9px;text-decoration:none;transform:rotate(-4deg);filter:url(#tear);z-index:9}
+  .scrap{position:relative;filter:url(#tear) drop-shadow(2px 4px 0 rgba(0,0,0,.22));padding:.25em .5em;display:inline-block;line-height:1.05}
+  .mast{display:flex;flex-wrap:wrap;align-items:flex-end;gap:6px 4px;margin-bottom:26px}
+  .mast .scrap{font-size:clamp(34px,9vw,104px)}
+  .f1{font-family:Impact,"Haettenschweiler","Arial Narrow Bold",sans-serif;text-transform:uppercase;letter-spacing:.01em}
+  .f2{font-family:"Didot","Bodoni MT","Bodoni 72",Georgia,serif;font-style:italic}
+  .f3{font-family:"Courier New",Courier,monospace;font-weight:700}
+  .f4{font-family:"Futura","Century Gothic","Trebuchet MS",sans-serif;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+  .f5{font-family:"Brush Script MT","Snell Roundhand","Segoe Script",cursive}
+  .f6{font-family:"Rockwell","Roboto Slab","Courier New",serif;font-weight:900}
+  .c1{background:var(--paper)} .c2{background:var(--ink);color:var(--paper)} .c3{background:var(--red);color:#fff5e6}
+  .c4{background:var(--news)} .c5{background:var(--yel)} .c6{background:var(--blue);color:#f2ead7} .c7{background:#f6f1e4}
+  .c4{background-image:repeating-linear-gradient(0deg,transparent 0 5px,rgba(0,0,0,.14) 5px 6px)}
+  .layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(16px,3vw,40px);align-items:start}
+  .poemwrap{position:relative;background:#f3ecdb;padding:clamp(22px,4vw,46px) clamp(14px,3vw,36px) clamp(30px,5vw,56px);min-height:420px;transform:rotate(-1.2deg);filter:url(#tear) drop-shadow(6px 10px 0 rgba(0,0,0,.25));
+    background-image:linear-gradient(90deg,rgba(210,41,28,.5) 0 2px,transparent 2px),repeating-linear-gradient(0deg,transparent 0 31px,rgba(39,64,122,.18) 31px 32px);background-position:38px 0,0 0;background-repeat:no-repeat,repeat}
+  .poemwrap::before{content:"";position:absolute;top:-16px;left:42%;width:120px;height:34px;background:rgba(232,182,42,.72);transform:rotate(-3deg);mix-blend-mode:multiply}
+  .poem{display:flex;flex-direction:column;gap:clamp(8px,1.6vw,14px);padding-left:clamp(14px,4vw,34px)}
+  .line{display:flex;flex-wrap:wrap;gap:5px 3px;align-items:center}
+  .line .scrap{font-size:clamp(15px,2.5vw,25px);animation:drop .5s cubic-bezier(.2,1.5,.4,1) backwards}
+  @keyframes drop{from{opacity:0;transform:translateY(-40px) rotate(var(--r0,20deg)) scale(1.4)}}
+  .side{display:flex;flex-direction:column;gap:22px;align-items:flex-start}
+  .eye{width:min(210px,60%);transform:rotate(7deg);filter:url(#tear) drop-shadow(4px 6px 0 rgba(0,0,0,.25));align-self:center}
+  .lever{font:900 clamp(20px,3.4vw,30px)/1 Impact,"Arial Narrow Bold",sans-serif;text-transform:uppercase;letter-spacing:.06em;background:var(--red);color:#fff5e6;border:0;padding:20px 24px 18px;cursor:pointer;transform:rotate(-3deg);filter:url(#tear) drop-shadow(5px 6px 0 var(--ink));transition:transform .12s}
+  .lever:hover{transform:rotate(1deg) scale(1.03)} .lever:active{transform:rotate(-1deg) scale(.96)}
+  .lever small{display:block;font:700 11px "Courier New",monospace;letter-spacing:.1em;margin-top:6px;text-transform:none}
+  .manifesto{font:700 13px/1.55 "Courier New",monospace;background:var(--news);padding:16px 16px 18px;transform:rotate(2deg);filter:url(#tear) drop-shadow(3px 5px 0 rgba(0,0,0,.22));max-width:320px}
+  .manifesto b{background:var(--ink);color:var(--paper);padding:0 4px}
+  .stamp{font:900 15px/1.1 "Courier New",monospace;color:var(--red);border:3px double var(--red);padding:8px 12px;transform:rotate(-12deg);letter-spacing:.14em;text-transform:uppercase;opacity:.82;align-self:flex-end;mix-blend-mode:multiply}
+  .hand{position:absolute;right:clamp(4px,3vw,40px);top:clamp(120px,22vw,250px);font:900 clamp(40px,8vw,90px)/1 serif;transform:rotate(18deg);color:var(--ink);pointer-events:none;opacity:.9}
+  .num{position:absolute;font:900 clamp(70px,16vw,200px)/.8 Impact,sans-serif;color:var(--red);mix-blend-mode:multiply;opacity:.8;right:38%;bottom:10px;transform:rotate(-9deg);pointer-events:none}
+  .strip{margin-top:34px;display:flex;flex-wrap:wrap;gap:8px 6px;align-items:center}
+  .strip .scrap{font-size:clamp(12px,1.8vw,16px)}
+  @media (max-width:760px){.layout{grid-template-columns:1fr}.hand{display:none}.side{flex-direction:row;flex-wrap:wrap;align-items:center}.eye{width:120px}}
+  @media (prefers-reduced-motion:reduce){.line .scrap{animation:none}.lever{transition:none}}
+</style>
+</head>
+<body>
+<svg class="defs" aria-hidden="true"><defs>
+  <filter id="tear" x="-5%" y="-10%" width="110%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency=".045 .09" numOctaves="3" seed="11" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</defs></svg>
+
+<main class="board">
+  <a class="back" href="index.html">← 100</a>
+  <h1 class="mast" aria-label="Gazette of Nothing">
+    <span class="scrap f1 c2" style="transform:rotate(-3deg)">GAZ</span><span class="scrap f2 c5" style="transform:rotate(4deg) translateY(8px)">ette</span>
+    <span class="scrap f3 c7" style="transform:rotate(-7deg);font-size:clamp(20px,4vw,44px)">of</span>
+    <span class="scrap f6 c3" style="transform:rotate(2deg)">NO</span><span class="scrap f4 c4" style="transform:rotate(-2deg) translateY(-10px);font-size:clamp(22px,5.4vw,62px)">thing</span>
+    <span class="scrap f5 c6" style="transform:rotate(9deg);font-size:clamp(22px,4.4vw,50px)">no. 391½</span>
+  </h1>
+  <div class="hand" aria-hidden="true">☞</div>
+
+  <div class="layout">
+    <section class="poemwrap" aria-live="polite">
+      <div class="poem" id="poem"></div>
+      <div class="num" id="num" aria-hidden="true">7</div>
+    </section>
+    <aside class="side">
+      <button class="lever" id="cut" type="button">✂ Cut the paper!<small>shake the hat · tip it out</small></button>
+      <svg class="eye" viewBox="0 0 200 150" role="img" aria-label="Collaged eye with clock hands">
+        <rect width="200" height="150" fill="#d8d0bb"/>
+        <g stroke="#16130f" stroke-width=".8" opacity=".3">
+          <path d="M0 12h200M0 24h200M0 36h200M0 48h200M0 60h200M0 72h200M0 84h200M0 96h200M0 108h200M0 120h200M0 132h200"/></g>
+        <path d="M14 75Q100 5 186 75Q100 145 14 75z" fill="#f6f1e4" stroke="#16130f" stroke-width="4"/>
+        <circle cx="100" cy="75" r="36" fill="#d2291c"/><circle cx="100" cy="75" r="36" fill="none" stroke="#16130f" stroke-width="3" stroke-dasharray="2 7.4"/>
+        <circle cx="100" cy="75" r="14" fill="#16130f"/>
+        <g id="hands" stroke="#16130f" stroke-linecap="round"><line x1="100" y1="75" x2="100" y2="46" stroke-width="5" stroke="#f6f1e4"/><line x1="100" y1="75" x2="124" y2="88" stroke-width="3" stroke="#e8b62a"/></g>
+        <path d="M30 40l-12-16M52 24l-6-18M80 14l-2-14M120 14l4-14M148 24l8-17M170 40l13-14" stroke="#16130f" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <p class="manifesto"><b>INSTRUCTIONS.</b> Take one newspaper. Take scissors. Choose an article as long as the poem you deserve. Cut. Shake gently. The poem will resemble you — <b>charming</b>, and misunderstood by the vulgar.</p>
+      <div class="stamp">Approved by<br>no committee</div>
+    </aside>
+  </div>
+  <div class="strip" id="strip" aria-hidden="true"></div>
+</main>
+
+<script>
+(() => {
+  const W={
+    art:['the','a','every','no','our','one','your','that'],
+    adj:['umbrella-shaped','municipal','boiled','fluorescent','reluctant','alphabetical','second-hand','magnetic','velvet','bankrupt','horizontal','edible','provisional','left-handed','tin','enormous'],
+    noun:['bicycle','moustache','ministry','trombone','sardine','piano','telegram','eyebrow','locomotive','committee','staircase','pineapple','dentist','typewriter','moon','accordion','overcoat','herring','gramophone','funnel'],
+    verb:['swallows','applauds','unbuttons','telephones','resembles','forgives','marries','dissolves','invoices','salutes','forgets','irons','auditions','devours','postpones'],
+    adv:['politely','backwards','in triplicate','at noon','without trousers','for no reason','sideways','until Thursday','by candlelight','with great ceremony'],
+    cry:['BOOM!','hélas —','DADA?','tick. tick.','oh.','PFFT','!!!','(applause)','zang','no no no','YES','et cetera'],
+    prep:['under','against','inside','instead of','despite','beside','on top of']
+  };
+  const FORMS=[
+    ['art','adj','noun','verb','art','noun'],['cry','art','noun','verb','adv'],['adj','noun','prep','art','adj','noun'],
+    ['noun','noun','noun','cry'],['art','noun','verb','adv','cry'],['prep','art','noun','art','noun','verb'],['cry','cry','adj','noun'],['art','adj','adj','noun','verb','adv']
+  ];
+  const F=['f1','f2','f3','f4','f5','f6'], C=['c1','c1','c7','c4','c4','c2','c3','c5','c6'];
+  const pick=a=>a[Math.floor(Math.random()*a.length)], rnd=(a,b)=>a+Math.random()*(b-a);
+  function scrap(word,i){
+    const s=document.createElement('span'); const f=pick(F);
+    s.className='scrap '+f+' '+pick(C); s.textContent=word;
+    const r=rnd(-7,7); s.style.transform='rotate('+r.toFixed(1)+'deg) translateY('+rnd(-4,4).toFixed(0)+'px)';
+    s.style.setProperty('--r0',rnd(-50,50).toFixed(0)+'deg'); s.style.animationDelay=(i*45)+'ms';
+    s.style.fontSize=(rnd(.8,1.45)*(f==='f5'?1.2:1)).toFixed(2)+'em';
+    return s;
+  }
+  function cut(){
+    const poem=document.getElementById('poem'); poem.innerHTML=''; let i=0;
+    const n=5+Math.floor(Math.random()*3), forms=[...FORMS].sort(()=>Math.random()-.5);
+    for(let l=0;l<n;l++){
+      const line=document.createElement('div'); line.className='line'; line.style.marginLeft=rnd(0,12).toFixed(0)+'%';
+      const inner=document.createElement('span'); inner.style.cssText='display:contents;font-size:clamp(15px,2.5vw,25px)';
+      forms[l%forms.length].forEach(k=>{ const w=pick(W[k]); const s=scrap(w,i++); s.style.fontSize=''; s.style.zoom=''; s.dataset.k=k; s.style.fontSize='calc(clamp(15px,2.5vw,25px) * '+rnd(.8,1.5).toFixed(2)+')'; line.appendChild(s); });
+      poem.appendChild(line);
+    }
+    document.getElementById('num').textContent=pick(['7','3','?','&','9','Ø','½','!']);
+    const strip=document.getElementById('strip'); strip.innerHTML='';
+    for(let k=0;k<9;k++){ const s=scrap(pick([...W.noun,...W.cry,...W.adv]),0); s.style.animation='none'; s.style.fontSize=''; strip.appendChild(s); }
+    const h=document.getElementById('hands'); h.setAttribute('transform','rotate('+Math.floor(rnd(0,360))+' 100 75)');
+  }
+  document.getElementById('cut').addEventListener('click',cut);
+  addEventListener('keydown',e=>{ if(e.code==='Space'&&document.activeElement.tagName!=='BUTTON'){ e.preventDefault(); cut(); } });
+  cut();
+})();
+</script>
+</body>
+</html>

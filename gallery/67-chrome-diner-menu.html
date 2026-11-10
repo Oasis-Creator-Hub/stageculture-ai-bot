@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Starlite Comet Diner — Menu &amp; Jukebox</title>
+<meta name="description" content="A 1950s chrome diner: neon sign, checkerboard floor, cherry red and turquoise, a playful menu of invented dishes and a working tabletop jukebox selector.">
+<style>
+:root{--red:#d3202f;--teal:#2fb5ac;--tealdk:#0f6f6b;--cream:#fff6e0;--ink:#1d1a1c;--chrome:linear-gradient(180deg,#fdfdfd 0,#b8c1c8 18%,#eef2f4 34%,#6f7a83 50%,#3d464d 52%,#aab4bb 70%,#f4f6f7 88%,#8b959c 100%)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Futura,"Century Gothic","Avenir Next","Trebuchet MS",sans-serif;color:var(--ink);background:var(--teal);overflow-x:hidden}
+a.back{position:absolute;left:14px;top:12px;z-index:5;color:#ffd9dc;font-size:12px;font-weight:700;letter-spacing:.14em;text-decoration:none}
+.sky{position:relative;background:radial-gradient(ellipse at 50% 120%,#3a2a55 0,#17122b 60%,#0b0916);padding:clamp(40px,7vw,80px) 16px clamp(34px,5vw,60px);text-align:center;overflow:hidden}
+.sky:after{content:"";position:absolute;inset:0;background:radial-gradient(1.5px 1.5px at 12% 30%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 28% 68%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 81% 22%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 67% 74%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 92% 55%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 6% 80%,#fff 50%,transparent 51%);opacity:.6;pointer-events:none}
+.neon{position:relative;display:inline-block;z-index:1}
+.neon .script{font-family:"Brush Script MT","Snell Roundhand","Segoe Script","Lucida Handwriting",cursive;font-size:clamp(64px,15vw,170px);line-height:.9;color:#fff0f1;
+  text-shadow:0 0 6px #fff,0 0 14px #ff5b6b,0 0 34px #ff2137,0 0 70px #ff2137;transform:rotate(-5deg);display:block;animation:buzz 6s infinite}
+.neon .cap{display:inline-block;margin-top:10px;font-weight:700;font-size:clamp(16px,3.6vw,34px);letter-spacing:.5em;padding:.25em 0 .25em .5em;color:#eaffff;border:3px solid #9ffcf5;border-radius:999px;width:min(86vw,560px);
+  text-shadow:0 0 6px #fff,0 0 16px #2ff5e6,0 0 36px #2ff5e6;box-shadow:0 0 12px #2ff5e6,inset 0 0 12px #2ff5e6}
+.neon .cap i{font-style:normal;animation:dead 7s infinite}
+.open{position:relative;z-index:1;margin-top:18px;color:#ffe9a6;font-size:13px;letter-spacing:.4em;font-weight:700;text-shadow:0 0 10px #ffb400}
+@keyframes buzz{0%,100%{opacity:1}41%{opacity:1}42%{opacity:.7}43%{opacity:1}45%{opacity:.82}46%{opacity:1}}
+@keyframes dead{0%,62%,66%,100%{opacity:1}63%,65%{opacity:.25}}
+.trim{height:26px;background:var(--chrome);box-shadow:0 3px 6px rgba(0,0,0,.4)}
+.trim.thin{height:10px}
+.wall{background:repeating-linear-gradient(90deg,var(--teal) 0 46px,#29a69e 46px 48px);padding:clamp(22px,5vw,60px) clamp(12px,4vw,40px)}
+.menu{position:relative;max-width:1080px;margin:0 auto;background:var(--cream);border-radius:22px;padding:clamp(18px,3.4vw,40px);box-shadow:0 0 0 6px var(--red),0 0 0 10px var(--cream),0 0 0 13px var(--red),0 24px 40px rgba(0,40,40,.5)}
+.menu>header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;border-bottom:4px double var(--red);padding-bottom:12px;margin-bottom:8px}
+.menu h1{margin:0;font-family:"Brush Script MT","Snell Roundhand","Segoe Script",cursive;font-size:clamp(34px,6vw,60px);font-weight:400;color:var(--red);line-height:1}
+.menu header p{margin:0;font-size:11px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;color:var(--tealdk);text-align:right}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px clamp(20px,4vw,52px)}
+@media(max-width:700px){.cols{grid-template-columns:1fr}}
+h2{font-size:clamp(20px,2.6vw,27px);letter-spacing:.2em;text-transform:uppercase;margin:22px 0 8px;display:flex;align-items:center;gap:12px;color:var(--ink)}
+h2:before{content:"";width:22px;height:22px;flex:none;background:conic-gradient(var(--ink) 0 25%,var(--cream) 0 50%,var(--ink) 0 75%,var(--cream) 0);border:2px solid var(--ink)}
+h2:after{content:"";flex:1;height:8px;background:repeating-linear-gradient(90deg,var(--teal) 0 8px,transparent 8px 16px)}
+.dish{margin:0 0 12px}
+.dish div{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:clamp(15px,1.6vw,17px);text-transform:uppercase;letter-spacing:.04em}
+.dish div:after{content:"";flex:1;border-bottom:2px dotted #b9a98a;order:1;transform:translateY(-4px)}
+.dish b{order:2;color:var(--red);font-family:Rockwell,"Courier New",serif;font-size:1.1em}
+.dish p{margin:2px 0 0;font-family:Georgia,serif;font-style:italic;font-size:14px;line-height:1.4;color:#5a4d44;max-width:44ch}
+.burst{position:absolute;right:clamp(-6px,1vw,26px);top:clamp(70px,9vw,100px);width:118px;height:118px;display:grid;place-items:center;text-align:center;color:#fff;font-weight:700;font-size:11px;letter-spacing:.08em;line-height:1.15;text-transform:uppercase;transform:rotate(12deg);z-index:2}
+.burst:before{content:"";position:absolute;inset:0;background:var(--red);clip-path:polygon(50% 0,58% 16%,75% 7%,75% 25%,93% 25%,84% 42%,100% 50%,84% 58%,93% 75%,75% 75%,75% 93%,58% 84%,50% 100%,42% 84%,25% 93%,25% 75%,7% 75%,16% 58%,0 50%,16% 42%,7% 25%,25% 25%,25% 7%,42% 16%);animation:spin 30s linear infinite}
+.burst span{position:relative}.burst big{display:block;font-size:22px;font-family:Rockwell,serif}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:700px){.burst{position:relative;right:auto;top:auto;margin:8px auto -6px}}
+/* jukebox */
+.juke{max-width:820px;margin:clamp(30px,6vw,64px) auto 0;padding:14px;border-radius:120px 120px 22px 22px/70px 70px 22px 22px;background:var(--chrome);box-shadow:0 20px 34px rgba(0,40,40,.55),inset 0 0 0 2px #fff}
+.jin{border-radius:108px 108px 12px 12px/60px 60px 12px 12px;background:linear-gradient(#7a0f1b,#3d060c);padding:clamp(14px,3vw,26px);box-shadow:inset 0 0 0 4px #1a0204,inset 0 8px 24px rgba(0,0,0,.6)}
+.marq{text-align:center;color:#ffe9a6;font-family:"Brush Script MT","Snell Roundhand","Segoe Script",cursive;font-size:clamp(26px,5vw,40px);text-shadow:0 0 12px #ffb400;margin-bottom:10px}
+.tube{height:12px;border-radius:9px;margin:0 8% 14px;background:linear-gradient(90deg,#ff3d6e,#ffd23d,#3dffe1,#ff3d6e,#ffd23d,#3dffe1,#ff3d6e);background-size:200% 100%;animation:tube 5s linear infinite;box-shadow:0 0 14px rgba(255,210,61,.7),inset 0 2px 2px rgba(255,255,255,.7)}
+@keyframes tube{to{background-position:-200% 0}}
+.strips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;background:#111;padding:8px;border-radius:8px;box-shadow:inset 0 0 0 2px #555}
+@media(max-width:640px){.strips{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.strip{font:inherit;text-align:left;background:#fffbe9;border:0;border-radius:3px;padding:5px 7px 5px 30px;position:relative;cursor:pointer;min-height:42px;border-top:3px solid var(--red);border-bottom:3px solid var(--red);color:var(--ink)}
+.strip i{position:absolute;left:5px;top:50%;transform:translateY(-50%);font-style:normal;font-weight:700;font-size:12px;color:var(--red);font-family:Rockwell,serif}
+.strip b{display:block;font-size:11.5px;line-height:1.15;text-transform:uppercase;letter-spacing:.02em}
+.strip span{font-family:Georgia,serif;font-style:italic;font-size:10.5px;color:#6d5d50}
+.strip.on{background:#ffe04a;box-shadow:0 0 14px #ffe04a}
+.deckrow{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;margin-top:14px}
+.led{flex:1 1 220px;background:#0c0503;color:#ff9a2e;font:700 14px/1.2 "Courier New",monospace;letter-spacing:.14em;padding:12px 14px;border-radius:6px;box-shadow:inset 0 0 0 2px #5a2a12;text-shadow:0 0 8px #ff7a00;min-height:44px;text-transform:uppercase;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.keys{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.keys button{width:42px;height:42px;border-radius:50%;border:0;font:700 16px Rockwell,"Courier New",serif;cursor:pointer;color:var(--ink);background:radial-gradient(circle at 35% 28%,#fff,#fff3c9 45%,#c9b77e);box-shadow:0 3px 0 #6a5a2a,0 5px 6px rgba(0,0,0,.5)}
+.keys button:active,.keys button.on{transform:translateY(3px);box-shadow:0 0 0 #6a5a2a,0 0 12px #ffe04a;background:#ffe04a}
+.keys button.rej{width:auto;border-radius:22px;padding:0 14px;font-size:11px;letter-spacing:.12em;background:radial-gradient(circle at 35% 28%,#ff8a92,#d3202f 60%,#8a0f1b);color:#fff;box-shadow:0 3px 0 #5a0810,0 5px 6px rgba(0,0,0,.5)}
+.floor{height:clamp(90px,16vw,190px);background:conic-gradient(#111 0 25%,#f4f1e8 0 50%,#111 0 75%,#f4f1e8 0) 0 0/clamp(56px,9vw,110px) clamp(56px,9vw,110px);transform:perspective(420px) rotateX(48deg) scale(1.5);transform-origin:50% 0;margin-bottom:-30px}
+.foot{position:relative;background:var(--ink);color:#bfb8ad;font-size:11px;letter-spacing:.22em;text-transform:uppercase;text-align:center;padding:16px}
+@media(prefers-reduced-motion:reduce){.neon .script,.neon .cap i,.burst:before,.tube{animation:none}}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← 100</a>
+<div class="sky">
+  <div class="neon"><span class="script">Starlite</span><span class="cap">COM<i>E</i>T DINER</span></div>
+  <div class="open">★ OPEN ALL NIGHT · ROUTE 9 AT MILE 61 ★</div>
+</div>
+<div class="trim"></div>
+<div class="wall">
+  <article class="menu">
+    <div class="burst"><span>Blue plate special<big>$2.95</big>ask Dot</span></div>
+    <header><h1>Bill of Fare</h1><p>Coffee poured till you say when<br>No substitutions after midnight</p></header>
+    <div class="cols">
+      <section><h2>Griddle</h2>
+        <div class="dish"><div>The Sputnik Stack<b>1.85</b></div><p>Five silver-dollar hotcakes in orbit around one scoop of whipped honey butter.</p></div>
+        <div class="dish"><div>Hubcap Hash<b>2.10</b></div><p>Corned beef, crisped potatoes and a sunny egg, served in the skillet it met its maker in.</p></div>
+        <div class="dish"><div>Two-Lane Eggs<b>1.40</b></div><p>A pair any style, toast cut on the bias, jam of the cook’s current mood.</p></div>
+        <div class="dish"><div>Moonlight Melt<b>2.25</b></div><p>Rye, Swiss, griddled onions and a patty pressed thin enough to read the funnies through.</p></div>
+      </section>
+      <section><h2>Blue Plates</h2>
+        <div class="dish"><div>Chrome Bumper Burger<b>2.60</b></div><p>Double-decker with pickle “headlights” and our classified pink sauce. Comes with a paper hat.</p></div>
+        <div class="dish"><div>Drive-In Meatloaf<b>2.95</b></div><p>Thick slice, brown gravy lake, mashed potato levee. Peas at no extra charge or request.</p></div>
+        <div class="dish"><div>Fender-Bender Franks<b>1.95</b></div><p>Two split dogs under a pile-up of chili, cheese and regret-free onions.</p></div>
+        <div class="dish"><div>Tailfin Tuna Bake<b>2.40</b></div><p>Egg noodles, crushed-cracker crust, and one triumphant sprig of parsley.</p></div>
+      </section>
+      <section><h2>Fountain</h2>
+        <div class="dish"><div>Atomic Cherry Phosphate<b>.45</b></div><p>Glows a little. Tastes like the first day of summer vacation.</p></div>
+        <div class="dish"><div>The Thick One<b>.85</b></div><p>Malted, any flavour, with the frosty tin left right there on the counter.</p></div>
+        <div class="dish"><div>Lime Rickey Rocket<b>.50</b></div><p>Fresh lime, seltzer, countdown optional.</p></div>
+      </section>
+      <section><h2>Pie Case</h2>
+        <div class="dish"><div>Mile-High Lemon Cloud<b>.65</b></div><p>Meringue with altitude. Duck when it passes.</p></div>
+        <div class="dish"><div>Rhubarb Rumble<b>.60</b></div><p>Tart enough to settle an argument. À la mode adds a dime.</p></div>
+        <div class="dish"><div>Icebox Eclipse<b>.70</b></div><p>Chocolate so dark the whipped cream is there for navigation.</p></div>
+      </section>
+    </div>
+    <section class="juke" aria-label="Jukebox">
+      <div class="jin">
+        <div class="marq">Melody-Matic Wallbox</div><div class="tube"></div>
+        <div class="strips" id="strips"></div>
+        <div class="deckrow">
+          <div class="led" id="led" aria-live="polite">Drop a dime · pick a letter</div>
+          <div class="keys" id="keys"></div>
+        </div>
+      </div>
+    </section>
+  </article>
+</div>
+<div class="trim thin"></div>
+<div class="floor" aria-hidden="true"></div>
+<div class="foot">Tip your waitress · Mind the pie case glass · Drive home slow</div>
+<script>
+(function(){
+const SONGS=[['Cherry Cola Heart','The Tailfins'],['Midnight at the Malt Shop','Dolly Mae Pruitt'],['Hubcap Hop','Rex Ronson & His Rivets'],['Saddle Shoe Shuffle','The Four Spoons'],
+['Rocket to Reno','Buzz Calloway'],['Lonesome Neon','The Starliters'],['Jukebox Jenny','Hank Vandermeer'],['Blue Plate Blues','Big Otis Griddle'],
+['Drive-In Dream','The Velvetones'],['Thunderbird Waltz','Lorna Lee'],['Soda Jerk Stomp','The Fizz Brothers'],['Parking Lot Moon','Johnny Chrome'],
+['Dime in My Shoe','The Pompadours'],['Rhubarb Baby','Ginger & the Snaps'],['Route 9 Rumble','The Dipsticks'],['Last Booth on the Left','Marty Sable'],
+['Pink Sauce Boogie','The Counter Stools'],['Go, Comet, Go','The Asteroid Aces'],['Hold the Onions (Hold Me)','Peggy Lou Trask'],['Closing Time Polka','The Night Shift']];
+const L='ABCDE',$=i=>document.getElementById(i),strips=$('strips'),keys=$('keys'),led=$('led');
+strips.innerHTML=SONGS.map((s,i)=>{const code=L[i/4|0]+(i%4+1);return `<button class="strip" data-i="${i}" aria-label="${code}: ${s[0]} by ${s[1]}"><i>${code}</i><b>${s[0]}</b><span>${s[1]}</span></button>`}).join('');
+keys.innerHTML=[...L].map(c=>`<button data-k="${c}">${c}</button>`).join('')+[1,2,3,4].map(c=>`<button data-k="${c}">${c}</button>`).join('')+'<button class="rej" data-k="x">Reject</button>';
+let letter=null,AC=null,timer=null,nodes=[];
+function clearSel(){keys.querySelectorAll('.on').forEach(b=>b.classList.remove('on'));strips.querySelectorAll('.on').forEach(b=>b.classList.remove('on'))}
+function stop(){clearInterval(timer);timer=null;nodes.forEach(n=>{try{n.stop()}catch(e){}});nodes=[]}
+function note(t,f,d,v,type,dest){const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(dest);o.start(t);o.stop(t+d+.02);nodes.push(o)}
+function play(i){
+  stop();clearSel();strips.children[i].classList.add('on');const code=L[i/4|0]+(i%4+1);led.textContent='♪ '+code+' · '+SONGS[i][0];
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){return}
+  const out=AC.createGain();out.gain.value=.5;const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=3200;out.connect(lp);lp.connect(AC.destination);
+  const root=98*Math.pow(2,(i*5%12)/12),bpm=132+(i*7%5)*10,b8=60/bpm/2,sw=.62,walk=i%2?[0,4,7,9,10,9,7,4]:[0,0,7,7,9,9,7,7],prog=[0,0,0,0,5,5,0,0,7,5,0,7];
+  let step=0,next=AC.currentTime+.08;const st=x=>Math.pow(2,x/12);
+  timer=setInterval(()=>{while(next<AC.currentTime+.2){
+    const bar=step/8|0,k=step%8;if(bar>=12){stop();led.textContent='Thank you · pick another';clearSel();return}
+    const t=next+(k%2?b8*(sw-.5)*2:0),r=root*st(prog[bar]);
+    note(t,r*st(walk[k]),b8*1.1,.5,'triangle',out);
+    if(k%2===1||k===0){[4,7,10].forEach(x=>note(t,r*2*st(x),.12,.07,'square',out));note(t,r*4,.1,.05,'square',out)}
+    if(k%4===2){const n=AC.createBufferSource(),bf=AC.createBuffer(1,2200,AC.sampleRate),d=bf.getChannelData(0);for(let j=0;j<2200;j++)d[j]=(Math.random()*2-1)*(1-j/2200);n.buffer=bf;const g=AC.createGain();g.gain.value=.22;n.connect(g);g.connect(out);n.start(t);nodes.push(n)}
+    if(k===0||k===3||k===6)note(t,r*4*st([0,4,7,9,12][(bar*3+k+i)%5]),b8*1.4,.13,'sawtooth',out);
+    next+=b8;step++}},50);
+}
+keys.onclick=e=>{const k=e.target.dataset.k;if(!k)return;
+  if(k==='x'){stop();clearSel();letter=null;led.textContent='Rejected · pick a letter';return}
+  if(isNaN(k)){clearSel();letter=k;e.target.classList.add('on');led.textContent=k+' _ · now a number'}
+  else if(letter){const i=L.indexOf(letter)*4+(+k-1);letter=null;play(i)}
+  else led.textContent='Letter first, sugar'};
+strips.onclick=e=>{const b=e.target.closest('.strip');if(b){letter=null;play(+b.dataset.i)}};
+})();
+</script>
+</body>
+</html>
